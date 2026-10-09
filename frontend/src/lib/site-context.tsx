@@ -7,6 +7,7 @@ export interface EnquiryPrefill {
   course_interest?: string;
   source?: string;
   title?: string;
+  message?: string;
 }
 
 interface SiteCtx {

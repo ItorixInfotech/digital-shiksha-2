@@ -24,7 +24,7 @@ interface Props {
 const empty = { name: "", phone: "", email: "", city: "", course_interest: "", budget: "", message: "" };
 
 export default function EnquiryForm({ prefill, testid = "enquiry", showMessage = false, showBudget = false, dark = false, onDone }: Props) {
-  const [f, setF] = useState({ ...empty, course_interest: prefill?.course_interest ?? "" });
+  const [f, setF] = useState({ ...empty, course_interest: prefill?.course_interest ?? "", message: prefill?.message ?? "" });
   const [done, setDone] = useState(false);
   const set = (k: keyof typeof empty) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setF((cur) => ({ ...cur, [k]: e.target.value }));

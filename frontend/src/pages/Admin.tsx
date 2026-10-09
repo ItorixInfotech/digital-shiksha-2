@@ -46,7 +46,7 @@ const COLLEGE_FIELDS: FieldSpec[] = [
   { key: "overview", label: "Overview", type: "textarea" },
   { key: "admission", label: "Admission process", type: "textarea" },
   { key: "courses", label: "Courses & fees (JSON)", type: "json", hint: 'e.g. [{"name":"B.Tech","duration":"4 Years","fees":"₹1 L/yr","eligibility":"10+2 PCM","seats":60}]' },
-  { key: "cutoffs", label: "Cutoffs (JSON)", type: "json", hint: 'e.g. [{"exam":"MHT CET","branch":"Computer","cutoff":"99.5 percentile"}]' },
+  { key: "cutoffs", label: "Cutoffs (JSON)", type: "json", hint: 'e.g. [{"exam":"MHT CET","branch":"Computer","cutoff":"99.50 percentile","value":99.5}] — "value" (percentile, NEET score or JEE Adv rank) powers the College Predictor' },
   { key: "featured", label: "Featured on home page", type: "bool" },
 ];
 const COURSE_FIELDS: FieldSpec[] = [

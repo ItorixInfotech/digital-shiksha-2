@@ -1,9 +1,11 @@
 import re
+from datetime import timedelta
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 
 from lib.db import db
+from lib.email import notify_new_lead
 from models.content import (
     Article, College, Course, Exam, FacetCount, Lead, LeadIn, Meta, SearchHit,
 )
@@ -149,7 +151,11 @@ async def meta():
 
 
 @router.post("/enquiries", response_model=Lead, status_code=201)
-async def create_enquiry(body: LeadIn):
+async def create_enquiry(body: LeadIn, background: BackgroundTasks):
     lead = Lead(**body.model_dump())
+    # Same phone within 10 min = duplicate submit: still saved, but no second alert email.
+    recent = await db.leads.find_one({"phone": lead.phone, "created_at": {"$gte": lead.created_at - timedelta(minutes=10)}})
     await db.leads.insert_one(lead.model_dump())
+    if not recent:
+        background.add_task(notify_new_lead, lead.model_dump())
     return lead

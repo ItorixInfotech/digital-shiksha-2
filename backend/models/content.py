@@ -22,6 +22,7 @@ class CutoffRow(BaseModel):
     exam: str
     branch: str
     cutoff: str
+    value: Optional[float] = None  # numeric closing value for the predictor (percentile / score / rank)
 
 
 class CollegeIn(BaseModel):

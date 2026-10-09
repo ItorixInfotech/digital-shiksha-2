@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
+  { to: "/predictor", label: "Predictor" },
   { to: "/courses", label: "Courses" },
   { to: "/exams", label: "Exams" },
   { to: "/compare", label: "Compare" },

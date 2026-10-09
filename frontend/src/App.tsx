@@ -8,6 +8,7 @@ import CourseDetail from "@/pages/CourseDetail";
 import Exams from "@/pages/Exams";
 import ExamDetail from "@/pages/ExamDetail";
 import Compare from "@/pages/Compare";
+import Predictor from "@/pages/Predictor";
 import { ArticleDetail, News } from "@/pages/News";
 import { Consultation, NotFound } from "@/pages/Consultation";
 import Admin, { AdminLogin } from "@/pages/Admin";
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/exams" element={<Exams />} />
         <Route path="/exams/:slug" element={<ExamDetail />} />
         <Route path="/compare" element={<Compare />} />
+        <Route path="/predictor" element={<Predictor />} />
         <Route path="/news" element={<News />} />
         <Route path="/news/:slug" element={<ArticleDetail />} />
         <Route path="/consultation" element={<Consultation />} />

@@ -6,7 +6,7 @@ const COLS = [
   { title: "Top Colleges", links: [["Engineering Colleges", "/colleges?stream=Engineering"], ["MBA Colleges", "/colleges?stream=Management"], ["Medical Colleges", "/colleges?stream=Medical"], ["Law Colleges", "/colleges?stream=Law"], ["Colleges in Pune", "/colleges?city=Pune"], ["Colleges in Mumbai", "/colleges?city=Mumbai"]] },
   { title: "Top Courses", links: [["B.Tech", "/courses/btech"], ["MBA", "/courses/mba"], ["MBBS", "/courses/mbbs"], ["BBA", "/courses/bba"], ["BA LLB", "/courses/ba-llb"], ["All Courses", "/courses"]] },
   { title: "Top Exams", links: [["JEE Main", "/exams/jee-main"], ["NEET UG", "/exams/neet-ug"], ["MHT CET", "/exams/mht-cet"], ["CAT", "/exams/cat"], ["CLAT", "/exams/clat"], ["All Exams", "/exams"]] },
-  { title: "Digital Shiksha", links: [["Free Counselling", "/consultation"], ["Compare Colleges", "/compare"], ["News & Articles", "/news"], ["Admin Login", "/admin/login"]] },
+  { title: "Digital Shiksha", links: [["Free Counselling", "/consultation"], ["College Predictor", "/predictor"], ["Compare Colleges", "/compare"], ["News & Articles", "/news"], ["Admin Login", "/admin/login"]] },
 ] as const;
 
 export default function Footer() {

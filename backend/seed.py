@@ -3,7 +3,8 @@ Upserts by slug, so admin edits to other docs are kept; re-running restores seed
 import asyncio
 
 from lib.db import db, ensure_indexes
-from models.content import Article, College, Course, Exam
+from models.content import Article, College, Course, CutoffRow, Exam
+from seed_mh import MH_COLLEGES, REAL_CUTOFFS, display
 
 IMG = [
     "https://images.unsplash.com/photo-1658133134704-121129a67c73?crop=entropy&cs=srgb&fm=jpg&q=80&w=1200",
@@ -120,6 +121,14 @@ def build_college(t: tuple, i: int) -> College:
         top_recruiters=RECRUITERS.get(main, ["TCS", "Infosys", "Wipro", "HDFC Bank", "Deloitte", "Capgemini"]),
         facilities=FACILITIES[: 5 + (i % 4)], featured=featured,
     )
+
+
+def with_real_cutoffs(c: College) -> College:
+    """Replace generated cutoffs with the curated Pune/Mumbai values (these power the predictor)."""
+    rows = REAL_CUTOFFS.get(c.slug)
+    if rows:
+        c.cutoffs = [CutoffRow(exam=e, branch=b, cutoff=display(e, v), value=v) for (e, b, v) in rows]
+    return c
 
 
 # slug, name, full_name, stream, level, duration, fees, salary, eligibility, exams, specs, careers, popular
@@ -262,7 +271,7 @@ async def upsert(coll: str, docs: list) -> None:
 
 async def main() -> None:
     await ensure_indexes()
-    await upsert("colleges", [build_college(t, i) for i, t in enumerate(COLLEGES)])
+    await upsert("colleges", [with_real_cutoffs(build_college(t, i)) for i, t in enumerate(COLLEGES + MH_COLLEGES)])
     await upsert("courses", [
         Course(slug=s, name=n, full_name=fn, stream=st, level=lv, duration=du, avg_fees=fe, avg_salary=sa,
                eligibility=el, entrance_exams=ex, specializations=sp, careers=ca, popular=po,

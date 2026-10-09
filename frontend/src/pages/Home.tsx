@@ -13,7 +13,7 @@ import { SITE, STATS, STREAMS, slugify } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
 
 const HERO_IMG = "https://images.unsplash.com/photo-1687709348710-05314eea5476?crop=entropy&cs=srgb&fm=jpg&q=80&w=1600";
-const QUICK = [["B.Tech", "/courses/btech"], ["MBA", "/courses/mba"], ["MBBS", "/courses/mbbs"], ["BBA", "/courses/bba"], ["BA LLB", "/courses/ba-llb"], ["B.Pharm", "/courses/bpharm"], ["MHT CET", "/exams/mht-cet"], ["NEET UG", "/exams/neet-ug"]];
+const QUICK = [["College Predictor", "/predictor"], ["B.Tech", "/courses/btech"], ["MBA", "/courses/mba"], ["MBBS", "/courses/mbbs"], ["BBA", "/courses/bba"], ["BA LLB", "/courses/ba-llb"], ["MHT CET", "/exams/mht-cet"], ["NEET UG", "/exams/neet-ug"]];
 const TOP_TABS = ["Engineering", "Management", "Medical", "Law", "Design"];
 const CITIES = ["Pune", "Mumbai", "New Delhi", "Bengaluru", "Chennai", "Ahmedabad", "Vellore", "Pilani"];
 const FAQ = [
@@ -150,6 +150,21 @@ export default function Home() {
             ))}
             {exams.isLoading && <li className="p-4 text-sm text-slate-500">Loading exams…</li>}
           </ul>
+        </div>
+      </section>
+
+      {/* CITIES */}
+      <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8" data-testid="home-predictor-cta">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-navy to-brand-blue p-8 text-white sm:p-10">
+          <div className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-brand-teal/30 blur-3xl" />
+          <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-red-300">New • College Predictor 2026</p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Got your MHT CET, JEE or NEET score?</h2>
+              <p className="mt-2 max-w-xl text-slate-200">See which Pune & Mumbai colleges you can likely get — based on last year's closing cutoffs.</p>
+            </div>
+            <Link to="/predictor" data-testid="home-predictor-link" className="shrink-0 rounded-lg bg-brand-red px-6 py-3 text-sm font-semibold text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform]">Predict my college →</Link>
+          </div>
         </div>
       </section>
 

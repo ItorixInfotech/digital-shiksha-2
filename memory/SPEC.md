@@ -22,5 +22,15 @@ Admin (cookie): GET /admin/stats, GET /admin/leads, PATCH/DELETE /admin/leads/{i
 / , /colleges, /colleges/:slug (tabs), /courses, /courses/:slug, /exams, /exams/:slug, /compare (?c=slug1,slug2 up to 3; shortlist persisted in localStorage), /news, /news/:slug, /consultation, /admin/login, /admin
 Enquiry modal (header "Enquire Now", college "Apply"), floating WhatsApp/Call, compare bar.
 
+## Lead email alerts
+POST /enquiries saves the lead then (BackgroundTask) emails LEAD_ALERT_EMAIL (enquiry@digitalshiksha.in) via Emergent-managed Resend (`backend/lib/email.py`, from_name = EMAIL_FROM_NAME "Digital Shiksha"). Same phone again within 10 min → saved but no 2nd email. Email failures are logged, never break the request.
+
+## College predictor
+GET /api/predictor/exams; POST /api/predictor {exam, score, city?} → results with chance High/Medium/Reach.
+Exams: MHT CET (percentile), JEE Main (percentile), NEET UG (score /720), MAH MBA CET (percentile), JEE Advanced (rank, lower better).
+Uses `cutoffs[].value` on colleges (curated in `backend/seed_mh.py` REAL_CUTOFFS, approx GOPEN previous-year). Margins: percentile 0/0.8/2.0, score 0/15/35, rank ×1/1.15/1.4.
+Frontend /predictor; "Pune & Mumbai" option fires two requests (city=Pune, city=Mumbai) and merges.
+Seed now has 56 colleges (incl. SPIT, DJ Sanghvi, Cummins, KEM, JJ, SIMSREE, SPJIMR...).
+
 ## Auth
 Single admin from backend/.env (ADMIN_USERNAME / ADMIN_PASSWORD). See memory/test_credentials.md.

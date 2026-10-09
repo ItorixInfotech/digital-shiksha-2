@@ -12,6 +12,7 @@ export interface CutoffRow {
   exam: string;
   branch: string;
   cutoff: string;
+  value: number | null;
 }
 
 export interface CollegeIn {
@@ -149,4 +150,46 @@ export interface AdminStats {
   courses: number;
   exams: number;
   articles: number;
+}
+
+// Mirrors backend/models/predictor.py
+export type PredictorMetric = "percentile" | "score" | "rank";
+export type PredictorChance = "High" | "Medium" | "Reach";
+
+export interface PredictorExam {
+  name: string;
+  metric: PredictorMetric;
+  min: number;
+  max: number;
+  label: string;
+  hint: string;
+}
+
+export interface PredictorIn {
+  exam: string;
+  score: number;
+  city: string | null;
+}
+
+export interface PredictorResult {
+  college_slug: string;
+  college_name: string;
+  short_name: string;
+  city: string;
+  type: string;
+  image: string;
+  course: string;
+  cutoff: string;
+  cutoff_value: number;
+  chance: PredictorChance;
+  fees_min: number;
+  fees_max: number;
+  avg_package: number;
+}
+
+export interface PredictorOut {
+  exam: string;
+  metric: PredictorMetric;
+  score: number;
+  results: PredictorResult[];
 }
