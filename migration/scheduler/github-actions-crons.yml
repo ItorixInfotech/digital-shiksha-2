@@ -1,0 +1,25 @@
+# Copy to .github/workflows/crons.yml in any GitHub repo. Add repo secrets:
+#   API_BASE  = https://api.digitalshiksha.in   (or https://www.digitalshiksha.in if /api is proxied)
+#   CRON_SECRET = same value as WEBHOOK_CRON_SECRET in the backend .env
+name: digital-shiksha-crons
+on:
+  schedule:
+    - cron: "30 2 * * *"   # 08:00 IST daily  → counsellor morning reminders
+    - cron: "30 3 * * 1"   # 09:00 IST Monday → weekly SEO report
+  workflow_dispatch: {}
+jobs:
+  call:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Morning reminders
+        if: github.event.schedule == '30 2 * * *'
+        run: |
+          curl -fsS -X POST "${{ secrets.API_BASE }}/api/cron/morning-reminders" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" -H "Content-Type: application/json" \
+            -H "X-Webhook-Id: reminders-${{ github.run_id }}" -d '{"event":"schedule.triggered"}'
+      - name: Weekly SEO report
+        if: github.event.schedule == '30 3 * * 1'
+        run: |
+          curl -fsS -X POST "${{ secrets.API_BASE }}/api/cron/weekly-seo-report" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" -H "Content-Type: application/json" \
+            -H "X-Webhook-Id: seo-${{ github.run_id }}" -d '{"event":"schedule.triggered"}'

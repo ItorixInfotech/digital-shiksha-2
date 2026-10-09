@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://api.digitalshiksha.in/api/:path*" },
+    { "source": "/sitemap.xml", "destination": "https://api.digitalshiksha.in/api/sitemap.xml" },
+    { "source": "/robots.txt", "destination": "https://api.digitalshiksha.in/api/robots.txt" },
+    { "source": "/((?!assets/|.*\\.[a-z0-9]+$).*)", "destination": "/index.html" }
+  ]
+}

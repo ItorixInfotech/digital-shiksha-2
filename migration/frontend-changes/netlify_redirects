@@ -1,0 +1,4 @@
+/api/*        https://api.digitalshiksha.in/api/:splat   200
+/sitemap.xml  https://api.digitalshiksha.in/api/sitemap.xml  200
+/robots.txt   https://api.digitalshiksha.in/api/robots.txt   200
+/*            /index.html   200
