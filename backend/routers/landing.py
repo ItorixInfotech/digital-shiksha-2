@@ -37,7 +37,7 @@ def _year() -> int:
 
 def _defaults(stream: str, city: str, count: int, year: int) -> tuple[str, str]:
     lab = LABEL.get(stream, stream)
-    return (f"Top {lab} Colleges in {city} {year}: Fees, Ranking | Digital Shiksha",
+    return (f"Top {lab} Colleges in {city} {year} | Digital Shiksha",
             f"List of {count} best {lab} colleges in {city} {year} with fees, NIRF ranking, cutoffs & placements. Free admission counselling: {PHONE}.")
 
 

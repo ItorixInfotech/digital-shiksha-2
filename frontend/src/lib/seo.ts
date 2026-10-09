@@ -104,7 +104,8 @@ export function faqLd(faqs: FaqItem[]) {
   };
 }
 
-export interface SeoCheck { label: string; ok: boolean; fix: string }
+export type SeoCheckId = "title" | "description" | "keyword" | "image" | "content" | "faqs" | "index";
+export interface SeoCheck { id: SeoCheckId; label: string; ok: boolean; fix: string }
 export interface SeoScore { score: number; passed: number; level: "green" | "amber" | "red"; checks: SeoCheck[] }
 export interface SeoScoreInput {
   title: string;
@@ -120,13 +121,13 @@ export interface SeoScoreInput {
 export function seoScore(i: SeoScoreInput): SeoScore {
   const kw = (i.keywords[0] ?? "").toLowerCase();
   const checks: SeoCheck[] = [
-    { label: `Title length ${i.title.length} (30–${TITLE_MAX})`, ok: i.title.length >= 30 && i.title.length <= TITLE_MAX, fix: `Title is ${i.title.length} chars — keep it 30–${TITLE_MAX}` },
-    { label: `Description length ${i.description.length} (70–${DESC_MAX})`, ok: i.description.length >= 70 && i.description.length <= DESC_MAX, fix: `Description is ${i.description.length} chars — keep it 70–${DESC_MAX}` },
-    { label: `Focus keyword “${i.keywords[0] ?? ""}” used`, ok: !!kw && `${i.title} ${i.description}`.toLowerCase().includes(kw), fix: kw ? `Use the focus keyword “${i.keywords[0]}” in the title or description` : "Add a focus keyword" },
-    { label: "Social share image set", ok: i.hasImage, fix: "Add an OG / cover image" },
-    { label: "Content has 300+ characters", ok: i.bodyLength >= 300, fix: `Content is ${i.bodyLength} chars — write at least 300` },
-    ...(i.faqCount === null ? [] : [{ label: `${i.faqCount} FAQ(s) added`, ok: i.faqCount > 0, fix: "Add FAQs for Google FAQ rich results" }]),
-    { label: "Indexable by Google", ok: !i.noindex, fix: "Page is set to noindex — Google won't show it" },
+    { id: "title", label: `Title length ${i.title.length} (30–${TITLE_MAX})`, ok: i.title.length >= 30 && i.title.length <= TITLE_MAX, fix: `Title is ${i.title.length} chars — keep it 30–${TITLE_MAX}` },
+    { id: "description", label: `Description length ${i.description.length} (70–${DESC_MAX})`, ok: i.description.length >= 70 && i.description.length <= DESC_MAX, fix: `Description is ${i.description.length} chars — keep it 70–${DESC_MAX}` },
+    { id: "keyword", label: `Focus keyword “${i.keywords[0] ?? ""}” used`, ok: !!kw && `${i.title} ${i.description}`.toLowerCase().includes(kw), fix: kw ? `Use the focus keyword “${i.keywords[0]}” in the title or description` : "Add a focus keyword" },
+    { id: "image", label: "Social share image set", ok: i.hasImage, fix: "Add an OG / cover image" },
+    { id: "content", label: "Content has 300+ characters", ok: i.bodyLength >= 300, fix: `Content is ${i.bodyLength} chars — write at least 300` },
+    ...(i.faqCount === null ? [] : [{ id: "faqs" as const, label: `${i.faqCount} FAQ(s) added`, ok: i.faqCount > 0, fix: "Add FAQs for Google FAQ rich results" }]),
+    { id: "index", label: "Indexable by Google", ok: !i.noindex, fix: "Page is set to noindex — Google won't show it" },
   ];
   const passed = checks.filter((c) => c.ok).length;
   const score = Math.round((passed / checks.length) * 100);
@@ -144,3 +145,8 @@ export function entityScore(kind: SeoKind, raw: object, year: number): SeoScore 
     faqCount: kind === "colleges" || kind === "exams" ? ((r.faqs as unknown[] | undefined) ?? []).length : null, noindex: s.noindex,
   });
 }
+
+/** Minutes-ish effort per failing check — used to sort the SEO fix list quickest-first. */
+export const FIX_EFFORT: Record<SeoCheckId, number> = { index: 1, keyword: 1, title: 2, description: 2, image: 2, faqs: 3, content: 4 };
+export const SHORT_FIX: Record<SeoCheckId, string> = { index: "Remove noindex", keyword: "Focus keyword", title: "Title length", description: "Description length", image: "Share image", faqs: "Add FAQs", content: "300+ chars content" };
+export const fixEffort = (s: SeoScore) => s.checks.filter((c) => !c.ok).reduce((n, c) => n + FIX_EFFORT[c.id], 0);

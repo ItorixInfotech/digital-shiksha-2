@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2, Search } from "lucide-react";
@@ -44,6 +44,9 @@ interface Props {
   columns: { key: string; label: string }[];
   publicPath: string;
   faqs?: boolean;
+  /** Render only the edit dialog for this slug (used by the SEO fix list); onClose fires after save or cancel. */
+  editSlug?: string;
+  onClose?: () => void;
 }
 
 function toForm(fields: FieldSpec[], row?: Row): FormState {
@@ -71,7 +74,7 @@ function toPayload(fields: FieldSpec[], f: FormState): Record<string, unknown> {
   return out;
 }
 
-export default function ContentManager({ resource, title, fields, columns, publicPath, faqs: withFaqs = false }: Props) {
+export default function ContentManager({ resource, title, fields, columns, publicPath, faqs: withFaqs = false, editSlug, onClose }: Props) {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [editing, setEditing] = useState<Row | null | undefined>(undefined); // undefined = closed, null = new
@@ -87,7 +90,7 @@ export default function ContentManager({ resource, title, fields, columns, publi
 
   const save = useMutation({
     mutationFn: (body: Record<string, unknown>) => (editing ? apiPut<Row>(`/admin/${resource}/${editing.id}`, body) : apiPost<Row>(`/admin/${resource}`, body)),
-    onSuccess: () => { toast.success(editing ? "Saved changes" : "Created"); setEditing(undefined); invalidate(); },
+    onSuccess: () => { toast.success(editing ? "Saved changes" : "Created"); close(); invalidate(); },
     onError: (e) => toast.error(e instanceof ApiError && e.status === 409 ? "That slug is already used" : e instanceof ApiError && e.status === 422 ? "Some fields are invalid — check numbers and JSON" : "Save failed"),
   });
   const del = useMutation({
@@ -105,7 +108,52 @@ export default function ContentManager({ resource, title, fields, columns, publi
     save.mutate({ ...body, seo: fromSeoForm(seo), ...(withFaqs ? { faqs: cleanFaqs(faqs) } : {}) });
   };
 
+  const close = () => { setEditing(undefined); onClose?.(); };
+  const target = editSlug ? list.data?.find((r) => r.slug === editSlug) : undefined;
+  useEffect(() => { if (target) open(target); }, [target?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const rows = useMemo(() => (list.data ?? []).filter((r) => !q || JSON.stringify([r.name, r.title, r.slug]).toLowerCase().includes(q.toLowerCase())), [list.data, q]);
+
+  const dialog = (
+    <Dialog open={editing !== undefined} onOpenChange={(o) => { if (!o) close(); }}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl" data-testid={`admin-${resource}-dialog`}>
+        <DialogHeader><DialogTitle>{editing ? `Edit ${String(editing.name ?? editing.title ?? "")}` : `Add ${title.replace(/s$/, "")}`}</DialogTitle></DialogHeader>
+        <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
+          {fields.map((s) => {
+            const id = `f-${resource}-${s.key}`;
+            const tid = `admin-${resource}-field-${s.key.replace(/_/g, "-")}`;
+            const val = form[s.key];
+            if (s.type === "bool") return (
+              <label key={s.key} className="flex items-center gap-2 text-sm sm:col-span-2"><Checkbox checked={Boolean(val)} onCheckedChange={(c) => setForm((f) => ({ ...f, [s.key]: Boolean(c) }))} data-testid={tid} /> {s.label}</label>
+            );
+            const common = { id, value: String(val ?? ""), "data-testid": tid };
+            const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+              const v = e.target.value;
+              setForm((f) => ({ ...f, [s.key]: v, ...(s.key === "name" || s.key === "title" ? (!editing && (!f.slug || f.slug === slugify(String(f[s.key] ?? ""))) ? { slug: slugify(v) } : {}) : {}) }));
+            };
+            return (
+              <div key={s.key} className={`grid gap-1.5 ${s.full || s.type === "textarea" || s.type === "json" ? "sm:col-span-2" : ""}`}>
+                <Label htmlFor={id}>{s.label}{s.required ? " *" : ""}</Label>
+                {s.type === "textarea" || s.type === "json"
+                  ? <Textarea {...common} onChange={onChange} rows={s.type === "json" ? 6 : 4} className={s.type === "json" ? "font-mono text-xs" : ""} />
+                  : <Input {...common} onChange={onChange} type={s.type === "number" ? "number" : "text"} step="any" />}
+                {(s.hint || s.type === "list") && <p className="text-xs text-slate-500">{s.hint ?? "Comma-separated"}</p>}
+              </div>
+            );
+          })}
+          {withFaqs && <FaqEditor value={faqs} onChange={setFaqs} testid={`admin-${resource}-faqs`} />}
+          {editing !== undefined && (() => { const sc = entityScore(resource, { ...toPayload(fields.filter((f) => f.type !== "json"), form), seo: fromSeoForm(seo), faqs: cleanFaqs(faqs) }, year); return <div className="flex items-center gap-2 text-sm sm:col-span-2"><span className="font-medium">Live SEO score</span><SeoBadge score={sc} testid={`admin-${resource}-live-seo-score`} /></div>; })()}
+          <SeoEditor value={seo} onChange={setSeo} defaults={defaultSeo(resource, form, year)}
+            path={`${publicPath}/${String(form.slug ?? "")}`} testid={`admin-${resource}-seo`} />
+          <DialogFooter className="sm:col-span-2">
+            <Button type="button" variant="outline" onClick={close} data-testid={`admin-${resource}-cancel-button`}>Cancel</Button>
+            <Button type="submit" disabled={save.isPending} data-testid={`admin-${resource}-save-button`} className="bg-brand-navy text-white hover:bg-brand-blue">{save.isPending ? "Saving…" : "Save"}</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+  if (editSlug) return dialog;
 
   return (
     <div data-testid={`admin-${resource}-manager`}>
@@ -144,43 +192,7 @@ export default function ContentManager({ resource, title, fields, columns, publi
         </Table>
       </div>
 
-      <Dialog open={editing !== undefined} onOpenChange={(o) => { if (!o) setEditing(undefined); }}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl" data-testid={`admin-${resource}-dialog`}>
-          <DialogHeader><DialogTitle>{editing ? `Edit ${String(editing.name ?? editing.title ?? "")}` : `Add ${title.replace(/s$/, "")}`}</DialogTitle></DialogHeader>
-          <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-            {fields.map((s) => {
-              const id = `f-${resource}-${s.key}`;
-              const tid = `admin-${resource}-field-${s.key.replace(/_/g, "-")}`;
-              const val = form[s.key];
-              if (s.type === "bool") return (
-                <label key={s.key} className="flex items-center gap-2 text-sm sm:col-span-2"><Checkbox checked={Boolean(val)} onCheckedChange={(c) => setForm((f) => ({ ...f, [s.key]: Boolean(c) }))} data-testid={tid} /> {s.label}</label>
-              );
-              const common = { id, value: String(val ?? ""), "data-testid": tid };
-              const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                const v = e.target.value;
-                setForm((f) => ({ ...f, [s.key]: v, ...(s.key === "name" || s.key === "title" ? (!editing && (!f.slug || f.slug === slugify(String(f[s.key] ?? ""))) ? { slug: slugify(v) } : {}) : {}) }));
-              };
-              return (
-                <div key={s.key} className={`grid gap-1.5 ${s.full || s.type === "textarea" || s.type === "json" ? "sm:col-span-2" : ""}`}>
-                  <Label htmlFor={id}>{s.label}{s.required ? " *" : ""}</Label>
-                  {s.type === "textarea" || s.type === "json"
-                    ? <Textarea {...common} onChange={onChange} rows={s.type === "json" ? 6 : 4} className={s.type === "json" ? "font-mono text-xs" : ""} />
-                    : <Input {...common} onChange={onChange} type={s.type === "number" ? "number" : "text"} step="any" />}
-                  {(s.hint || s.type === "list") && <p className="text-xs text-slate-500">{s.hint ?? "Comma-separated"}</p>}
-                </div>
-              );
-            })}
-            {withFaqs && <FaqEditor value={faqs} onChange={setFaqs} testid={`admin-${resource}-faqs`} />}
-            {editing !== undefined && (() => { const sc = entityScore(resource, { ...toPayload(fields.filter((f) => f.type !== "json"), form), seo: fromSeoForm(seo), faqs: cleanFaqs(faqs) }, year); return <div className="flex items-center gap-2 text-sm sm:col-span-2"><span className="font-medium">Live SEO score</span><SeoBadge score={sc} testid={`admin-${resource}-live-seo-score`} /></div>; })()}
-            <SeoEditor value={seo} onChange={setSeo} defaults={defaultSeo(resource, form, year)}
-              path={`${publicPath}/${String(form.slug ?? "")}`} testid={`admin-${resource}-seo`} />
-            <DialogFooter className="sm:col-span-2">
-              <Button type="button" variant="outline" onClick={() => setEditing(undefined)} data-testid={`admin-${resource}-cancel-button`}>Cancel</Button>
-              <Button type="submit" disabled={save.isPending} data-testid={`admin-${resource}-save-button`} className="bg-brand-navy text-white hover:bg-brand-blue">{save.isPending ? "Saving…" : "Save"}</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {dialog}
 
       <Dialog open={!!confirmDel} onOpenChange={(o) => { if (!o) setConfirmDel(null); }}>
         <DialogContent data-testid={`admin-${resource}-delete-dialog`}>

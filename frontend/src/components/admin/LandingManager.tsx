@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Pencil, Search } from "lucide-react";
@@ -16,16 +16,16 @@ import type { FaqItem, LandingOverrideIn, LandingSummary, SeoMeta } from "@/lib/
 
 const toSeoForm = (s?: SeoMeta): SeoForm => { const v = { ...EMPTY_SEO, ...s }; return { ...v, keywords: v.keywords.join(", ") }; };
 
-const scoreOf = (l: LandingSummary) => {
+export const landingScore = (l: LandingSummary) => {
   const o = l.override;
   return seoScore({
     title: o?.seo.meta_title || l.default_title, description: o?.seo.meta_description || l.default_description,
     // Auto intro (300+ chars), auto FAQs and the top college's photo fill in whatever the admin leaves empty.
-    keywords: o?.seo.keywords ?? [], hasImage: true, bodyLength: o?.intro ? o.intro.length : 300, faqCount: o?.faqs.length || 5, noindex: !!o?.seo.noindex,
+    keywords: o?.seo.keywords.length ? o.seo.keywords : [l.label], hasImage: true, bodyLength: o?.intro ? o.intro.length : 300, faqCount: o?.faqs.length || 5, noindex: !!o?.seo.noindex,
   });
 };
 
-export default function LandingManager() {
+export default function LandingManager({ editSlug, onClose }: { editSlug?: string; onClose?: () => void } = {}) {
   const qc = useQueryClient();
   const list = useQuery({ queryKey: ["landing", "list"], queryFn: () => apiGet<LandingSummary[]>("/landing") });
   const [q, setQ] = useState("");
@@ -36,7 +36,7 @@ export default function LandingManager() {
 
   const save = useMutation({
     mutationFn: (body: LandingOverrideIn) => apiPut<LandingSummary>(`/admin/landing/${editing!.slug}`, body),
-    onSuccess: () => { toast.success("City page saved"); setEditing(null); qc.invalidateQueries({ queryKey: ["landing"] }); },
+    onSuccess: () => { toast.success("City page saved"); close(); qc.invalidateQueries({ queryKey: ["landing"] }); },
     onError: () => toast.error("Save failed — check field lengths"),
   });
   const open = (l: LandingSummary) => { setEditing(l); setIntro(l.override?.intro ?? ""); setFaqs(l.override?.faqs ?? []); setSeo(toSeoForm(l.override?.seo)); };
@@ -44,7 +44,33 @@ export default function LandingManager() {
     intro: intro.trim(), faqs: cleanFaqs(faqs),
     seo: { meta_title: seo.meta_title.trim(), meta_description: seo.meta_description.trim(), canonical_url: seo.canonical_url.trim(), og_image: seo.og_image.trim(), noindex: seo.noindex, keywords: seo.keywords.split(",").map((x) => x.trim()).filter(Boolean) },
   });
+  const close = () => { setEditing(null); onClose?.(); };
+  const target = editSlug ? list.data?.find((l) => l.slug === editSlug) : undefined;
+  useEffect(() => { if (target) open(target); }, [target?.slug]); // eslint-disable-line react-hooks/exhaustive-deps
   const rows = useMemo(() => (list.data ?? []).filter((l) => !q || l.label.toLowerCase().includes(q.toLowerCase())), [list.data, q]);
+
+  const dialog = (
+    <Dialog open={!!editing} onOpenChange={(o) => { if (!o) close(); }}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl" data-testid="admin-landing-dialog">
+        <DialogHeader><DialogTitle>Edit “{editing?.label}”</DialogTitle></DialogHeader>
+        {editing && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-1.5 sm:col-span-2">
+              <Label htmlFor="landing-intro">Intro paragraph</Label>
+              <Textarea id="landing-intro" rows={5} value={intro} onChange={(e) => setIntro(e.target.value)} placeholder="Leave empty to use the auto-generated intro (with live fees, placements and exams). Separate paragraphs with a blank line." data-testid="admin-landing-intro-input" />
+            </div>
+            <FaqEditor value={faqs} onChange={setFaqs} testid="admin-landing-faqs" hint="Leave empty to use 5–6 auto FAQs built from the college data" />
+            <SeoEditor value={seo} onChange={setSeo} defaults={{ title: editing.default_title, description: editing.default_description, keywords: [editing.label] }} path={`/${editing.slug}`} testid="admin-landing-seo" />
+            <DialogFooter className="sm:col-span-2">
+              <Button variant="outline" onClick={close} data-testid="admin-landing-cancel-button">Cancel</Button>
+              <Button onClick={submit} disabled={save.isPending} className="bg-brand-navy text-white hover:bg-brand-blue" data-testid="admin-landing-save-button">{save.isPending ? "Saving…" : "Save"}</Button>
+            </DialogFooter>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+  if (editSlug) return dialog;
 
   return (
     <div data-testid="admin-landing-manager">
@@ -68,7 +94,7 @@ export default function LandingManager() {
                 <TableCell><a href={`/${l.slug}`} target="_blank" rel="noreferrer" className="font-medium hover:text-brand-red">{l.label}</a><p className="text-xs text-slate-400">/{l.slug}</p></TableCell>
                 <TableCell className="text-slate-600">{l.count}</TableCell>
                 <TableCell className="text-xs">{l.customised ? <span className="rounded-md bg-teal-50 px-2 py-0.5 font-semibold text-teal-800">Customised</span> : <span className="text-slate-400">Auto</span>}</TableCell>
-                <TableCell><SeoBadge score={scoreOf(l)} testid={`admin-landing-seo-score-${l.slug}`} /></TableCell>
+                <TableCell><SeoBadge score={landingScore(l)} testid={`admin-landing-seo-score-${l.slug}`} /></TableCell>
                 <TableCell><Button size="icon-sm" variant="ghost" aria-label="Edit" onClick={() => open(l)} data-testid={`admin-landing-edit-${l.slug}`}><Pencil className="size-4" /></Button></TableCell>
               </TableRow>
             ))}
@@ -76,25 +102,7 @@ export default function LandingManager() {
         </Table>
       </div>
 
-      <Dialog open={!!editing} onOpenChange={(o) => { if (!o) setEditing(null); }}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl" data-testid="admin-landing-dialog">
-          <DialogHeader><DialogTitle>Edit “{editing?.label}”</DialogTitle></DialogHeader>
-          {editing && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="grid gap-1.5 sm:col-span-2">
-                <Label htmlFor="landing-intro">Intro paragraph</Label>
-                <Textarea id="landing-intro" rows={5} value={intro} onChange={(e) => setIntro(e.target.value)} placeholder="Leave empty to use the auto-generated intro (with live fees, placements and exams). Separate paragraphs with a blank line." data-testid="admin-landing-intro-input" />
-              </div>
-              <FaqEditor value={faqs} onChange={setFaqs} testid="admin-landing-faqs" hint="Leave empty to use 5–6 auto FAQs built from the college data" />
-              <SeoEditor value={seo} onChange={setSeo} defaults={{ title: editing.default_title, description: editing.default_description, keywords: [editing.label] }} path={`/${editing.slug}`} testid="admin-landing-seo" />
-              <DialogFooter className="sm:col-span-2">
-                <Button variant="outline" onClick={() => setEditing(null)} data-testid="admin-landing-cancel-button">Cancel</Button>
-                <Button onClick={submit} disabled={save.isPending} className="bg-brand-navy text-white hover:bg-brand-blue" data-testid="admin-landing-save-button">{save.isPending ? "Saving…" : "Save"}</Button>
-              </DialogFooter>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {dialog}
     </div>
   );
 }
