@@ -56,3 +56,8 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 - backend/.env has real Twilio TRIAL creds (sender +17372508034). Trial = free-form Body rejected ("ContentSid Required") and only verified recipients allowed. Needs: TWILIO_LEAD_TEMPLATE_SID ({{1}} name, {{2}} mobile, {{3}} interest, {{4}} details) and TWILIO_STUDENT_TEMPLATE_SID ({{1}} first name, {{2}} exam & score, {{3}} top colleges, {{4}} results link); empty → falls back to Body.
 - LeadIn has `prediction` {exam, score, category, cities} + `whatsapp_opt_in`. Predictor "Get guidance" sends both; form shows opt-in checkbox (default on). Student list sent max once per phone / 24 h; link uses PUBLIC_SITE_URL env.
 - Last send status per kind stored in `settings` collection (key whatsapp_lead / whatsapp_student) and shown in Admin → Leads banner via AdminStats.whatsapp.
+
+## v6: Admin → WhatsApp tab
+- GET /api/admin/whatsapp (panel), POST /api/admin/whatsapp/check (re-query Twilio Content API), PUT /api/admin/whatsapp/templates {lead_sid, student_sid} (HX + 32 hex, or empty; stored in settings key whatsapp_templates, env fallback), POST /api/admin/whatsapp/test {kind: sample|lead|student} → sends to WHATSAPP_ALERT_TO[0], GET /api/admin/whatsapp/messages/{SM|MM sid} → delivery status (UI polls every 2.5s until delivered/read/failed/undelivered).
+- effective_template(kind): template used only if WhatsApp status approved (or "unavailable"/"unknown" = cannot verify, e.g. trial → tried anyway); non-approved re-checked at most every 10 min, so it switches on automatically.
+- TWILIO_SAMPLE_TEMPLATE_SID = Twilio's fixed sample (HXfe5ab5…) used only by "Connection test" — delivered OK to +918149689468 on trial.

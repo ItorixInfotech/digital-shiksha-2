@@ -268,3 +268,47 @@ export interface PredictorReport {
   exams: ExamReport[];
   recent: PredictionLog[];
 }
+
+// Mirrors backend/routers/whatsapp_admin.py
+export interface WaTemplateInfo {
+  sid: string;
+  status: string;
+  name: string;
+  body: string;
+  variables: number;
+  rejection_reason: string;
+  note: string;
+  checked_at: string | null;
+  in_use: boolean;
+}
+
+export interface WhatsAppPanel {
+  configured: boolean;
+  sender: string;
+  alert_to: string[];
+  lead: WaTemplateInfo | null;
+  student: WaTemplateInfo | null;
+  sample_available: boolean;
+  last_lead: string;
+  last_student: string;
+}
+
+export interface WaTemplateSidsIn {
+  lead_sid: string;
+  student_sid: string;
+}
+
+export type WaTestKind = "sample" | "lead" | "student";
+
+export interface WaTestOut {
+  ok: boolean;
+  message_sid: string;
+  detail: string;
+  used_template: string;
+  to: string;
+}
+
+export interface WaMessageStatus {
+  status: string;
+  error: string;
+}

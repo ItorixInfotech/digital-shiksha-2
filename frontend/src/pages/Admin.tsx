@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import ContentManager from "@/components/admin/ContentManager";
 import PredictorReportPanel from "@/components/admin/PredictorReport";
 import CutoffUploadPanel from "@/components/admin/CutoffUpload";
+import WhatsAppPanel from "@/components/admin/WhatsAppPanel";
 import type { FieldSpec } from "@/components/admin/ContentManager";
 import { apiDelete, apiGet, apiPatch, apiPost, ApiError } from "@/lib/api";
 import { beginSession, endSession } from "@/lib/session";
@@ -98,6 +99,7 @@ const TABS = [
   { key: "leads", label: "Leads", icon: Inbox },
   { key: "predictor", label: "Predictor Report", icon: BarChart3 },
   { key: "cutoffs", label: "Cutoff Upload", icon: FileSpreadsheet },
+  { key: "whatsapp", label: "WhatsApp", icon: MessageCircle },
   { key: "colleges", label: "Colleges", icon: School },
   { key: "courses", label: "Courses", icon: GraduationCap },
   { key: "exams", label: "Exams", icon: FileText },
@@ -282,6 +284,7 @@ export default function Admin() {
           {tab === "leads" && <LeadsPanel whatsappOn={stats.data?.whatsapp_alerts} wa={stats.data?.whatsapp} />}
           {tab === "predictor" && <PredictorReportPanel />}
           {tab === "cutoffs" && <CutoffUploadPanel />}
+          {tab === "whatsapp" && <WhatsAppPanel />}
           {tab === "colleges" && <ContentManager resource="colleges" title="Colleges" fields={COLLEGE_FIELDS} publicPath="/colleges" columns={[{ key: "name", label: "Name" }, { key: "city", label: "City" }, { key: "type", label: "Type" }, { key: "nirf_rank", label: "NIRF" }]} />}
           {tab === "courses" && <ContentManager resource="courses" title="Courses" fields={COURSE_FIELDS} publicPath="/courses" columns={[{ key: "name", label: "Name" }, { key: "stream", label: "Stream" }, { key: "level", label: "Level" }, { key: "duration", label: "Duration" }]} />}
           {tab === "exams" && <ContentManager resource="exams" title="Exams" fields={EXAM_FIELDS} publicPath="/exams" columns={[{ key: "name", label: "Name" }, { key: "stream", label: "Stream" }, { key: "level", label: "Level" }, { key: "exam_date", label: "Date" }]} />}
