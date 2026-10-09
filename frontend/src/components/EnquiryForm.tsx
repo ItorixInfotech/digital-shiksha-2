@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiPost, ApiError } from "@/lib/api";
 import type { Lead, LeadIn } from "@/lib/types";
@@ -26,6 +27,7 @@ const empty = { name: "", phone: "", email: "", city: "", course_interest: "", b
 export default function EnquiryForm({ prefill, testid = "enquiry", showMessage = false, showBudget = false, dark = false, onDone }: Props) {
   const [f, setF] = useState({ ...empty, course_interest: prefill?.course_interest ?? "", message: prefill?.message ?? "" });
   const [done, setDone] = useState(false);
+  const [waOptIn, setWaOptIn] = useState(true);
   const set = (k: keyof typeof empty) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setF((cur) => ({ ...cur, [k]: e.target.value }));
 
@@ -58,6 +60,8 @@ export default function EnquiryForm({ prefill, testid = "enquiry", showMessage =
       budget: f.budget.trim(),
       message: f.message.trim(),
       source: prefill?.source ?? "website",
+      prediction: prefill?.prediction ?? null,
+      whatsapp_opt_in: !!prefill?.prediction && waOptIn,
     });
   };
 
@@ -127,6 +131,12 @@ export default function EnquiryForm({ prefill, testid = "enquiry", showMessage =
           <Label htmlFor={`${testid}-message`} className={labelCls}>Message</Label>
           <Textarea id={`${testid}-message`} data-testid={`${testid}-message-input`} className={inputCls} rows={3} placeholder="Your score / percentile, preferred colleges, questions…" value={f.message} onChange={set("message")} />
         </div>
+      )}
+      {prefill?.prediction && (
+        <label className={`flex items-start gap-2 text-sm ${dark ? "text-slate-200" : "text-slate-700"}`}>
+          <Checkbox checked={waOptIn} onCheckedChange={(c) => setWaOptIn(Boolean(c))} data-testid={`${testid}-whatsapp-optin-checkbox`} className="mt-0.5" />
+          Send my predicted college list to this number on WhatsApp
+        </label>
       )}
       <Button type="submit" size="lg" disabled={m.isPending} data-testid={`${testid}-submit-button`} className="mt-1 h-11 bg-brand-red text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform]">
         {m.isPending ? <Loader2 className="size-4 animate-spin" /> : null}

@@ -180,7 +180,7 @@ export default function Predictor() {
                       <div><p className="text-xs text-slate-500">Avg pkg</p><p className="font-semibold">{r.avg_package ? `₹${r.avg_package} LPA` : "—"}</p></div>
                     </div>
                     <Button size="sm" data-testid={`predictor-apply-${r.college_slug}-${slugify(r.course)}`}
-                      onClick={() => openEnquiry({ college: r.college_name, source: "predictor", title: `Get admission guidance for ${r.short_name}`, message: `Predictor: ${data.exam} ${data.score} (${data.category}) — interested in ${r.course} at ${r.short_name} (${CHANCE[r.chance].label})` })}
+                      onClick={() => openEnquiry({ college: r.college_name, source: "predictor", title: `Get admission guidance for ${r.short_name}`, prediction: body ?? undefined, message: `Predictor: ${data.exam} ${data.score} (${data.category}) — interested in ${r.course} at ${r.short_name} (${CHANCE[r.chance].label})` })}
                       className="bg-brand-red text-white hover:bg-red-700">Get guidance</Button>
                   </div>
                 ))}

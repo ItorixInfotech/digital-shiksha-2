@@ -118,6 +118,13 @@ class Article(ArticleIn):
 LeadStatus = Literal["New", "Contacted", "In-Progress", "Converted"]
 
 
+class PredictionContext(BaseModel):
+    exam: str
+    score: float
+    category: str = "General"
+    cities: List[str] = []
+
+
 class LeadIn(BaseModel):
     name: str = Field(min_length=2, max_length=80)
     phone: str = Field(pattern=r"^[6-9]\d{9}$")
@@ -128,6 +135,8 @@ class LeadIn(BaseModel):
     budget: str = ""
     message: str = ""
     source: str = "website"
+    prediction: Optional[PredictionContext] = None
+    whatsapp_opt_in: bool = False
 
 
 class Lead(LeadIn):
@@ -177,6 +186,15 @@ class AdminStats(BaseModel):
     exams: int
     articles: int
     whatsapp_alerts: bool = False
+    whatsapp: Optional["WhatsAppStatus"] = None
+
+
+class WhatsAppStatus(BaseModel):
+    configured: bool
+    lead_template: bool
+    student_template: bool
+    last_lead: str
+    last_student: str
 
 
 class ImportIssue(BaseModel):
@@ -192,3 +210,6 @@ class CutoffImportResult(BaseModel):
     skipped: int
     colleges_affected: int
     issues: List[ImportIssue]
+
+
+AdminStats.model_rebuild()

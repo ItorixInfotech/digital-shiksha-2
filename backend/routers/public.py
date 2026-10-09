@@ -1,3 +1,4 @@
+import logging
 import re
 from datetime import timedelta
 from typing import List, Optional
@@ -6,12 +7,13 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 
 from lib.db import db
 from lib.email import notify_new_lead, send_student_confirmation
-from lib.whatsapp import notify_whatsapp
+from lib.whatsapp import notify_whatsapp, send_student_prediction
 from models.content import (
     Article, College, Course, Exam, FacetCount, Lead, LeadIn, Meta, SearchHit,
 )
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 def _rx(q: str) -> dict:
@@ -151,6 +153,18 @@ async def meta():
     )
 
 
+async def _student_list(lead: dict) -> None:
+    from routers.predictor import run_prediction  # local import keeps router modules independent
+    from models.predictor import PredictorIn
+    try:
+        p = lead["prediction"]
+        out = await run_prediction(PredictorIn(exam=p["exam"], score=p["score"], category=p.get("category", "General"), cities=p.get("cities", [])))
+    except Exception as exc:  # noqa: BLE001 — bad context must never break lead capture
+        logger.error("Student prediction for %s failed: %s", lead.get("id"), exc)
+        return
+    await send_student_prediction(lead, out, lead["prediction"])
+
+
 @router.post("/enquiries", response_model=Lead, status_code=201)
 async def create_enquiry(body: LeadIn, background: BackgroundTasks):
     lead = Lead(**body.model_dump())
@@ -159,7 +173,13 @@ async def create_enquiry(body: LeadIn, background: BackgroundTasks):
     # Student thank-you: at most one per email address per 24 h (abuse guard for a public form).
     confirm = bool(lead.email) and not await db.leads.find_one(
         {"email": lead.email, "created_at": {"$gte": lead.created_at - timedelta(hours=24)}})
+    # Student's own predicted list on WhatsApp: only with opt-in, max once per phone per 24 h.
+    send_list = bool(lead.prediction and lead.whatsapp_opt_in) and not await db.leads.find_one(
+        {"phone": lead.phone, "whatsapp_opt_in": True, "prediction": {"$ne": None},
+         "created_at": {"$gte": lead.created_at - timedelta(hours=24)}})
     await db.leads.insert_one(lead.model_dump())
+    if send_list:
+        background.add_task(_student_list, lead.model_dump())
     if not recent:
         background.add_task(notify_new_lead, lead.model_dump())
         background.add_task(notify_whatsapp, lead.model_dump())

@@ -103,6 +103,13 @@ export interface Article extends ArticleIn {
 
 export type LeadStatus = "New" | "Contacted" | "In-Progress" | "Converted";
 
+export interface PredictionContext {
+  exam: string;
+  score: number;
+  category: string;
+  cities: string[];
+}
+
 export interface LeadIn {
   name: string;
   phone: string;
@@ -113,6 +120,8 @@ export interface LeadIn {
   budget: string;
   message: string;
   source: string;
+  prediction: PredictionContext | null;
+  whatsapp_opt_in: boolean;
 }
 export interface Lead extends LeadIn {
   id: string;
@@ -152,6 +161,15 @@ export interface AdminStats {
   exams: number;
   articles: number;
   whatsapp_alerts: boolean;
+  whatsapp: WhatsAppStatus | null;
+}
+
+export interface WhatsAppStatus {
+  configured: boolean;
+  lead_template: boolean;
+  student_template: boolean;
+  last_lead: string;
+  last_student: string;
 }
 
 export interface ImportIssue {

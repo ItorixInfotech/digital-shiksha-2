@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import type { PredictionContext } from "@/lib/types";
 import { toast } from "sonner";
 
 export interface EnquiryPrefill {
@@ -8,6 +9,7 @@ export interface EnquiryPrefill {
   source?: string;
   title?: string;
   message?: string;
+  prediction?: PredictionContext;
 }
 
 interface SiteCtx {

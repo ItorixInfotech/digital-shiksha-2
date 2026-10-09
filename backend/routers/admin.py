@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 
 from lib.db import db
-from lib.whatsapp import whatsapp_configured
+from lib.whatsapp import whatsapp_configured, whatsapp_status
 from models.content import (
     AdminMe, AdminStats, Article, ArticleIn, College, CollegeIn, Course, CourseIn,
     Exam, ExamIn, Lead, LeadStatusUpdate, LoginIn,
@@ -67,6 +67,7 @@ async def stats(_: str = Depends(require_admin)):
         exams=await db.exams.count_documents({}),
         articles=await db.articles.count_documents({}),
         whatsapp_alerts=whatsapp_configured(),
+        whatsapp=await whatsapp_status(),
     )
 
 

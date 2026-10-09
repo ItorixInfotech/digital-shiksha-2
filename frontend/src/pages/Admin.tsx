@@ -15,7 +15,7 @@ import CutoffUploadPanel from "@/components/admin/CutoffUpload";
 import type { FieldSpec } from "@/components/admin/ContentManager";
 import { apiDelete, apiGet, apiPatch, apiPost, ApiError } from "@/lib/api";
 import { beginSession, endSession } from "@/lib/session";
-import type { AdminMe, AdminStats, Lead, LeadStatus } from "@/lib/types";
+import type { AdminMe, AdminStats, Lead, LeadStatus, WhatsAppStatus } from "@/lib/types";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -139,7 +139,7 @@ const leadSummary = (l: Lead) =>
   [`New Digital Shiksha enquiry`, `Name: ${l.name}`, `Mobile: +91 ${l.phone}`, l.email && `Email: ${l.email}`, l.city && `City: ${l.city}`,
     l.course_interest && `Course: ${l.course_interest}`, l.college && `College: ${l.college}`, l.message && `Message: ${l.message}`].filter(Boolean).join("\n");
 
-function LeadsPanel({ whatsappOn }: { whatsappOn: boolean | undefined }) {
+function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: WhatsAppStatus | null | undefined }) {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("all");
@@ -178,11 +178,15 @@ function LeadsPanel({ whatsappOn }: { whatsappOn: boolean | undefined }) {
         </div>
       </div>
       {whatsappOn !== undefined && (
-        <div data-testid="admin-whatsapp-status" className={cn("mt-4 flex items-start gap-2 rounded-xl p-3 text-sm", whatsappOn ? "bg-green-50 text-green-800" : "bg-amber-50 text-amber-900")}>
+        <div data-testid="admin-whatsapp-status" className={cn("mt-4 flex items-start gap-2 rounded-xl p-3 text-sm", whatsappOn && wa?.lead_template ? "bg-green-50 text-green-800" : "bg-amber-50 text-amber-900")}>
           <MessageCircle className="mt-0.5 size-4 shrink-0" />
-          {whatsappOn
-            ? "Automatic WhatsApp alerts are ON — every new enquiry is sent to +91 8149 68 9468."
-            : "Automatic WhatsApp alerts are OFF until Twilio WhatsApp keys are added. Meanwhile use the green buttons to WhatsApp the student or forward a lead to the counsellor in one tap."}
+          {!whatsappOn ? "Automatic WhatsApp alerts are OFF until Twilio WhatsApp keys are added. Meanwhile use the green buttons to WhatsApp the student or forward a lead to the counsellor in one tap." : (
+            <div className="space-y-0.5">
+              <p className="font-semibold">Twilio WhatsApp connected — alerts go to +91 8149 68 9468.{!wa?.lead_template && " Waiting for an approved lead-alert template (TWILIO_LEAD_TEMPLATE_SID)."}</p>
+              <p>Last counsellor alert: {wa?.last_lead ?? "—"}</p>
+              <p>Last student college list: {wa?.last_student ?? "—"}{!wa?.student_template && " (needs TWILIO_STUDENT_TEMPLATE_SID)"}</p>
+            </div>
+          )}
         </div>
       )}
       <div className="mt-4 rounded-2xl border bg-white">
@@ -275,7 +279,7 @@ export default function Admin() {
           ))}
         </div>
         <div className="mt-8">
-          {tab === "leads" && <LeadsPanel whatsappOn={stats.data?.whatsapp_alerts} />}
+          {tab === "leads" && <LeadsPanel whatsappOn={stats.data?.whatsapp_alerts} wa={stats.data?.whatsapp} />}
           {tab === "predictor" && <PredictorReportPanel />}
           {tab === "cutoffs" && <CutoffUploadPanel />}
           {tab === "colleges" && <ContentManager resource="colleges" title="Colleges" fields={COLLEGE_FIELDS} publicPath="/colleges" columns={[{ key: "name", label: "Name" }, { key: "city", label: "City" }, { key: "type", label: "Type" }, { key: "nirf_rank", label: "NIRF" }]} />}
