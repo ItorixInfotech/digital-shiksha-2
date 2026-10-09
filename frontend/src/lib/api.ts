@@ -20,10 +20,11 @@ type JsonBody = unknown;
 
 async function request<T>(method: string, path: string, body?: JsonBody): Promise<T> {
   // Auth rides the httpOnly session cookie automatically — never add auth headers here.
+  const isForm = body instanceof FormData; // multipart uploads: browser sets the boundary header
   const res = await fetch(`${BASE}${path}`, {
     method,
-    headers: body === undefined ? undefined : { "Content-Type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
+    headers: body === undefined || isForm ? undefined : { "Content-Type": "application/json" },
+    body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
   });
 
   // FastAPI reports request-validation failures as 422 with a {detail: [...]} body.

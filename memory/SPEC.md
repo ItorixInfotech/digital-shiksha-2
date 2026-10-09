@@ -45,3 +45,9 @@ If a lead includes an email, a fixed-template thank-you (counsellor phone/email/
 
 ## Admin Predictor Report
 GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor leads count, per-exam searches/avg/score buckets/category counts, 50 recent predictions. Admin tab "Predictor Report" also lists leads with source=predictor.
+
+## v4: Official cutoff upload, WhatsApp alerts, shareable prediction
+- cutoffs[] rows now have `category` (General|OBC|EWS|SC|ST, default General). Predictor uses an official row for the student's category when present (estimated=false), else estimates from General.
+- Admin "Cutoff Upload" tab: GET /api/admin/cutoffs/template (xlsx: Instructions, Cutoffs [College, Course/Branch, Exam, Category, Closing value] pre-filled, Colleges), POST /api/admin/cutoffs/upload?dry_run=true|false (multipart file .xlsx/.csv ≤5MB). Upsert key = college + branch(case-insens.) + exam + category. College matched by name / short name / slug. CET codes GOPENS/GOBCS/GSCS/GSTS accepted; ladies (L*) rejected.
+- WhatsApp: lib/whatsapp.py sends Twilio WhatsApp message to WHATSAPP_ALERT_TO (+918149689468) on each new (non-duplicate) lead — NO-OP until TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN / TWILIO_WHATSAPP_FROM are set in backend/.env (currently empty). AdminStats.whatsapp_alerts shows status. Leads table has one-tap wa.me buttons (message student / forward to counsellor).
+- Predictor page is URL-driven (/predictor?exam=&score=&category=&city=both|Pune|Mumbai|all) → shareable; GET /api/predictor/pdf?exam=&score=&category=&cities=Pune,Mumbai returns branded PDF (reportlab, not logged as a prediction). "Share on WhatsApp" uses wa.me/?text= with the results link.

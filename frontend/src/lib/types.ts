@@ -13,6 +13,7 @@ export interface CutoffRow {
   branch: string;
   cutoff: string;
   value: number | null;
+  category: string;
 }
 
 export interface CollegeIn {
@@ -150,6 +151,22 @@ export interface AdminStats {
   courses: number;
   exams: number;
   articles: number;
+  whatsapp_alerts: boolean;
+}
+
+export interface ImportIssue {
+  row: number;
+  message: string;
+}
+
+export interface CutoffImportResult {
+  dry_run: boolean;
+  rows_read: number;
+  added: number;
+  updated: number;
+  skipped: number;
+  colleges_affected: number;
+  issues: ImportIssue[];
 }
 
 // Mirrors backend/models/predictor.py

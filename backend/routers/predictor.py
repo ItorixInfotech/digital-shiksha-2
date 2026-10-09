@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta, timezone
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 
 from lib.db import db
+from lib.pdf import build_prediction_pdf
 from models.predictor import (
-    Bucket, ExamReport, PredictionLog, PredictorExam, PredictorIn, PredictorOut, PredictorReport, PredictorResult,
+    Bucket, Category, ExamReport, PredictionLog, PredictorExam, PredictorIn, PredictorOut, PredictorReport, PredictorResult,
 )
 from routers.admin import require_admin
 
@@ -69,8 +70,7 @@ async def predictor_exams():
     return list(EXAMS.values())
 
 
-@router.post("/predictor", response_model=PredictorOut)
-async def predict(body: PredictorIn):
+async def run_prediction(body: PredictorIn) -> PredictorOut:
     exam = EXAMS.get(body.exam)
     if not exam:
         raise HTTPException(status_code=400, detail="Unsupported exam")
@@ -79,31 +79,56 @@ async def predict(body: PredictorIn):
     f: dict = {"cutoffs": {"$elemMatch": {"exam": exam.name, "value": {"$ne": None}}}}
     if body.cities:
         f["city"] = {"$in": body.cities}
-    est = body.category != "General"
     results: List[PredictorResult] = []
     for c in await db.colleges.find(f, {"_id": 0}).to_list(500):
+        # Group this exam's rows by branch -> {category: row}
+        branches: dict = {}
         for row in c.get("cutoffs", []):
-            if row.get("exam") != exam.name or row.get("value") is None:
+            if row.get("exam") == exam.name and row.get("value") is not None:
+                branches.setdefault(row["branch"], {})[row.get("category") or "General"] = row
+        for branch, rows in branches.items():
+            gen = rows.get("General")
+            official = rows.get(body.category)
+            if official:  # uploaded/official value for the student's own category
+                closing, est = float(official["value"]), False
+            elif gen:
+                closing, est = category_cutoff(exam.metric, float(gen["value"]), body.category), True
+            else:
                 continue
-            general = float(row["value"])
-            closing = category_cutoff(exam.metric, general, body.category)
             ch = chance_for(exam.metric, body.score, closing)
-            if ch:
-                results.append(PredictorResult(
-                    college_slug=c["slug"], college_name=c["name"], short_name=c.get("short_name") or c["name"],
-                    city=c["city"], type=c.get("type", ""), image=c.get("image", ""), course=row["branch"],
-                    cutoff=(f"≈ {fmt(exam.metric, closing)} ({body.category})" if est else row["cutoff"]),
-                    cutoff_value=closing, general_cutoff=row["cutoff"], estimated=est, chance=ch,
-                    fees_min=c.get("fees_min", 0), fees_max=c.get("fees_max", 0), avg_package=c.get("avg_package", 0),
-                ))
+            if not ch:
+                continue
+            label = fmt(exam.metric, closing)
+            results.append(PredictorResult(
+                college_slug=c["slug"], college_name=c["name"], short_name=c.get("short_name") or c["name"],
+                city=c["city"], type=c.get("type", ""), image=c.get("image", ""), course=branch,
+                cutoff=(f"≈ {label} ({body.category})" if est else label),
+                cutoff_value=closing, general_cutoff=gen["cutoff"] if gen else "—", estimated=est, chance=ch,
+                fees_min=c.get("fees_min", 0), fees_max=c.get("fees_max", 0), avg_package=c.get("avg_package", 0),
+            ))
     order = {"High": 0, "Medium": 1, "Reach": 2}
     sign = 1 if exam.metric == "rank" else -1  # most competitive first
     results.sort(key=lambda r: (order[r.chance], sign * r.cutoff_value))
-    await db.predictions.insert_one(PredictionLog(
-        exam=exam.name, metric=exam.metric, score=body.score, category=body.category, cities=body.cities,
-        results=len(results), high=sum(r.chance == "High" for r in results),
-    ).model_dump())
     return PredictorOut(exam=exam.name, metric=exam.metric, score=body.score, category=body.category, results=results)
+
+
+@router.post("/predictor", response_model=PredictorOut)
+async def predict(body: PredictorIn):
+    out = await run_prediction(body)
+    await db.predictions.insert_one(PredictionLog(
+        exam=out.exam, metric=out.metric, score=out.score, category=out.category, cities=body.cities,
+        results=len(out.results), high=sum(r.chance == "High" for r in out.results),
+    ).model_dump())
+    return out
+
+
+@router.get("/predictor/pdf")
+async def predictor_pdf(exam: str, score: float, category: Category = "General", cities: str = ""):
+    body = PredictorIn(exam=exam, score=score, category=category, cities=[c for c in cities.split(",") if c])
+    out = await run_prediction(body)
+    pdf = build_prediction_pdf(out, body.cities)
+    name = f"digital-shiksha-{out.exam.lower().replace(' ', '-')}-{out.score:g}-prediction.pdf"
+    return Response(content=pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="{name}"'})
 
 
 BUCKETS = {

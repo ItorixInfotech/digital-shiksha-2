@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { Link, useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Info, Loader2, MapPin, Sparkles, Target, TrendingUp } from "lucide-react";
+import { Download, Info, Link2, Loader2, MapPin, MessageCircle, Sparkles, Target, TrendingUp } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/Common";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiGet, apiPost, ApiError } from "@/lib/api";
+import { buttonVariants } from "@/components/ui/button";
 import type { PredictorCategory, PredictorChance, PredictorExam, PredictorIn, PredictorOut } from "@/lib/types";
 import { feeRange, slugify } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
@@ -27,27 +28,49 @@ const CHANCE: Record<PredictorChance, { label: string; cls: string; desc: string
 
 export default function Predictor() {
   const { openEnquiry } = useSite();
-  const [exam, setExam] = useState("MHT CET");
-  const [score, setScore] = useState("");
-  const [city, setCity] = useState("both");
-  const [category, setCategory] = useState<PredictorCategory>("General");
+  const [sp, setSp] = useSearchParams();
+  const urlExam = sp.get("exam") ?? "";
+  const urlScore = sp.get("score") ?? "";
+  const urlCategory = (sp.get("category") ?? "General") as PredictorCategory;
+  const urlCity = CITY_LIST[sp.get("city") ?? ""] ? (sp.get("city") as string) : "both";
+  const [exam, setExam] = useState(urlExam || "MHT CET");
+  const [score, setScore] = useState(urlScore);
+  const [city, setCity] = useState(urlCity);
+  const [category, setCategory] = useState<PredictorCategory>(urlCategory);
   const [chanceFilter, setChanceFilter] = useState<PredictorChance | "all">("all");
 
   const exams = useQuery({ queryKey: ["predictor", "exams"], queryFn: () => apiGet<PredictorExam[]>("/predictor/exams") });
   const spec = exams.data?.find((e) => e.name === exam);
 
-  const predict = useMutation({
-    mutationFn: (body: PredictorIn) => apiPost<PredictorOut>("/predictor", body),
-    onSuccess: () => setChanceFilter("all"),
-    onError: (e) => toast.error(e instanceof ApiError && e.status === 422 ? `Enter a valid ${spec?.label ?? "score"}` : "Prediction failed. Please try again."),
+  // The URL is the source of truth for a prediction, so result links are shareable.
+  const body: PredictorIn | null = urlExam && urlScore && !Number.isNaN(Number(urlScore))
+    ? { exam: urlExam, score: Number(urlScore), category: urlCategory, cities: CITY_LIST[urlCity] } : null;
+  const predict = useQuery({
+    queryKey: ["predictor", "run", body],
+    queryFn: () => apiPost<PredictorOut>("/predictor", body),
+    enabled: !!body,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
+  const err = predict.error;
+  const errMsg = err ? (err instanceof ApiError && err.status === 422 ? `Enter a valid ${spec?.label ?? "score"}` : "Prediction failed. Please try again.") : "";
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const n = Number(score);
     if (!score.trim() || Number.isNaN(n)) return toast.error(`Please enter your ${spec?.label ?? "score"}`);
     if (spec && (n < spec.min || n > spec.max)) return toast.error(`${spec.label} must be between ${spec.min} and ${spec.max}`);
-    predict.mutate({ exam, score: n, category, cities: CITY_LIST[city] });
+    setChanceFilter("all");
+    setSp({ exam, score: String(n), category, city }, { replace: false });
+  };
+
+  const shareQs = body ? new URLSearchParams({ exam: body.exam, score: String(body.score), category: body.category, city: urlCity }).toString() : "";
+  const shareUrl = `${window.location.origin}/predictor?${shareQs}`;
+  const pdfHref = body ? `/api/predictor/pdf?${new URLSearchParams({ exam: body.exam, score: String(body.score), category: body.category, cities: body.cities.join(",") }).toString()}` : "";
+  const waText = body ? `My ${body.exam} college prediction (${body.score}, ${body.category}) from Digital Shiksha: ${shareUrl}` : "";
+  const copyLink = async () => {
+    try { await navigator.clipboard.writeText(shareUrl); toast.success("Link copied"); } catch { toast.error("Couldn't copy — please copy from the address bar"); }
   };
 
   const data = predict.data;
@@ -87,15 +110,16 @@ export default function Predictor() {
               <SelectContent>{Object.entries(CITIES).map(([k, l]) => <SelectItem key={k} value={k} data-testid={`predictor-city-option-${k.toLowerCase()}`}>{l}</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <Button type="submit" disabled={predict.isPending} data-testid="predictor-submit-button" className="h-11 bg-brand-red text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform] sm:col-span-2">
-            {predict.isPending ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />} Predict
+          <Button type="submit" disabled={predict.isFetching} data-testid="predictor-submit-button" className="h-11 bg-brand-red text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform] sm:col-span-2">
+            {predict.isFetching ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />} Predict
           </Button>
           {spec && <p className="text-xs text-slate-500 sm:col-span-12">{spec.hint}{category !== "General" && spec.rank_note ? ` • ${spec.rank_note}` : ""}</p>}
         </form>
       </PageHeader>
 
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        {!data && !predict.isPending && (
+        {errMsg && <p className="mb-6 rounded-xl bg-red-50 p-4 text-sm text-red-700" data-testid="predictor-error">{errMsg}</p>}
+        {!data && !predict.isFetching && (
           <div className="grid gap-4 md:grid-cols-3" data-testid="predictor-intro">
             {[[Target, "Cutoff-based", "Uses previous-year closing cutoffs (General Open, CAP Round 1 / state quota)."], [MapPin, "Pune & Mumbai focus", "Covers top engineering, medical and MBA colleges in both cities."], [TrendingUp, "Fees & packages", "Compare fees and average placements right in the results."]].map(([I, t, d]) => {
               const Icon = I as typeof Target;
@@ -117,8 +141,15 @@ export default function Predictor() {
                 <h2 className="text-2xl font-semibold tracking-tight" data-testid="predictor-results-summary">
                   {data.results.length ? <>{colleges} colleges, {data.results.length} course options for {data.exam} {data.metric === "rank" ? `rank ${data.score}` : data.metric === "score" ? `score ${data.score}` : `${data.score} percentile`}</> : "No matching colleges"}
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">{CITIES[city]} • {CATEGORIES.find((c) => c.value === data.category)?.label} • sorted by chance, then most competitive first</p>
+                <p className="mt-1 text-sm text-slate-500">{CITIES[urlCity]} • {CATEGORIES.find((c) => c.value === data.category)?.label} • sorted by chance, then most competitive first</p>
               </div>
+              <div className="flex flex-wrap gap-2" data-testid="predictor-share-actions">
+                <a href={pdfHref} download data-testid="predictor-download-pdf-button" className={cn(buttonVariants({ size: "sm" }), "bg-brand-navy text-white hover:bg-brand-blue")}><Download className="size-4" /> Download PDF</a>
+                <a href={`https://wa.me/?text=${encodeURIComponent(waText)}`} target="_blank" rel="noreferrer" data-testid="predictor-share-whatsapp-button" className={cn(buttonVariants({ size: "sm" }), "bg-[#25D366] text-white hover:bg-[#1ebe5a]")}><MessageCircle className="size-4" /> Share on WhatsApp</a>
+                <button type="button" onClick={copyLink} data-testid="predictor-copy-link-button" className={buttonVariants({ size: "sm", variant: "outline" })}><Link2 className="size-4" /> Copy link</button>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
               <div className="flex flex-wrap gap-2">
                 <button type="button" onClick={() => setChanceFilter("all")} data-testid="predictor-filter-all" className={cn("rounded-full border px-3 py-1 text-sm transition-colors", chanceFilter === "all" ? "border-brand-navy bg-brand-navy text-white" : "bg-white hover:border-slate-400")}>All ({data.results.length})</button>
                 {counts.map(([c, n]) => (

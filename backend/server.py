@@ -13,7 +13,7 @@ load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
 from lib.db import client, ensure_indexes
-from routers import public, admin, predictor
+from routers import public, admin, predictor, cutoffs
 
 
 @asynccontextmanager
@@ -36,6 +36,7 @@ async def root():
 api_router.include_router(public.router)
 api_router.include_router(admin.router)
 api_router.include_router(predictor.router)
+api_router.include_router(cutoffs.router)
 
 app.add_middleware(
     CORSMiddleware,

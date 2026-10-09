@@ -23,6 +23,7 @@ class CutoffRow(BaseModel):
     branch: str
     cutoff: str
     value: Optional[float] = None  # numeric closing value for the predictor (percentile / score / rank)
+    category: str = "General"  # General | OBC | EWS | SC | ST
 
 
 class CollegeIn(BaseModel):
@@ -175,3 +176,19 @@ class AdminStats(BaseModel):
     courses: int
     exams: int
     articles: int
+    whatsapp_alerts: bool = False
+
+
+class ImportIssue(BaseModel):
+    row: int
+    message: str
+
+
+class CutoffImportResult(BaseModel):
+    dry_run: bool
+    rows_read: int
+    added: int
+    updated: int
+    skipped: int
+    colleges_affected: int
+    issues: List[ImportIssue]

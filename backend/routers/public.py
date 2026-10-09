@@ -6,6 +6,7 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 
 from lib.db import db
 from lib.email import notify_new_lead, send_student_confirmation
+from lib.whatsapp import notify_whatsapp
 from models.content import (
     Article, College, Course, Exam, FacetCount, Lead, LeadIn, Meta, SearchHit,
 )
@@ -161,6 +162,7 @@ async def create_enquiry(body: LeadIn, background: BackgroundTasks):
     await db.leads.insert_one(lead.model_dump())
     if not recent:
         background.add_task(notify_new_lead, lead.model_dump())
+        background.add_task(notify_whatsapp, lead.model_dump())
     if confirm:
         background.add_task(send_student_confirmation, lead.model_dump())
     return lead

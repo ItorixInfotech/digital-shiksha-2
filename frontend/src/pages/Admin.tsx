@@ -2,15 +2,16 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BarChart3, Download, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock } from "lucide-react";
+import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import ContentManager from "@/components/admin/ContentManager";
 import PredictorReportPanel from "@/components/admin/PredictorReport";
+import CutoffUploadPanel from "@/components/admin/CutoffUpload";
 import type { FieldSpec } from "@/components/admin/ContentManager";
 import { apiDelete, apiGet, apiPatch, apiPost, ApiError } from "@/lib/api";
 import { beginSession, endSession } from "@/lib/session";
@@ -47,7 +48,7 @@ const COLLEGE_FIELDS: FieldSpec[] = [
   { key: "overview", label: "Overview", type: "textarea" },
   { key: "admission", label: "Admission process", type: "textarea" },
   { key: "courses", label: "Courses & fees (JSON)", type: "json", hint: 'e.g. [{"name":"B.Tech","duration":"4 Years","fees":"₹1 L/yr","eligibility":"10+2 PCM","seats":60}]' },
-  { key: "cutoffs", label: "Cutoffs (JSON)", type: "json", hint: 'e.g. [{"exam":"MHT CET","branch":"Computer","cutoff":"99.50 percentile","value":99.5}] — "value" (percentile, NEET score or JEE Adv rank) powers the College Predictor' },
+  { key: "cutoffs", label: "Cutoffs (JSON)", type: "json", hint: 'e.g. [{"exam":"MHT CET","branch":"Computer","cutoff":"99.50 percentile","value":99.5,"category":"General"}] — "value" (percentile, NEET score or JEE Adv rank) powers the College Predictor' },
   { key: "featured", label: "Featured on home page", type: "bool" },
 ];
 const COURSE_FIELDS: FieldSpec[] = [
@@ -96,6 +97,7 @@ const ARTICLE_FIELDS: FieldSpec[] = [
 const TABS = [
   { key: "leads", label: "Leads", icon: Inbox },
   { key: "predictor", label: "Predictor Report", icon: BarChart3 },
+  { key: "cutoffs", label: "Cutoff Upload", icon: FileSpreadsheet },
   { key: "colleges", label: "Colleges", icon: School },
   { key: "courses", label: "Courses", icon: GraduationCap },
   { key: "exams", label: "Exams", icon: FileText },
@@ -132,7 +134,12 @@ export function AdminLogin() {
   );
 }
 
-function LeadsPanel() {
+const COUNSELLOR_WA = "918149689468";
+const leadSummary = (l: Lead) =>
+  [`New Digital Shiksha enquiry`, `Name: ${l.name}`, `Mobile: +91 ${l.phone}`, l.email && `Email: ${l.email}`, l.city && `City: ${l.city}`,
+    l.course_interest && `Course: ${l.course_interest}`, l.college && `College: ${l.college}`, l.message && `Message: ${l.message}`].filter(Boolean).join("\n");
+
+function LeadsPanel({ whatsappOn }: { whatsappOn: boolean | undefined }) {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("all");
@@ -170,6 +177,14 @@ function LeadsPanel() {
           <Button variant="outline" onClick={exportCsv} disabled={!rows.length} data-testid="admin-leads-export-button"><Download className="size-4" /> Export CSV</Button>
         </div>
       </div>
+      {whatsappOn !== undefined && (
+        <div data-testid="admin-whatsapp-status" className={cn("mt-4 flex items-start gap-2 rounded-xl p-3 text-sm", whatsappOn ? "bg-green-50 text-green-800" : "bg-amber-50 text-amber-900")}>
+          <MessageCircle className="mt-0.5 size-4 shrink-0" />
+          {whatsappOn
+            ? "Automatic WhatsApp alerts are ON — every new enquiry is sent to +91 8149 68 9468."
+            : "Automatic WhatsApp alerts are OFF until Twilio WhatsApp keys are added. Meanwhile use the green buttons to WhatsApp the student or forward a lead to the counsellor in one tap."}
+        </div>
+      )}
       <div className="mt-4 rounded-2xl border bg-white">
         <Table data-testid="admin-leads-table">
           <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Student</TableHead><TableHead>Interest</TableHead><TableHead>Source</TableHead><TableHead>Status</TableHead><TableHead /></TableRow></TableHeader>
@@ -197,7 +212,10 @@ function LeadsPanel() {
                     <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s} data-testid={`admin-lead-status-option-${s.toLowerCase()}`}>{s}</SelectItem>)}</SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell><Button size="icon-sm" variant="ghost" aria-label="Delete lead" data-testid={`admin-lead-delete-${l.id}`} onClick={() => { if (window.confirm(`Delete lead from ${l.name}?`)) del.mutate(l.id); }} className="text-red-600"><Trash2 className="size-4" /></Button></TableCell>
+                <TableCell className="whitespace-nowrap">
+                  <a href={`https://wa.me/91${l.phone}?text=${encodeURIComponent(`Hi ${l.name.split(" ")[0]}, this is Digital Shiksha regarding your admission enquiry. When is a good time to call you?`)}`} target="_blank" rel="noreferrer" aria-label="WhatsApp student" title="WhatsApp student" data-testid={`admin-lead-whatsapp-${l.id}`} className={cn(buttonVariants({ size: "icon-sm", variant: "ghost" }), "text-[#128C7E]")}><MessageCircle className="size-4" /></a>
+                  <a href={`https://wa.me/${COUNSELLOR_WA}?text=${encodeURIComponent(leadSummary(l))}`} target="_blank" rel="noreferrer" aria-label="Forward to counsellor on WhatsApp" title="Forward to counsellor" data-testid={`admin-lead-forward-${l.id}`} className={cn(buttonVariants({ size: "icon-sm", variant: "ghost" }), "text-[#128C7E]")}><Send className="size-4" /></a>
+                <Button size="icon-sm" variant="ghost" aria-label="Delete lead" data-testid={`admin-lead-delete-${l.id}`} onClick={() => { if (window.confirm(`Delete lead from ${l.name}?`)) del.mutate(l.id); }} className="text-red-600"><Trash2 className="size-4" /></Button></TableCell>
               </TableRow>
             ))}
             {!leads.isLoading && !rows.length && <TableRow><TableCell colSpan={6} className="py-8 text-center text-slate-500">No enquiries yet.</TableCell></TableRow>}
@@ -257,8 +275,9 @@ export default function Admin() {
           ))}
         </div>
         <div className="mt-8">
-          {tab === "leads" && <LeadsPanel />}
+          {tab === "leads" && <LeadsPanel whatsappOn={stats.data?.whatsapp_alerts} />}
           {tab === "predictor" && <PredictorReportPanel />}
+          {tab === "cutoffs" && <CutoffUploadPanel />}
           {tab === "colleges" && <ContentManager resource="colleges" title="Colleges" fields={COLLEGE_FIELDS} publicPath="/colleges" columns={[{ key: "name", label: "Name" }, { key: "city", label: "City" }, { key: "type", label: "Type" }, { key: "nirf_rank", label: "NIRF" }]} />}
           {tab === "courses" && <ContentManager resource="courses" title="Courses" fields={COURSE_FIELDS} publicPath="/courses" columns={[{ key: "name", label: "Name" }, { key: "stream", label: "Stream" }, { key: "level", label: "Level" }, { key: "duration", label: "Duration" }]} />}
           {tab === "exams" && <ContentManager resource="exams" title="Exams" fields={EXAM_FIELDS} publicPath="/exams" columns={[{ key: "name", label: "Name" }, { key: "stream", label: "Stream" }, { key: "level", label: "Level" }, { key: "exam_date", label: "Date" }]} />}
