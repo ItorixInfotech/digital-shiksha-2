@@ -42,7 +42,7 @@ async def login(body: LoginIn, response: Response):
     token = jwt.encode(
         {"sub": body.username, "exp": datetime.now(timezone.utc) + timedelta(days=7)}, _secret(), algorithm="HS256"
     )
-    response.set_cookie(COOKIE, token, httponly=True, samesite="lax", secure=True, max_age=7 * 86400, path="/")
+    response.set_cookie(COOKIE, token, httponly=True, samesite="none", secure=True, max_age=7 * 86400, path="/")
     return AdminMe(username=body.username)
 
 
