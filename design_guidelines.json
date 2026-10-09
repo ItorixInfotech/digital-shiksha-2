@@ -1,0 +1,248 @@
+{
+  "project_name": "Digital Shiksha - India Higher Education & Admission Discovery Portal",
+  "template": "farm-ts",
+  "theme_preference": "light_with_subtle_crisp_contrast",
+  "archetype": "THE PERFORMANCE PRO & SWISS HYBRID (Educational Precision, Modern Indian Admission Trust)",
+  "brand_identity": {
+    "name": "Digital Shiksha",
+    "tagline": "India's Trusted Higher Education & Admission Counselling Platform",
+    "contact": {
+      "phone": "+91 8149 68 9468",
+      "email": "enquiry@digitalshiksha.in",
+      "address": "Saudamini Commercial Complex, C1-203, Paud Road, Bhusari Colony, Kothrud, Pune, Maharashtra 411038",
+      "whatsapp": "+91 8149 68 9468"
+    },
+    "logo_url": "https://www.digitalshiksha.in/wp-content/uploads/2026/02/Digital-Shiksha-Logo-1.png",
+    "stats": [
+      { "label": "Partner Institutes", "value": "200+" },
+      { "label": "Successful Admissions", "value": "15,000+" },
+      { "label": "Years of Guidance", "value": "16+" },
+      { "label": "Streams Covered", "value": "8+" }
+    ]
+  },
+  "colors": {
+    "surfaces": [
+      {
+        "name": "page",
+        "kind": "solid",
+        "bg": "#F8FAFC",
+        "on_bg": "#0F172A",
+        "on_bg_muted": "#475569",
+        "roles": {
+          "border": "#E2E8F0",
+          "link": "#0F2B5C",
+          "primary": "#DC2626",
+          "secondary": "#0A2540",
+          "accent_pill_counselling": "#0A2540",
+          "accent_pill_admission": "#16A34A",
+          "teal_gradient": "#0D9488",
+          "success": "#16A34A",
+          "warning": "#D97706",
+          "error": "#DC2626"
+        }
+      },
+      {
+        "name": "panel",
+        "kind": "solid",
+        "bg": "#FFFFFF",
+        "on_bg": "#0F172A",
+        "on_bg_muted": "#475569",
+        "roles": {
+          "border": "#E2E8F0",
+          "border_hover": "#CBD5E1",
+          "accent_tag": "#EEF2FF",
+          "accent_tag_text": "#1E40AF"
+        }
+      },
+      {
+        "name": "header_nav",
+        "kind": "glass",
+        "contrast_against": "#FFFFFF",
+        "guarantee": "backdrop-blur-md bg-white/95 border-b border-slate-200 shadow-sm",
+        "on_bg": "#0F172A",
+        "on_bg_muted": "#475569",
+        "roles": {
+          "active_link": "#DC2626",
+          "cta_button": "#DC2626"
+        }
+      },
+      {
+        "name": "hero",
+        "kind": "solid",
+        "bg": "#0B192C",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#CBD5E1",
+        "roles": {
+          "badge_bg": "#1E293B",
+          "badge_text": "#38BDF8",
+          "highlight": "#F87171",
+          "link": "#60A5FA",
+          "error": { "color": "#F87171", "contrast_against": "#0B192C" },
+          "success": { "color": "#4ADE80", "contrast_against": "#0B192C" }
+        }
+      },
+      {
+        "name": "inverse",
+        "kind": "solid",
+        "bg": "#0F172A",
+        "on_bg": "#F8FAFC",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "border": "#334155",
+          "accent": "#DC2626"
+        }
+      },
+      {
+        "name": "badge_admission",
+        "kind": "solid",
+        "bg": "#DCFCE7",
+        "on_bg": "#14532D",
+        "on_bg_muted": "#166534"
+      },
+      {
+        "name": "badge_counselling",
+        "kind": "solid",
+        "bg": "#E0E7FF",
+        "on_bg": "#1E1B4B",
+        "on_bg_muted": "#312E81"
+      },
+      {
+        "name": "badge_engineering",
+        "kind": "solid",
+        "bg": "#FEF2F2",
+        "on_bg": "#991B1B",
+        "on_bg_muted": "#B91C1C"
+      },
+      {
+        "name": "badge_management",
+        "kind": "solid",
+        "bg": "#F0FDF4",
+        "on_bg": "#166534",
+        "on_bg_muted": "#15803D"
+      },
+      {
+        "name": "badge_medical",
+        "kind": "solid",
+        "bg": "#F0FDFA",
+        "on_bg": "#115E59",
+        "on_bg_muted": "#0F766E"
+      }
+    ],
+    "accent": "#DC2626",
+    "on_accent": "#FFFFFF",
+    "brand_palette_breakdown": {
+      "digital_red": "#DC2626",
+      "shiksha_navy": "#0A2540",
+      "pencil_teal": "#0D9488",
+      "admission_green": "#16A34A",
+      "counselling_blue": "#1E3A8A"
+    }
+  },
+  "typography": {
+    "font_family_heading": "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+    "font_family_body": "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+    "font_family_mono": "'SF Mono', Monaco, Menlo, Consolas, monospace",
+    "scale_px": {
+      "display": 56,
+      "h1": 44,
+      "h2": 32,
+      "h3": 22,
+      "h4": 18,
+      "body": 16,
+      "caption": 14
+    },
+    "scale_classes": {
+      "display": "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight",
+      "h1": "text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight",
+      "h3": "text-xl sm:text-2xl font-semibold tracking-tight",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base leading-relaxed",
+      "caption": "text-sm text-slate-500 font-normal",
+      "overline": "text-xs font-bold uppercase tracking-wider text-red-600"
+    }
+  },
+  "entry_surfaces": {
+    "/": "split hero — brand positioning, live unified search (colleges, courses, exams), real stats on left, quick stream badge pill selector & featured top institute grid on right",
+    "/colleges": "structured directory with sticky filter sidebar (stream, city, state, college type, fee range), top search & sorting bar, and high-density college cards with fees, cutoff, ratings, and instant enquiry CTA",
+    "/colleges/:slug": "editorial college profile header with cover image, NIRF ranking, badges, quick action row, tabbed sub-navigation (Overview, Courses & Fees, Admission 2026, Cutoff, Placements, Reviews), and lead capture panel",
+    "/courses": "stream-categorized course hub with degree level filters (UG, PG, Diploma, Doctorate), duration, average fee bracket, career opportunities, and direct college list for each course",
+    "/exams": "national & state entrance exam timeline tracker (JEE, NEET, CAT, GATE, MHT-CET, etc.) with exam dates, syllabus, eligibility, and accepting colleges",
+    "/compare": "side-by-side 3-college matrix comparing NIRF rank, fee structures, placement CTC (highest & avg), admission criteria, and facilities",
+    "/news": "education updates, admission notices, cutoff analysis, and expert career guidance articles with category filters and search",
+    "/news/:slug": "article reader view with table of contents, author/consultant byline, share tools, related colleges and inline free counselling enquiry form",
+    "/consultation": "guided counselling booking workflow with student profile questionnaire, preferred location, budget, target course, and instant WhatsApp callback hook",
+    "/admin": "password-protected portal dashboard with lead management (filtering, export to CSV, status tracking: New, Contacted, In-Progress, Converted) and content CRUD for colleges, courses, exams, and articles"
+  },
+  "grids_and_layouts": {
+    "container_max_width": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "bento_home_streams": "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4",
+    "top_colleges_grid": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+    "directory_split": "grid grid-cols-1 lg:grid-cols-12 gap-8 items-start",
+    "directory_sidebar": "lg:col-span-3 sticky top-24 space-y-6",
+    "directory_content": "lg:col-span-9 space-y-6",
+    "compare_table": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4",
+    "admin_dashboard_grid": "grid grid-cols-1 md:grid-cols-4 gap-6"
+  },
+  "image_urls": {
+    "campus_hero": {
+      "url": "https://images.unsplash.com/photo-1687709348710-05314eea5476?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjBjb2xsZWdlJTIwY2FtcHVzJTIwdW5pdmVyc2l0eSUyMHN0dWRlbnRzfGVufDB8fHx8MTc5MTUyMzAxM3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Indian college university campus walkway with modern building architecture",
+      "category": "hero_background"
+    },
+    "campus_library": {
+      "url": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwxfHxjb2xsZWdlJTIwc3R1ZGVudHMlMjBsaWJyYXJ5JTIwc3R1ZHlpbmd8ZW58MHx8fHwxNzkxNTIzMDEzfDA&ixlib=rb-4.1.0&q=85",
+      "description": "College students collaborating and studying with laptops in modern academic space",
+      "category": "counselling_overview"
+    },
+    "graduates_celebration": {
+      "url": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwyfHxncmFkdWF0aW9uJTIwY2VyZW1vbnklMjBzdHVkZW50cyUyMGNhcHN8ZW58MHx8fHwxNzkxNTIzMDEzfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Successful graduates tossing caps in graduation ceremony",
+      "category": "placement_success"
+    },
+    "campus_building_landmark": {
+      "url": "https://images.unsplash.com/photo-1695722099520-564bb36a3a6b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHw0fHxpbmRpYW4lMjBjb2xsZWdlJTIwY2FtcHVzJTIwdW5pdmVyc2l0eSUyMHN0dWRlbnRzfGVufDB8fHx8MTc5MTUyMzAxM3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Prestigious Indian institute main building with lush grounds",
+      "category": "college_card_covers"
+    },
+    "students_mentoring": {
+      "url": "https://images.unsplash.com/photo-1790339616267-3e7bd8aab5eb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwyfHxpbmRpYW4lMjBjb2xsZWdlJTIwY2FtcHVzJTIwdW5pdmVyc2l0eSUyMHN0dWRlbnRzfGVufDB8fHx8MTc5MTUyMzAxM3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Graduates in commencement robes representing student guidance excellence",
+      "category": "about_digital_shiksha"
+    }
+  },
+  "component_structure": {
+    "navbar": "frontend/src/components/Navbar.tsx (Logo + Stream Mega-Menu + Search Trigger + City/Stream Quick Filters + Counselling CTA Button)",
+    "footer": "frontend/src/components/Footer.tsx (Pune Address + Contact numbers + Stream links + Quick Links + Disclaimer + Copyright)",
+    "floating_contact": "frontend/src/components/FloatingActions.tsx (WhatsApp Chat Float + Instant Call Button + Free Counselling Modal Trigger)",
+    "enquiry_dialog": "frontend/src/components/EnquiryModal.tsx (Clean lead capture form with course interest, city, phone validation, saved to MongoDB leads collection)",
+    "college_card": "frontend/src/components/CollegeCard.tsx (Logo, NIRF rank badge, fees, avg CTC, course tags, Compare checkbox, Enquire CTA)",
+    "compare_bar": "frontend/src/components/CompareFloatingBar.tsx (Sticky bottom drawer when 1-3 colleges are selected with 'Compare Now' button)",
+    "filter_sidebar": "frontend/src/components/FilterSidebar.tsx (Multi-facet filter: Stream, State, City, Degree, Fees, Type [Govt/Private])",
+    "admin_layout": "frontend/src/components/AdminLayout.tsx (Sidebar navigation for Leads, Colleges, Courses, Exams, Articles, and Logout)"
+  },
+  "motion_and_interactions": {
+    "transitions": "transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease",
+    "card_hover": "hover:-translate-y-1 hover:shadow-lg transition-transform duration-200",
+    "button_press": "active:scale-[0.98] transition-transform duration-100",
+    "tabs_switch": "motion.div with opacity fade and slide-x for tab content transitions",
+    "dropdown_enter": "tw-animate-in fade-in-0 zoom-in-95 duration-150"
+  },
+  "accessibility_requirements": {
+    "wcag_level": "AA",
+    "contrast_ratio_normal_text": ">= 4.5:1",
+    "contrast_ratio_large_text": ">= 3.0:1",
+    "data_testid_convention": "All interactive inputs, buttons, filter chips, tabs, search bars, and table rows must have explicit kebab-case data-testid attributes (e.g. data-testid='hero-search-input', data-testid='enquire-now-button', data-testid='filter-stream-engineering', data-testid='compare-checkbox-iit-bombay', data-testid='admin-leads-table')."
+  },
+  "instructions_to_main_agent": [
+    "1. Scope Boundaries: We focus 100% on INDIA higher education only (No Work Abroad, No Study Abroad as requested).",
+    "2. Logo & Branding: Use https://www.digitalshiksha.in/wp-content/uploads/2026/02/Digital-Shiksha-Logo-1.png in Navbar and Footer. Incorporate the red 'Digital', deep navy 'Shiksha', teal graduation cap motif, and counselling/admission badge styling.",
+    "3. Typography: Implement the Apple website font stack in index.css: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif.",
+    "4. Contact & Address: Saudamini Commercial Complex, C1-203, Paud Road, Bhusari Colony, Kothrud, Pune, Maharashtra 411038 | Phone: +91 8149 68 9468 | Email: enquiry@digitalshiksha.in.",
+    "5. Key Academic Streams: Engineering (B.Tech, M.Tech), Management (MBA, PGDM, BBA), Medical (MBBS, BDS, BAMS), Science (B.Sc, M.Sc), Commerce & Banking (B.Com, CA), Computer Applications (BCA, MCA), Law (BA LLB, LLM), Design & Animation.",
+    "6. Key Features: Unified Search, Stream Discovery, College Directory with multi-facet filters, Rich College Detail page with tabs (Overview, Courses & Fees, Admission 2026, Cutoffs, Placements), Courses directory, Entrance Exams portal, 3-way College Comparison, Educational News/Articles, and floating WhatsApp/Call widgets.",
+    "7. Backend & DB: MongoDB collections for colleges, courses, exams, articles, and enquiries/leads. Create seed.py with rich data for top Indian institutes (IIT Bombay, IIM Ahmedabad, AIIMS New Delhi, COEP Pune, Symbiosis Pune, BITS Pilani, etc.).",
+    "8. Admin Panel: Secure admin route (/admin) protected with password (e.g. admin123) with full lead table and CRUD capability.",
+    "9. Testing Compliance: Ensure data-testid attributes on all key interactive elements."
+  ]
+}
