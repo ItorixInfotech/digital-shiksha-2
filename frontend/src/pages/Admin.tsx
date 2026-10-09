@@ -225,7 +225,11 @@ export default function Admin() {
               <t.icon className="size-4" /> {t.label}
             </button>
           ))}
-          <button type="button" onClick={() => endSession("/admin/login")} data-testid="admin-logout-button" className="flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-sidebar-accent hover:text-white transition-colors lg:mt-6">
+          {/* Plain download link: same-origin GET carries the admin cookie; the file comes from /api/admin/export. */}
+          <a href="/api/admin/export" download data-testid="admin-export-db-link" className="flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-sidebar-accent hover:text-white transition-colors lg:mt-6">
+            <Download className="size-4" /> Download database
+          </a>
+          <button type="button" onClick={() => endSession("/admin/login")} data-testid="admin-logout-button" className="flex shrink-0 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-sidebar-accent hover:text-white transition-colors">
             <LogOut className="size-4" /> Logout
           </button>
         </nav>
