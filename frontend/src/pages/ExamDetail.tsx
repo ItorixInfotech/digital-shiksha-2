@@ -6,6 +6,7 @@ import EnquiryForm from "@/components/EnquiryForm";
 import { EmptyState, PageHeader } from "@/components/Common";
 import { apiGet } from "@/lib/api";
 import type { College, Exam } from "@/lib/types";
+import { EntitySeo } from "@/components/Seo";
 
 export default function ExamDetail() {
   const { slug = "" } = useParams();
@@ -20,6 +21,7 @@ export default function ExamDetail() {
 
   return (
     <div data-testid="exam-detail-page">
+      <EntitySeo kind="exams" item={e} />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Exams", to: "/exams" }, { label: e.name }]} title={`${e.name} 2026`} subtitle={`${e.full_name} — dates, eligibility, syllabus & accepting colleges`} testid="exam-header" />
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:px-8">
         <div className="space-y-6 lg:col-span-8">

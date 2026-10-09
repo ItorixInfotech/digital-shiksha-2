@@ -26,6 +26,16 @@ class CutoffRow(BaseModel):
     category: str = "General"  # General | OBC | EWS | SC | ST
 
 
+class SeoMeta(BaseModel):
+    """On-page SEO overrides; empty fields fall back to auto-generated defaults on the page."""
+    meta_title: str = Field(default="", max_length=120)
+    meta_description: str = Field(default="", max_length=320)
+    keywords: List[str] = []
+    canonical_url: str = ""
+    og_image: str = ""
+    noindex: bool = False
+
+
 class CollegeIn(BaseModel):
     slug: str
     name: str
@@ -52,6 +62,7 @@ class CollegeIn(BaseModel):
     top_recruiters: List[str] = []
     facilities: List[str] = []
     featured: bool = False
+    seo: SeoMeta = Field(default_factory=SeoMeta)
 
 
 class College(CollegeIn):
@@ -73,6 +84,7 @@ class CourseIn(BaseModel):
     specializations: List[str] = []
     careers: List[str] = []
     popular: bool = False
+    seo: SeoMeta = Field(default_factory=SeoMeta)
 
 
 class Course(CourseIn):
@@ -93,6 +105,7 @@ class ExamIn(BaseModel):
     overview: str = ""
     syllabus: List[str] = []
     website: str = ""
+    seo: SeoMeta = Field(default_factory=SeoMeta)
 
 
 class Exam(ExamIn):
@@ -109,6 +122,7 @@ class ArticleIn(BaseModel):
     image: str = ""
     published_at: str = ""
     tags: List[str] = []
+    seo: SeoMeta = Field(default_factory=SeoMeta)
 
 
 class Article(ArticleIn):

@@ -6,6 +6,7 @@ import { EmptyState, PageHeader } from "@/components/Common";
 import { apiGet } from "@/lib/api";
 import type { Article } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { EntitySeo, PageSeo } from "@/components/Seo";
 
 const CATS = ["", "Admission", "Exam", "College", "Career"];
 const fmt = (d: string) => (d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "");
@@ -19,6 +20,7 @@ export function News() {
 
   return (
     <div data-testid="news-page">
+      <PageSeo page="news" />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "News" }]} title="Education News & Articles" subtitle="Admission alerts, exam updates, cutoff analysis and career guidance from Digital Shiksha experts." testid="news-header" />
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-wrap gap-2">
@@ -69,6 +71,7 @@ export function ArticleDetail() {
 
   return (
     <div data-testid="article-page">
+      <EntitySeo kind="articles" item={a} />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "News", to: "/news" }, { label: a.category }]} title={a.title} testid="article-header">
         <div className="mt-5 flex flex-wrap gap-5 text-sm text-slate-300">
           <span className="flex items-center gap-1.5"><UserRound className="size-4" /> {a.author}</span>

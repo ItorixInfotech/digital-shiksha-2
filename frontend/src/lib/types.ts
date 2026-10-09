@@ -16,6 +16,39 @@ export interface CutoffRow {
   category: string;
 }
 
+export interface SeoMeta {
+  meta_title: string;
+  meta_description: string;
+  keywords: string[];
+  canonical_url: string;
+  og_image: string;
+  noindex: boolean;
+}
+
+export interface PageSeoIn {
+  key: string;
+  meta_title: string;
+  meta_description: string;
+  og_image: string;
+  noindex: boolean;
+}
+
+export interface PageSeo extends PageSeoIn {
+  label: string;
+  path: string;
+  default_title: string;
+  default_description: string;
+}
+
+export interface SeoPages {
+  year: number;
+  pages: PageSeo[];
+}
+
+export interface SeoPagesIn {
+  pages: PageSeoIn[];
+}
+
 export interface CollegeIn {
   slug: string;
   name: string;
@@ -42,6 +75,7 @@ export interface CollegeIn {
   top_recruiters: string[];
   facilities: string[];
   featured: boolean;
+  seo: SeoMeta;
 }
 export interface College extends CollegeIn {
   id: string;
@@ -62,6 +96,7 @@ export interface CourseIn {
   specializations: string[];
   careers: string[];
   popular: boolean;
+  seo: SeoMeta;
 }
 export interface Course extends CourseIn {
   id: string;
@@ -81,6 +116,7 @@ export interface ExamIn {
   overview: string;
   syllabus: string[];
   website: string;
+  seo: SeoMeta;
 }
 export interface Exam extends ExamIn {
   id: string;
@@ -96,6 +132,7 @@ export interface ArticleIn {
   image: string;
   published_at: string;
   tags: string[];
+  seo: SeoMeta;
 }
 export interface Article extends ArticleIn {
   id: string;

@@ -3,6 +3,7 @@ import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import EnquiryForm from "@/components/EnquiryForm";
 import { PageHeader } from "@/components/Common";
 import { SITE } from "@/lib/site";
+import { PageSeo, Seo } from "@/components/Seo";
 
 const STEPS = [
   ["Share your profile", "Tell us your scores, preferred course, city and budget."],
@@ -14,6 +15,7 @@ const STEPS = [
 export function Consultation() {
   return (
     <div data-testid="consultation-page">
+      <PageSeo page="consultation" />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Free Counselling" }]} title="Book your free admission consultation" subtitle="Personalised guidance from Pune's trusted admission consultants — for Engineering, MBA, Medical, Law and every course in India." testid="consultation-header" />
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-12 lg:px-8">
         <div className="lg:col-span-5">
@@ -52,6 +54,7 @@ export function Consultation() {
 export function NotFound() {
   return (
     <div className="mx-auto max-w-xl px-4 py-24 text-center" data-testid="not-found-page">
+      <Seo title="Page not found | Digital Shiksha" description="This page does not exist." noindex />
       <p className="text-6xl font-bold text-brand-red">404</p>
       <h1 className="mt-4 text-2xl font-semibold">Page not found</h1>
       <p className="mt-2 text-slate-500">The page you're looking for doesn't exist.</p>

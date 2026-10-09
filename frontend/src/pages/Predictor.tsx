@@ -14,6 +14,7 @@ import type { PredictorCategory, PredictorChance, PredictorExam, PredictorIn, Pr
 import { feeRange, slugify } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
+import { PageSeo } from "@/components/Seo";
 
 const CITIES: Record<string, string> = { both: "Pune & Mumbai", Pune: "Pune only", Mumbai: "Mumbai only", all: "All India" };
 const CITY_LIST: Record<string, string[]> = { both: ["Pune", "Mumbai"], Pune: ["Pune"], Mumbai: ["Mumbai"], all: [] };
@@ -80,6 +81,7 @@ export default function Predictor() {
 
   return (
     <div data-testid="predictor-page">
+      <PageSeo page="predictor" />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "College Predictor" }]} title={<>College Predictor <span className="text-red-400">2026</span></>}
         subtitle="Enter your MHT CET, JEE Main, NEET or MBA CET score and see which Pune & Mumbai colleges you can likely get, based on last year's closing cutoffs." testid="predictor-header">
         <form onSubmit={submit} className="mt-8 grid max-w-4xl gap-4 rounded-2xl bg-white p-5 text-slate-900 shadow-2xl sm:grid-cols-12 sm:items-end" data-testid="predictor-form">

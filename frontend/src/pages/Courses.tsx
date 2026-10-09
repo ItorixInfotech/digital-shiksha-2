@@ -6,6 +6,8 @@ import { apiGet } from "@/lib/api";
 import type { Course } from "@/lib/types";
 import { STREAMS, slugify, streamDef } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { PageSeo } from "@/components/Seo";
+import { breadcrumbLd } from "@/lib/seo";
 
 const LEVELS = ["", "UG", "PG", "Diploma", "Doctorate", "Certification"];
 
@@ -23,6 +25,7 @@ export default function Courses() {
 
   return (
     <div data-testid="courses-page">
+      <PageSeo page="courses" jsonLd={[breadcrumbLd([["Home", "/"], ["Courses", "/courses"]])]} />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Courses" }]} title="Courses in India 2026" subtitle="Explore UG, PG, Diploma and Doctorate courses across every stream — duration, fees, eligibility, entrance exams and career scope." testid="courses-header" />
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-wrap gap-2" data-testid="courses-level-filter">

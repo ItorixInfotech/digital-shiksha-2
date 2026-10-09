@@ -1,0 +1,97 @@
+import { SITE } from "@/lib/site";
+import type { SeoMeta } from "@/lib/types";
+
+export type SeoKind = "colleges" | "courses" | "exams" | "articles";
+export const EMPTY_SEO: SeoMeta = { meta_title: "", meta_description: "", keywords: [], canonical_url: "", og_image: "", noindex: false };
+export const TITLE_MAX = 60;
+export const DESC_MAX = 160;
+export const PATH: Record<SeoKind, string> = { colleges: "/colleges", courses: "/courses", exams: "/exams", articles: "/news" };
+const SECTION: Record<SeoKind, string> = { colleges: "Colleges", courses: "Courses", exams: "Exams", articles: "News" };
+
+const str = (v: unknown) => (v === null || v === undefined ? "" : String(v)).trim();
+const list = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : str(v).split(",")).map((x) => x.trim()).filter(Boolean);
+export const clip = (s: string, n: number) => (s.length <= n ? s : `${s.slice(0, n - 1).replace(/\s+\S*$/, "")}…`);
+const firstSentence = (s: string) => str(s).split(/(?<=\.)\s/)[0] ?? "";
+
+/** Auto-generated title/description used whenever the admin leaves the SEO field empty. Accepts API rows or admin form state. */
+export function defaultSeo(kind: SeoKind, raw: object, year: number): { title: string; description: string; keywords: string[] } {
+  const r = raw as Record<string, unknown>;
+  if (kind === "colleges") {
+    const name = str(r.name), short = str(r.short_name) || name, city = str(r.city);
+    const exams = list(r.exams_accepted).slice(0, 3).join(", ");
+    const parts = [`${name}${city ? `, ${city}` : ""}: courses & fees${exams ? `, ${exams} cutoff` : ""}`,
+      Number(r.avg_package) ? `placements (avg ₹${str(r.avg_package)} LPA)` : "placements",
+      Number(r.nirf_rank) ? `NIRF rank ${str(r.nirf_rank)}` : "", `admission ${year}`].filter(Boolean);
+    return {
+      title: `${short}${city && !short.includes(city) ? ` ${city}` : ""}: Fees, Cutoff, Placements ${year} | ${SITE.name}`,
+      description: clip(`${parts.join(", ")}. Free counselling: ${SITE.phone}.`, DESC_MAX),
+      keywords: [`${short} fees`, `${short} cutoff ${year}`, `${short} placements`, `${short} admission`, city && `colleges in ${city}`].filter(Boolean) as string[],
+    };
+  }
+  if (kind === "courses") {
+    const name = str(r.name), full = str(r.full_name);
+    return {
+      title: `${name}${full && full !== name ? ` (${full})` : ""}: Fees, Eligibility, Colleges ${year} | ${SITE.name}`,
+      description: clip(firstSentence(str(r.overview)) || `${full || name} course details — duration ${str(r.duration) || "-"}, fees ${str(r.avg_fees) || "-"}, eligibility, entrance exams, top colleges and career scope in India.`, DESC_MAX),
+      keywords: [`${name} course`, `${name} fees`, `${name} eligibility`, `${name} colleges`, `${name} admission ${year}`],
+    };
+  }
+  if (kind === "exams") {
+    const name = str(r.name), full = str(r.full_name);
+    return {
+      title: `${name} ${year}: Exam Date, Eligibility, Syllabus, Cutoff | ${SITE.name}`,
+      description: clip(`${full || name} ${year}${str(r.exam_date) ? ` on ${str(r.exam_date)}` : ""} — application dates, eligibility, syllabus, pattern, cutoff and colleges accepting ${name}.`, DESC_MAX),
+      keywords: [`${name} ${year}`, `${name} exam date`, `${name} syllabus`, `${name} eligibility`, `${name} cutoff`],
+    };
+  }
+  return {
+    title: `${clip(str(r.title), 48)} | ${SITE.name}`,
+    description: clip(str(r.excerpt) || firstSentence(str(r.content)), DESC_MAX),
+    keywords: list(r.tags),
+  };
+}
+
+export const origin = () => (typeof window === "undefined" ? "" : window.location.origin);
+export const absUrl = (u: string) => (!u ? "" : /^https?:\/\//.test(u) ? u : `${origin()}${u.startsWith("/") ? "" : "/"}${u}`);
+
+export function breadcrumbLd(items: [string, string][]) {
+  return {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: items.map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: absUrl(path) })),
+  };
+}
+
+const publisher = () => ({ "@type": "Organization", name: SITE.name, logo: { "@type": "ImageObject", url: absUrl(SITE.logo) } });
+
+export function organizationLd() {
+  return {
+    "@context": "https://schema.org", "@type": "EducationalOrganization", name: SITE.name, url: origin(), logo: absUrl(SITE.logo),
+    telephone: "+918149689468", email: SITE.email, sameAs: [SITE.facebook, SITE.instagram],
+    address: { "@type": "PostalAddress", streetAddress: "Saudamini Commercial Complex, C1-203, Paud Road, Bhusari Colony, Kothrud", addressLocality: "Pune", addressRegion: "Maharashtra", postalCode: "411038", addressCountry: "IN" },
+  };
+}
+
+/** Page schema + breadcrumbs for a detail page. */
+export function entityLd(kind: SeoKind, raw: object, description: string): object[] {
+  const r = raw as Record<string, unknown>;
+  const title = str(r.name) || str(r.title);
+  const path = `${PATH[kind]}/${str(r.slug)}`;
+  const crumbs = breadcrumbLd([["Home", "/"], [SECTION[kind], PATH[kind]], [title, path]]);
+  let main: object | null = null;
+  if (kind === "colleges") {
+    main = {
+      "@context": "https://schema.org", "@type": "CollegeOrUniversity", name: title, alternateName: str(r.short_name) || undefined, url: absUrl(path),
+      image: str(r.image) || undefined, description, foundingDate: str(r.established) || undefined,
+      address: { "@type": "PostalAddress", addressLocality: str(r.city), addressRegion: str(r.state), addressCountry: "IN" },
+    };
+  } else if (kind === "courses") {
+    main = { "@context": "https://schema.org", "@type": "Course", name: str(r.full_name) || title, description, url: absUrl(path), provider: publisher(),
+      educationalLevel: str(r.level) || undefined, timeRequired: str(r.duration) || undefined };
+  } else if (kind === "articles") {
+    const date = str(r.published_at);
+    main = { "@context": "https://schema.org", "@type": "NewsArticle", headline: clip(title, 110), description, image: str(r.image) ? [str(r.image)] : undefined,
+      datePublished: date || undefined, dateModified: date || undefined, author: { "@type": "Organization", name: str(r.author) || SITE.name }, publisher: publisher(),
+      mainEntityOfPage: absUrl(path), keywords: list(r.tags).join(", ") || undefined };
+  }
+  return main ? [main, crumbs] : [crumbs];
+}

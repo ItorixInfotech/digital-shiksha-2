@@ -11,6 +11,8 @@ import { apiGet } from "@/lib/api";
 import type { College, FacetCount, Meta } from "@/lib/types";
 import { slugify } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { PageSeo } from "@/components/Seo";
+import { breadcrumbLd } from "@/lib/seo";
 
 const FEES = [["", "Any budget"], ["100000", "Under ₹1 Lakh"], ["300000", "Under ₹3 Lakh"], ["1000000", "Under ₹10 Lakh"]] as const;
 const SORTS: Record<string, string> = { rank: "NIRF Rank", rating: "Rating", package: "Highest avg package", fees: "Lowest fees" };
@@ -83,6 +85,7 @@ export default function Colleges() {
 
   return (
     <div data-testid="colleges-page">
+      <PageSeo page="colleges" jsonLd={[breadcrumbLd([["Home", "/"], ["Colleges", "/colleges"]])]} />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Colleges" }]} title={heading} subtitle="Compare fees, NIRF rankings, cutoffs and placements. Shortlist up to 3 colleges to compare side-by-side." testid="colleges-header">
         <form onSubmit={(e) => { e.preventDefault(); set("q", q.trim()); }} className="mt-6 flex max-w-xl items-center gap-2 rounded-xl bg-white p-1.5 pl-3">
           <Search className="size-4 text-slate-400" />

@@ -11,6 +11,8 @@ import { apiGet } from "@/lib/api";
 import type { Article, College, Course, Exam, Meta } from "@/lib/types";
 import { SITE, STATS, STREAMS, slugify } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
+import { PageSeo } from "@/components/Seo";
+import { organizationLd } from "@/lib/seo";
 
 const HERO_IMG = "https://images.unsplash.com/photo-1687709348710-05314eea5476?crop=entropy&cs=srgb&fm=jpg&q=80&w=1600";
 const QUICK = [["College Predictor", "/predictor"], ["B.Tech", "/courses/btech"], ["MBA", "/courses/mba"], ["MBBS", "/courses/mbbs"], ["BBA", "/courses/bba"], ["BA LLB", "/courses/ba-llb"], ["MHT CET", "/exams/mht-cet"], ["NEET UG", "/exams/neet-ug"]];
@@ -40,6 +42,7 @@ export default function Home() {
 
   return (
     <div data-testid="home-page">
+      <PageSeo page="home" jsonLd={[organizationLd(), { "@context": "https://schema.org", "@type": "WebSite", name: "Digital Shiksha", url: window.location.origin }]} />
       {/* HERO */}
       <section className="relative overflow-hidden bg-brand-ink text-white" data-testid="home-hero">
         <img src={HERO_IMG} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />

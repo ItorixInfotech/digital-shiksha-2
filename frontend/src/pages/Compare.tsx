@@ -9,6 +9,7 @@ import { apiGet } from "@/lib/api";
 import type { College } from "@/lib/types";
 import { feeRange } from "@/lib/site";
 import { MAX_COMPARE, useSite } from "@/lib/site-context";
+import { PageSeo } from "@/components/Seo";
 
 const ROWS: [string, (c: College) => string][] = [
   ["Location", (c) => `${c.city}, ${c.state}`],
@@ -44,6 +45,7 @@ export default function Compare() {
 
   return (
     <div data-testid="compare-page">
+      <PageSeo page="compare" />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Compare Colleges" }]} title="Compare colleges side-by-side" subtitle="Pick up to 3 colleges and compare rankings, fees, placements and admission criteria." testid="compare-header" />
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         {compare.length < MAX_COMPARE && (

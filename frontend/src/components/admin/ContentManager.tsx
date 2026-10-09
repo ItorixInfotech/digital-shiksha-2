@@ -11,6 +11,16 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { apiDelete, apiGet, apiPost, apiPut, ApiError } from "@/lib/api";
 import { slugify } from "@/lib/site";
+import SeoEditor, { type SeoForm } from "@/components/admin/SeoEditor";
+import { useSeoPages } from "@/components/Seo";
+import { defaultSeo, EMPTY_SEO } from "@/lib/seo";
+import type { SeoMeta } from "@/lib/types";
+
+const toSeoForm = (s?: SeoMeta): SeoForm => { const v = { ...EMPTY_SEO, ...s }; return { ...v, keywords: v.keywords.join(", ") }; };
+const fromSeoForm = (f: SeoForm): SeoMeta => ({
+  meta_title: f.meta_title.trim(), meta_description: f.meta_description.trim(), canonical_url: f.canonical_url.trim(), og_image: f.og_image.trim(), noindex: f.noindex,
+  keywords: f.keywords.split(",").map((x) => x.trim()).filter(Boolean),
+});
 
 export type FieldType = "text" | "number" | "textarea" | "list" | "json" | "bool";
 export interface FieldSpec {
@@ -63,6 +73,8 @@ export default function ContentManager({ resource, title, fields, columns, publi
   const [q, setQ] = useState("");
   const [editing, setEditing] = useState<Row | null | undefined>(undefined); // undefined = closed, null = new
   const [form, setForm] = useState<FormState>({});
+  const [seo, setSeo] = useState<SeoForm>(toSeoForm());
+  const seoPages = useSeoPages();
   const [confirmDel, setConfirmDel] = useState<Row | null>(null);
 
   const list = useQuery({ queryKey: [resource, "admin"], queryFn: () => apiGet<Row[]>(`/${resource}${resource === "colleges" ? "?limit=500" : ""}`) });
@@ -79,13 +91,13 @@ export default function ContentManager({ resource, title, fields, columns, publi
     onError: () => toast.error("Delete failed"),
   });
 
-  const open = (row: Row | null) => { setForm(toForm(fields, row ?? undefined)); setEditing(row); };
+  const open = (row: Row | null) => { setForm(toForm(fields, row ?? undefined)); setSeo(toSeoForm(row?.seo as SeoMeta | undefined)); setEditing(row); };
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     for (const s of fields) if (s.required && !String(form[s.key] ?? "").trim()) return toast.error(`${s.label} is required`);
     let body: Record<string, unknown>;
     try { body = toPayload(fields, form); } catch { return toast.error("Invalid JSON in one of the fields"); }
-    save.mutate(body);
+    save.mutate({ ...body, seo: fromSeoForm(seo) });
   };
 
   const rows = useMemo(() => (list.data ?? []).filter((r) => !q || JSON.stringify([r.name, r.title, r.slug]).toLowerCase().includes(q.toLowerCase())), [list.data, q]);
@@ -152,6 +164,8 @@ export default function ContentManager({ resource, title, fields, columns, publi
                 </div>
               );
             })}
+            <SeoEditor value={seo} onChange={setSeo} defaults={defaultSeo(resource, form, seoPages.data?.year ?? new Date().getFullYear())}
+              path={`${publicPath}/${String(form.slug ?? "")}`} testid={`admin-${resource}-seo`} />
             <DialogFooter className="sm:col-span-2">
               <Button type="button" variant="outline" onClick={() => setEditing(undefined)} data-testid={`admin-${resource}-cancel-button`}>Cancel</Button>
               <Button type="submit" disabled={save.isPending} data-testid={`admin-${resource}-save-button`} className="bg-brand-navy text-white hover:bg-brand-blue">{save.isPending ? "Saving…" : "Save"}</Button>

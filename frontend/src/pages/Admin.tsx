@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock, Users } from "lucide-react";
+import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock, Users, SearchCheck } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,8 @@ import PredictorReportPanel from "@/components/admin/PredictorReport";
 import CutoffUploadPanel from "@/components/admin/CutoffUpload";
 import WhatsAppPanel from "@/components/admin/WhatsAppPanel";
 import CounsellorsPanel from "@/components/admin/CounsellorsPanel";
+import SeoPagesPanel from "@/components/admin/SeoPagesPanel";
+import { Seo } from "@/components/Seo";
 import type { FieldSpec } from "@/components/admin/ContentManager";
 import { apiDelete, apiGet, apiPatch, apiPost, ApiError } from "@/lib/api";
 import { beginSession, endSession } from "@/lib/session";
@@ -106,6 +108,7 @@ const TABS = [
   { key: "courses", label: "Courses", icon: GraduationCap },
   { key: "exams", label: "Exams", icon: FileText },
   { key: "articles", label: "Articles", icon: Newspaper },
+  { key: "seo", label: "SEO → Pages", icon: SearchCheck },
 ] as const;
 type TabKey = (typeof TABS)[number]["key"];
 
@@ -120,6 +123,7 @@ export function AdminLogin() {
   });
   return (
     <div className="grid min-h-screen place-items-center bg-brand-ink px-4" data-testid="admin-login-page">
+      <Seo title="Admin login | Digital Shiksha" description="Digital Shiksha admin" noindex />
       <Toaster richColors />
       <form onSubmit={(e) => { e.preventDefault(); login.mutate(); }} className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl animate-fade-up">
         <img src={SITE.logo} alt="Digital Shiksha" className="h-14 w-auto" />
@@ -273,6 +277,7 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-slate-50 lg:flex" data-testid="admin-dashboard">
+      <Seo title="Admin | Digital Shiksha" description="Digital Shiksha admin" noindex />
       <Toaster richColors />
       <aside className="bg-sidebar text-sidebar-foreground lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0">
         <div className="flex items-center gap-3 p-5">
@@ -310,6 +315,7 @@ export default function Admin() {
         <div className="mt-8">
           {tab === "leads" && <LeadsPanel whatsappOn={stats.data?.whatsapp_alerts} wa={stats.data?.whatsapp} />}
           {tab === "counsellors" && <CounsellorsPanel />}
+          {tab === "seo" && <SeoPagesPanel />}
           {tab === "predictor" && <PredictorReportPanel />}
           {tab === "cutoffs" && <CutoffUploadPanel />}
           {tab === "whatsapp" && <WhatsAppPanel />}

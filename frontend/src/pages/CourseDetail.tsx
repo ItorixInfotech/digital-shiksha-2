@@ -7,6 +7,7 @@ import { EmptyState, PageHeader } from "@/components/Common";
 import { apiGet } from "@/lib/api";
 import type { College, Course, Exam } from "@/lib/types";
 import { slugify } from "@/lib/site";
+import { EntitySeo } from "@/components/Seo";
 
 export default function CourseDetail() {
   const { slug = "" } = useParams();
@@ -22,6 +23,7 @@ export default function CourseDetail() {
 
   return (
     <div data-testid="course-detail-page">
+      <EntitySeo kind="courses" item={c} />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Courses", to: "/courses" }, { label: c.name }]} title={<>{c.name}: <span className="text-red-400">{c.full_name}</span></>} subtitle={`${c.stream} • Admission 2026, fees, eligibility, entrance exams & career scope`} testid="course-header" />
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:px-8">
         <div className="space-y-6 lg:col-span-8">

@@ -33,6 +33,13 @@ if (!hotReloadDisabled) {
   process.env.CHOKIDAR_USEPOLLING = "true";
 }
 
+// /api → FastAPI; crawler files at the site root are served by the backend's SEO router.
+const SEO_PROXY = {
+  "/api": { target: "http://localhost:8001", changeOrigin: true },
+  "/sitemap.xml": { target: "http://localhost:8001", changeOrigin: false, rewrite: () => "/api/sitemap.xml" },
+  "/robots.txt": { target: "http://localhost:8001", changeOrigin: false, rewrite: () => "/api/robots.txt" },
+};
+
 // https://vite.dev/config/
 export default defineConfig(async () => {
   const emergentOverlay = await loadEmergentOverlay();
@@ -101,12 +108,8 @@ export default defineConfig(async () => {
       watch: hotReloadDisabled ? null : { usePolling: true, interval: 300 },
       // The /api proxy convention: frontend code calls relative /api/*, never an
       // absolute backend URL. Target is the FastAPI dev server (supervisor: backend).
-      proxy: {
-        "/api": {
-          target: "http://localhost:8001",
-          changeOrigin: true,
-        },
-      },
+      proxy: SEO_PROXY,
     },
+    preview: { proxy: SEO_PROXY },
   } satisfies UserConfig;
 });
