@@ -7,3 +7,11 @@ crons:
     endpoint: "{{BASE_URL}}/api/cron/morning-reminders"
     method: POST
     enabled: true
+  - name: weekly-seo-report
+    description: "Emails the weekly SEO report (pages turned green + top 10 quick fixes) on Monday 9 AM IST"
+    cron: "0 9 * * 1"
+    timezone: "Asia/Kolkata"
+    # Cron endpoints must ack 2xx immediately; enqueue/background the actual work.
+    endpoint: "{{BASE_URL}}/api/cron/weekly-seo-report"
+    method: POST
+    enabled: true

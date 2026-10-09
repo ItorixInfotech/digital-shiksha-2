@@ -449,3 +449,47 @@ export interface WaMessageStatus {
   status: string;
   error: string;
 }
+
+export interface KeywordFillItem {
+  kind: string;
+  slug: string;
+  name: string;
+  keyword: string;
+}
+
+export interface KeywordFillResult {
+  dry_run: boolean;
+  without_keyword: number;
+  will_fill: number;
+  skipped: number;
+  newly_green: number;
+  items: KeywordFillItem[];
+}
+
+export interface SeoReportItem {
+  kind: string;
+  slug: string;
+  name: string;
+  score: number;
+  level: string;
+  fixes: string[];
+  url: string;
+}
+
+export interface SeoReportKind {
+  kind: string;
+  label: string;
+  green: number;
+  amber: number;
+  red: number;
+}
+
+export interface SeoReportSummary {
+  baseline: boolean;
+  since: string;
+  total: number;
+  needs_fix: number;
+  kinds: SeoReportKind[];
+  turned_green: SeoReportItem[];
+  top_fixes: SeoReportItem[];
+}

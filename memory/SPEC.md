@@ -85,3 +85,8 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 - Sort: fixEffort = sum of FIX_EFFORT of failing checks (index 1, keyword 1, title 2, description 2, image 2, faqs 3, content 4), then higher score, then name. Failing checks shown as chips.
 - "Fix" opens the record's own edit dialog in place: ContentManager / LandingManager accept `editSlug` + `onClose` (dialog-only mode). Field specs moved to components/admin/resources.ts (RESOURCES).
 - City page default title is now "Top {Stream} Colleges in {City} {year} | Digital Shiksha"; city page focus keyword defaults to its label.
+
+## v11: One-click focus keywords + weekly SEO email
+- `backend/lib/seo_score.py` = Python mirror of lib/seo.ts defaultSeo/seoScore/FIX_EFFORT (KEEP IN SYNC; parity verified: 136 to-fix both sides before keyword fill).
+- POST /api/admin/seo/keywords?dry_run=true|false: fills seo.keywords=[kw] only for colleges/courses/exams/articles with no keywords; kw = suggest_keyword() (college "{short} {city}", exam "{name} {year}", course name, article tag/title words) and must already appear in the effective title/description. Returns will_fill, newly_green, skipped, items. UI: SEO Fix List → "Fill focus keywords" (preview dialog → Apply).
+- Weekly report: POST /api/admin/seo/report/send (manual, doesn't move baseline) and POST /api/cron/weekly-seo-report (crons.yml weekly-seo-report, Mon 09:00 Asia/Kolkata; updates baseline). Email to SEO_REPORT_EMAIL or LEAD_ALERT_EMAIL: per-type green/amber/red, pages turned green since last snapshot (settings key seo_snapshot {levels{"kind:slug": level}, at}), top 10 quickest fixes. Cron auth shared in lib/cron.py accept_cron().

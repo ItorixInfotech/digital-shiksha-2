@@ -13,7 +13,7 @@ load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
 from lib.db import client, ensure_indexes
-from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing
+from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools
 
 
 @asynccontextmanager
@@ -41,6 +41,7 @@ api_router.include_router(whatsapp_admin.router)
 api_router.include_router(counsellors.router)
 api_router.include_router(seo.router)
 api_router.include_router(landing.router)
+api_router.include_router(seo_tools.router)
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,15 +1,12 @@
 """Counsellors CRUD, lead assignment, morning reminders (manual + platform cron)."""
-import os
 import re
-import secrets
-from datetime import datetime, timezone
+from datetime import timezone
 from typing import List
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
-from fastapi.responses import JSONResponse
-from pymongo.errors import DuplicateKeyError
 
 from lib import counsellors as cs
+from lib.cron import accept_cron
 from lib import whatsapp as wa
 from lib.db import db
 from models.content import Lead
@@ -113,22 +110,8 @@ async def send_now(background: BackgroundTasks, _: str = Depends(require_admin))
 @router.post("/cron/morning-reminders", status_code=202)
 async def cron_morning_reminders(request: Request, background: BackgroundTasks):
     # Cron endpoints must ack 2xx immediately; enqueue/background the actual work.
-    expected = os.environ.get("WEBHOOK_CRON_SECRET", "")
-    auth = request.headers.get("authorization", "")
-    token = auth[7:] if auth.lower().startswith("bearer ") else ""
-    if not expected or not token or not secrets.compare_digest(token, expected):
-        return JSONResponse({"detail": "Unauthorized"}, status_code=401)
-    try:
-        env = await request.json()
-    except ValueError:
-        env = None
-    if not isinstance(env, dict):
-        return JSONResponse({"detail": "Invalid body"}, status_code=400)
-    run_id = request.headers.get("x-webhook-id") or env.get("run_id") or ""
-    if run_id:
-        try:
-            await db.cron_runs.insert_one({"_id": f"morning-reminders:{run_id}", "at": datetime.now(timezone.utc)})
-        except DuplicateKeyError:
-            return {"ok": True, "duplicate": True}
+    early = await accept_cron(request, "morning-reminders")
+    if early is not None:
+        return early
     await _queue_reminders(background, "8 AM schedule")
     return {"ok": True}
