@@ -1,0 +1,64 @@
+{
+  "iteration": 1,
+  "passed": 7,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Code-review fix: owner lead-alert email is no longer dropped when the enquiry text contains phishing-like words (e.g. 'CVV', 'seed phrase')",
+      "name": "test_tscheck_lead_alert_phishing_words.py::test_enquiry_with_phishing_words_sends_lead_alert",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/enquiries with message containing 'CVV' and 'seed phrase' -> 201; backend.err.log: 'Lead alert for <id> sent: 01a11f86-d793-7526-a965-6fe9ebbb9e74'; no 'Lead alert failed' / no 'asks the recipient for credentials' line. Confirmed in code: lib/email.py send_email(internal=True) skips the credential-phrase scan for staff alerts."
+    },
+    {
+      "criterion": "Duplicate enquiry (same phone within 10 min) does not consume an auto-assign round-robin turn",
+      "name": "test_tscheck_duplicate_enquiry_round_robin.py::test_duplicate_enquiry_skips_round_robin_turn",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "With auto_assign ON + 2 fresh counsellors: enquiry A -> counsellor_id=c1; immediate duplicate (same phone) -> counsellor_id=null; enquiry B (new phone) -> counsellor_id=c2 (the OTHER counsellor). Test restores auto_assign to its prior value (false) and deletes its fixture leads/counsellors in a finally block; verified via curl afterwards: GET /admin/counsellor-settings -> auto_assign:false."
+    },
+    {
+      "criterion": "Morning reminder cron acks fast and is protected",
+      "name": "test_tscheck_morning_reminder_cron.py (3 tests: no-auth, valid-bearer+idempotent, non-JSON body)",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/cron/morning-reminders no Bearer -> 401; with Bearer WEBHOOK_CRON_SECRET + new X-Webhook-Id -> 202 in <5s, duplicate!=true; same X-Webhook-Id replayed -> 202 {\"duplicate\":true}; non-JSON body with valid bearer -> 400."
+    },
+    {
+      "criterion": "Weekly SEO report cron",
+      "name": "test_tscheck_weekly_seo_report_cron.py (3 tests: no-auth, valid-bearer, admin send shape)",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/cron/weekly-seo-report no auth -> 401; valid bearer -> 202 in <5s; admin POST /admin/seo/report/send -> 200 with needs_fix:int, kinds len=5 (colleges/courses/exams/articles/landing), top_fixes len<=10."
+    },
+    {
+      "criterion": "Admin counsellor assignment UI still works",
+      "name": "admin-counsellor-assigns-lead",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Logged in as admin; added fixture counsellor via Counsellors tab UI; created fixture lead via POST /api/enquiries; on Leads tab, used the per-row Counsellor select to assign the fixture counsellor to the fixture lead; success toast 'Assigned to <name> — WhatsApp & email alert queued' appeared; select now shows the counsellor's name. Also re-ran once against the public preview URL https://digital-shiksha-2.preview.emergentagent.com (passed)."
+    },
+    {
+      "criterion": "Admin counsellor assignment UI still works (reminders)",
+      "name": "admin-counsellors-send-reminders",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Admin -> Counsellors -> 'Send reminders now' renders the admin-reminder-result recipient list (screenshot captured)."
+    },
+    {
+      "criterion": "SEO Fix List still works",
+      "name": "admin-seo-fix-list",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Admin -> SEO Fix List shows summary cards (admin-seo-summary-colleges etc) and the fix table; 'Fix' opens the record edit dialog (role=dialog visible), closed without saving. 'Fill focus keywords': current seed data has 0 pages without a keyword (verified via POST /admin/seo/keywords?dry_run=true -> will_fill:0), so the app correctly shows an info toast instead of an empty preview dialog -- this is the documented behavior in SeoDashboard.tsx (onSuccess: if (d.will_fill) setPreview(d); else toast.info(...)), not a bug. Apply was never clicked."
+    }
+  ],
+  "notes": [
+    "SEO Fix List 'Fill focus keywords' preview-dialog path could not be exercised end-to-end because every colleges/courses/exams/articles record in the current dataset already has a focus keyword (will_fill=0); the dialog only renders when will_fill>0. Code path for the dialog (admin-seo-keywords-dialog, will-fill/newly-green/skipped counts, cancel button) was inspected in SeoDashboard.tsx and matches the acceptance criterion; just not currently reachable without first removing keywords from seeded (non-fixture) records, which the fixture-discipline rule forbids.",
+    "Twilio WhatsApp sends fail on the trial account (400/422) and some Resend emails hit a 429 rate limit during the reminder tests -- both match spec_deviations as expected, not bugs.",
+    "Matrix has 6 criteria; 7 artifacts produced because the counsellor-assignment criterion covers two distinct UI flows (lead assignment + send reminders), each getting its own browser check."
+  ]
+}

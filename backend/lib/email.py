@@ -60,12 +60,12 @@ class _EmailScan(HTMLParser):
             self._href, self._text = None, []
 
 
-def _assert_safe_email(subject: str, html: str) -> None:
+def _assert_safe_email(subject: str, html: str, scan_text: bool = True) -> None:
     scan = _EmailScan()
     scan.feed(html)
     if scan.tags & {"form", "input", "textarea", "select"}:
         raise ValueError("No forms or input fields in email (G2)")
-    body = f"{subject}\n{html}".lower()
+    body = f"{subject}\n{html}".lower() if scan_text else ""
     for p in _CRED_ASK:
         if p in body:
             raise ValueError(f"Email asks the recipient for credentials: {p!r} (G2)")
@@ -87,9 +87,11 @@ def _assert_safe_email(subject: str, html: str) -> None:
                 raise ValueError(f"Anchor text {m.group(1)!r} != real link host {real!r} (G3)")
 
 
-async def send_email(*, to: str, subject: str, html: str) -> str | None:
+async def send_email(*, to: str, subject: str, html: str, internal: bool = False) -> str | None:
     """Internal only — recipient/subject/html always come from server-side code (G4)."""
-    _assert_safe_email(subject, html)
+    # internal=True: staff-only alerts that embed escaped applicant text (e.g. a message mentioning "CVV");
+    # skip the phishing-phrase scan there, but keep the structural form/link checks.
+    _assert_safe_email(subject, html, scan_text=not internal)
     payload = {"to": [to], "subject": subject, "html": html, "from_name": os.environ["EMAIL_FROM_NAME"]}
     reply_to = os.environ.get("EMAIL_REPLY_TO")
     if reply_to:
@@ -155,7 +157,7 @@ async def notify_new_lead(lead: dict, to: str | None = None) -> None:
         return
     try:
         subject = f"New enquiry: {lead['name']}" + (f" – {lead['course_interest']}" if lead.get("course_interest") else "")
-        email_id = await send_email(to=to, subject=subject[:150], html=lead_alert_html(lead))
+        email_id = await send_email(to=to, subject=subject[:150], html=lead_alert_html(lead), internal=True)
         logger.info("Lead alert for %s sent: %s", lead["id"], email_id)
     except Exception as exc:  # noqa: BLE001
         logger.error("Lead alert failed for %s: %s", lead.get("id"), exc)

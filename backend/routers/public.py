@@ -178,7 +178,7 @@ async def create_enquiry(body: LeadIn, background: BackgroundTasks):
     send_list = bool(lead.prediction and lead.whatsapp_opt_in) and not await db.leads.find_one(
         {"phone": lead.phone, "whatsapp_opt_in": True, "prediction": {"$ne": None},
          "created_at": {"$gte": lead.created_at - timedelta(hours=24)}})
-    if (await get_settings()).get("auto_assign"):
+    if not recent and (await get_settings()).get("auto_assign"):
         c = await next_counsellor()
         lead.counsellor_id = c["id"] if c else None
     await db.leads.insert_one(lead.model_dump())

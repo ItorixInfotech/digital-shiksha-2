@@ -113,5 +113,10 @@ async def cron_morning_reminders(request: Request, background: BackgroundTasks):
     early = await accept_cron(request, "morning-reminders")
     if early is not None:
         return early
-    await _queue_reminders(background, "8 AM schedule")
+    async def job():
+        groups = await cs.build_reminders()
+        if groups:
+            await cs.send_reminders(groups, "8 AM schedule")
+
+    background.add_task(job)
     return {"ok": True}

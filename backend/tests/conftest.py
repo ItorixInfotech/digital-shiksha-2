@@ -6,10 +6,16 @@ file — add app-specific fixtures below the marker at the bottom.
 """
 
 import os
+from pathlib import Path
 
 import httpx
 import pytest
 import pytest_asyncio
+from dotenv import load_dotenv
+
+# The running backend loads backend/.env itself (server.py); the pytest process doesn't,
+# so app-specific tests (cron secrets, etc.) need it loaded here too.
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8001")
 API_URL = f"{BACKEND_URL}/api"

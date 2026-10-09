@@ -107,7 +107,7 @@ async def send_reminders(groups: list[dict], trigger: str) -> None:
                 (logger.info if ok else logger.error)("Reminder WhatsApp -> %s: %s", to, info)
         if g["email"]:
             try:
-                await send_email(to=g["email"], subject=f"{len(g['leads'])} new lead(s) to call today – Digital Shiksha", html=reminder_html(g, lines))
+                await send_email(to=g["email"], subject=f"{len(g['leads'])} new lead(s) to call today – Digital Shiksha", html=reminder_html(g, lines), internal=True)
             except Exception as exc:  # noqa: BLE001
                 logger.error("Reminder email -> %s failed: %s", g["email"], exc)
     total = sum(len(g["leads"]) for g in groups)
