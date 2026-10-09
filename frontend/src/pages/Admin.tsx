@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Download, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock } from "lucide-react";
+import { BarChart3, Download, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import ContentManager from "@/components/admin/ContentManager";
+import PredictorReportPanel from "@/components/admin/PredictorReport";
 import type { FieldSpec } from "@/components/admin/ContentManager";
 import { apiDelete, apiGet, apiPatch, apiPost, ApiError } from "@/lib/api";
 import { beginSession, endSession } from "@/lib/session";
@@ -94,6 +95,7 @@ const ARTICLE_FIELDS: FieldSpec[] = [
 
 const TABS = [
   { key: "leads", label: "Leads", icon: Inbox },
+  { key: "predictor", label: "Predictor Report", icon: BarChart3 },
   { key: "colleges", label: "Colleges", icon: School },
   { key: "courses", label: "Courses", icon: GraduationCap },
   { key: "exams", label: "Exams", icon: FileText },
@@ -256,6 +258,7 @@ export default function Admin() {
         </div>
         <div className="mt-8">
           {tab === "leads" && <LeadsPanel />}
+          {tab === "predictor" && <PredictorReportPanel />}
           {tab === "colleges" && <ContentManager resource="colleges" title="Colleges" fields={COLLEGE_FIELDS} publicPath="/colleges" columns={[{ key: "name", label: "Name" }, { key: "city", label: "City" }, { key: "type", label: "Type" }, { key: "nirf_rank", label: "NIRF" }]} />}
           {tab === "courses" && <ContentManager resource="courses" title="Courses" fields={COURSE_FIELDS} publicPath="/courses" columns={[{ key: "name", label: "Name" }, { key: "stream", label: "Stream" }, { key: "level", label: "Level" }, { key: "duration", label: "Duration" }]} />}
           {tab === "exams" && <ContentManager resource="exams" title="Exams" fields={EXAM_FIELDS} publicPath="/exams" columns={[{ key: "name", label: "Name" }, { key: "stream", label: "Stream" }, { key: "level", label: "Level" }, { key: "exam_date", label: "Date" }]} />}

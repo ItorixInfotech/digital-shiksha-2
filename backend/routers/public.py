@@ -5,7 +5,7 @@ from typing import List, Optional
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 
 from lib.db import db
-from lib.email import notify_new_lead
+from lib.email import notify_new_lead, send_student_confirmation
 from models.content import (
     Article, College, Course, Exam, FacetCount, Lead, LeadIn, Meta, SearchHit,
 )
@@ -155,7 +155,12 @@ async def create_enquiry(body: LeadIn, background: BackgroundTasks):
     lead = Lead(**body.model_dump())
     # Same phone within 10 min = duplicate submit: still saved, but no second alert email.
     recent = await db.leads.find_one({"phone": lead.phone, "created_at": {"$gte": lead.created_at - timedelta(minutes=10)}})
+    # Student thank-you: at most one per email address per 24 h (abuse guard for a public form).
+    confirm = bool(lead.email) and not await db.leads.find_one(
+        {"email": lead.email, "created_at": {"$gte": lead.created_at - timedelta(hours=24)}})
     await db.leads.insert_one(lead.model_dump())
     if not recent:
         background.add_task(notify_new_lead, lead.model_dump())
+    if confirm:
+        background.add_task(send_student_confirmation, lead.model_dump())
     return lead

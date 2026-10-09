@@ -155,6 +155,7 @@ export interface AdminStats {
 // Mirrors backend/models/predictor.py
 export type PredictorMetric = "percentile" | "score" | "rank";
 export type PredictorChance = "High" | "Medium" | "Reach";
+export type PredictorCategory = "General" | "OBC" | "EWS" | "SC" | "ST";
 
 export interface PredictorExam {
   name: string;
@@ -163,12 +164,14 @@ export interface PredictorExam {
   max: number;
   label: string;
   hint: string;
+  rank_note: string;
 }
 
 export interface PredictorIn {
   exam: string;
   score: number;
-  city: string | null;
+  category: PredictorCategory;
+  cities: string[];
 }
 
 export interface PredictorResult {
@@ -181,6 +184,8 @@ export interface PredictorResult {
   course: string;
   cutoff: string;
   cutoff_value: number;
+  general_cutoff: string;
+  estimated: boolean;
   chance: PredictorChance;
   fees_min: number;
   fees_max: number;
@@ -191,5 +196,40 @@ export interface PredictorOut {
   exam: string;
   metric: PredictorMetric;
   score: number;
+  category: PredictorCategory;
   results: PredictorResult[];
+}
+
+export interface PredictionLog {
+  id: string;
+  exam: string;
+  metric: PredictorMetric;
+  score: number;
+  category: PredictorCategory;
+  cities: string[];
+  results: number;
+  high: number;
+  created_at: string;
+}
+
+export interface PredictorBucket {
+  label: string;
+  count: number;
+}
+
+export interface ExamReport {
+  exam: string;
+  metric: PredictorMetric;
+  searches: number;
+  avg_score: number;
+  buckets: PredictorBucket[];
+  categories: Record<string, number>;
+}
+
+export interface PredictorReport {
+  total_searches: number;
+  last_7_days: number;
+  predictor_leads: number;
+  exams: ExamReport[];
+  recent: PredictionLog[];
 }

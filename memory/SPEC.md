@@ -34,3 +34,14 @@ Seed now has 56 colleges (incl. SPIT, DJ Sanghvi, Cummins, KEM, JJ, SIMSREE, SPJ
 
 ## Auth
 Single admin from backend/.env (ADMIN_USERNAME / ADMIN_PASSWORD). See memory/test_credentials.md.
+
+## Category predictor (v3)
+POST /api/predictor body: {exam, score, category: General|OBC|EWS|SC|ST, cities: ["Pune","Mumbai"] | [] (all India)}.
+Reserved-category cutoffs are ESTIMATED from the General value: percentile 100-(100-v)*factor (EWS 1.4, OBC 1.6, SC 3.5, ST 6); NEET score minus (EWS 10, OBC 12, SC 70, ST 110); JEE Adv category rank = GEN rank × (EWS .2, OBC .45, SC .25, ST .12). Results carry `estimated` + `general_cutoff`.
+Every prediction is logged to `predictions` collection.
+
+## Student confirmation email
+If a lead includes an email, a fixed-template thank-you (counsellor phone/email/address/hours) is sent to the student — max 1 per email address per 24 h; only a sanitised first name is interpolated.
+
+## Admin Predictor Report
+GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor leads count, per-exam searches/avg/score buckets/category counts, 50 recent predictions. Admin tab "Predictor Report" also lists leads with source=predictor.

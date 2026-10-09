@@ -9,12 +9,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiGet, apiPost, ApiError } from "@/lib/api";
-import type { PredictorChance, PredictorExam, PredictorIn, PredictorOut } from "@/lib/types";
+import type { PredictorCategory, PredictorChance, PredictorExam, PredictorIn, PredictorOut } from "@/lib/types";
 import { feeRange, slugify } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
 
 const CITIES: Record<string, string> = { both: "Pune & Mumbai", Pune: "Pune only", Mumbai: "Mumbai only", all: "All India" };
+const CITY_LIST: Record<string, string[]> = { both: ["Pune", "Mumbai"], Pune: ["Pune"], Mumbai: ["Mumbai"], all: [] };
+const CATEGORIES: { value: PredictorCategory; label: string }[] = [
+  { value: "General", label: "General / Open" }, { value: "OBC", label: "OBC (NCL)" }, { value: "EWS", label: "EWS" }, { value: "SC", label: "SC" }, { value: "ST", label: "ST" },
+];
 const CHANCE: Record<PredictorChance, { label: string; cls: string; desc: string }> = {
   High: { label: "High chance", cls: "bg-green-50 text-green-800 ring-green-200", desc: "Your score is at or above last year's closing cutoff." },
   Medium: { label: "Good chance", cls: "bg-amber-50 text-amber-800 ring-amber-200", desc: "Slightly below last year's cutoff — possible in later rounds." },
@@ -26,22 +30,14 @@ export default function Predictor() {
   const [exam, setExam] = useState("MHT CET");
   const [score, setScore] = useState("");
   const [city, setCity] = useState("both");
+  const [category, setCategory] = useState<PredictorCategory>("General");
   const [chanceFilter, setChanceFilter] = useState<PredictorChance | "all">("all");
 
   const exams = useQuery({ queryKey: ["predictor", "exams"], queryFn: () => apiGet<PredictorExam[]>("/predictor/exams") });
   const spec = exams.data?.find((e) => e.name === exam);
 
   const predict = useMutation({
-    mutationFn: async (body: PredictorIn) => {
-      if (city !== "both") return apiPost<PredictorOut>("/predictor", body);
-      const [p, m] = await Promise.all([
-        apiPost<PredictorOut>("/predictor", { ...body, city: "Pune" }),
-        apiPost<PredictorOut>("/predictor", { ...body, city: "Mumbai" }),
-      ]);
-      const order = { High: 0, Medium: 1, Reach: 2 };
-      const dir = p.metric === "rank" ? 1 : -1;
-      return { ...p, results: [...p.results, ...m.results].sort((a, b) => order[a.chance] - order[b.chance] || dir * (a.cutoff_value - b.cutoff_value)) };
-    },
+    mutationFn: (body: PredictorIn) => apiPost<PredictorOut>("/predictor", body),
     onSuccess: () => setChanceFilter("all"),
     onError: (e) => toast.error(e instanceof ApiError && e.status === 422 ? `Enter a valid ${spec?.label ?? "score"}` : "Prediction failed. Please try again."),
   });
@@ -51,7 +47,7 @@ export default function Predictor() {
     const n = Number(score);
     if (!score.trim() || Number.isNaN(n)) return toast.error(`Please enter your ${spec?.label ?? "score"}`);
     if (spec && (n < spec.min || n > spec.max)) return toast.error(`${spec.label} must be between ${spec.min} and ${spec.max}`);
-    predict.mutate({ exam, score: n, city: city === "both" || city === "all" ? null : city });
+    predict.mutate({ exam, score: n, category, cities: CITY_LIST[city] });
   };
 
   const data = predict.data;
@@ -64,7 +60,7 @@ export default function Predictor() {
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "College Predictor" }]} title={<>College Predictor <span className="text-red-400">2026</span></>}
         subtitle="Enter your MHT CET, JEE Main, NEET or MBA CET score and see which Pune & Mumbai colleges you can likely get, based on last year's closing cutoffs." testid="predictor-header">
         <form onSubmit={submit} className="mt-8 grid max-w-4xl gap-4 rounded-2xl bg-white p-5 text-slate-900 shadow-2xl sm:grid-cols-12 sm:items-end" data-testid="predictor-form">
-          <div className="grid gap-1.5 sm:col-span-4">
+          <div className="grid gap-1.5 sm:col-span-3">
             <Label>Entrance exam</Label>
             <Select value={exam} onValueChange={(v: string) => { setExam(v); setScore(""); }}>
               <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-exam-select"><SelectValue>{(v) => v as string}</SelectValue></SelectTrigger>
@@ -77,7 +73,14 @@ export default function Predictor() {
             <Label htmlFor="predictor-score">{spec?.label ?? "Your score"}</Label>
             <Input id="predictor-score" data-testid="predictor-score-input" inputMode="decimal" className="h-11" placeholder={spec?.hint.split(" — ")[0] ?? "Score"} value={score} onChange={(e) => setScore(e.target.value)} />
           </div>
-          <div className="grid gap-1.5 sm:col-span-3">
+          <div className="grid gap-1.5 sm:col-span-2">
+            <Label>Category</Label>
+            <Select value={category} onValueChange={(v: string) => setCategory(v as PredictorCategory)}>
+              <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-category-select"><SelectValue>{(v) => CATEGORIES.find((c) => c.value === v)?.label}</SelectValue></SelectTrigger>
+              <SelectContent>{CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value} data-testid={`predictor-category-option-${c.value.toLowerCase()}`}>{c.label}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="grid gap-1.5 sm:col-span-2">
             <Label>Location</Label>
             <Select value={city} onValueChange={(v: string) => setCity(v)}>
               <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-city-select"><SelectValue>{(v) => CITIES[v as string]}</SelectValue></SelectTrigger>
@@ -87,7 +90,7 @@ export default function Predictor() {
           <Button type="submit" disabled={predict.isPending} data-testid="predictor-submit-button" className="h-11 bg-brand-red text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform] sm:col-span-2">
             {predict.isPending ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />} Predict
           </Button>
-          {spec && <p className="text-xs text-slate-500 sm:col-span-12">{spec.hint}</p>}
+          {spec && <p className="text-xs text-slate-500 sm:col-span-12">{spec.hint}{category !== "General" && spec.rank_note ? ` • ${spec.rank_note}` : ""}</p>}
         </form>
       </PageHeader>
 
@@ -114,7 +117,7 @@ export default function Predictor() {
                 <h2 className="text-2xl font-semibold tracking-tight" data-testid="predictor-results-summary">
                   {data.results.length ? <>{colleges} colleges, {data.results.length} course options for {data.exam} {data.metric === "rank" ? `rank ${data.score}` : data.metric === "score" ? `score ${data.score}` : `${data.score} percentile`}</> : "No matching colleges"}
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">{CITIES[city]} • sorted by chance, then most competitive first</p>
+                <p className="mt-1 text-sm text-slate-500">{CITIES[city]} • {CATEGORIES.find((c) => c.value === data.category)?.label} • sorted by chance, then most competitive first</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <button type="button" onClick={() => setChanceFilter("all")} data-testid="predictor-filter-all" className={cn("rounded-full border px-3 py-1 text-sm transition-colors", chanceFilter === "all" ? "border-brand-navy bg-brand-navy text-white" : "bg-white hover:border-slate-400")}>All ({data.results.length})</button>
@@ -141,19 +144,19 @@ export default function Predictor() {
                       <p className="text-sm text-slate-600">{r.course}</p>
                     </div>
                     <div className="grid grid-cols-3 gap-4 text-sm sm:w-[380px]">
-                      <div><p className="text-xs text-slate-500">Last cutoff</p><p className="font-semibold">{r.cutoff}</p></div>
+                      <div><p className="text-xs text-slate-500">{r.estimated ? "Est. cutoff" : "Last cutoff"}</p><p className="font-semibold" data-testid={`predictor-cutoff-${r.college_slug}-${slugify(r.course)}`}>{r.cutoff.replace(/^≈ /, "").replace(/ \((OBC|EWS|SC|ST)\)$/, "")}</p>{r.estimated && <p className="text-[11px] text-slate-400">Open: {r.general_cutoff}</p>}</div>
                       <div><p className="text-xs text-slate-500">Fees / yr</p><p className="font-semibold">{feeRange(r.fees_min, r.fees_max)}</p></div>
                       <div><p className="text-xs text-slate-500">Avg pkg</p><p className="font-semibold">{r.avg_package ? `₹${r.avg_package} LPA` : "—"}</p></div>
                     </div>
                     <Button size="sm" data-testid={`predictor-apply-${r.college_slug}-${slugify(r.course)}`}
-                      onClick={() => openEnquiry({ college: r.college_name, source: "predictor", title: `Get admission guidance for ${r.short_name}`, message: `Predictor: ${data.exam} ${data.score} — interested in ${r.course} at ${r.short_name} (${CHANCE[r.chance].label})` })}
+                      onClick={() => openEnquiry({ college: r.college_name, source: "predictor", title: `Get admission guidance for ${r.short_name}`, message: `Predictor: ${data.exam} ${data.score} (${data.category}) — interested in ${r.course} at ${r.short_name} (${CHANCE[r.chance].label})` })}
                       className="bg-brand-red text-white hover:bg-red-700">Get guidance</Button>
                   </div>
                 ))}
               </div>
             )}
             <p className="mt-6 flex items-start gap-2 rounded-xl bg-slate-100 p-4 text-xs leading-relaxed text-slate-600" data-testid="predictor-disclaimer">
-              <Info className="mt-0.5 size-4 shrink-0" /> Predictions use approximate previous-year closing cutoffs for the General Open category (Maharashtra state quota / All-India quota where noted). Reserved categories, home-university and minority quotas usually have different cutoffs, and cutoffs change every year. Call {"+91 8149 68 9468"} for a personalised option-form plan.
+              <Info className="mt-0.5 size-4 shrink-0" /> Predictions use approximate previous-year closing cutoffs for the General Open category (Maharashtra state quota / All-India quota where noted). For OBC, EWS, SC and ST we estimate the category cutoff from typical historical gaps — actual category, home-university, ladies and minority quota cutoffs vary by college and change every year. Call {"+91 8149 68 9468"} for a personalised option-form plan.
             </p>
           </div>
         )}

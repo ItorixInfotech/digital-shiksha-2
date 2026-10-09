@@ -44,6 +44,12 @@ INDEXES: dict[str, list[IndexModel]] = {
         IndexModel([("id", ASCENDING)], name="id", unique=True),
         IndexModel([("created_at", DESCENDING)], name="created_desc"),
         IndexModel([("phone", ASCENDING), ("created_at", DESCENDING)], name="phone_created"),
+        IndexModel([("email", ASCENDING), ("created_at", DESCENDING)], name="email_created"),
+        IndexModel([("source", ASCENDING)], name="source"),
+    ],
+    "predictions": [
+        IndexModel([("id", ASCENDING)], name="id", unique=True),
+        IndexModel([("created_at", DESCENDING)], name="created_desc"),
     ],
 }
 
