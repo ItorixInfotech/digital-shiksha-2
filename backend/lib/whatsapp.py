@@ -79,14 +79,14 @@ def alert_numbers() -> list[str]:
     return [t.strip() for t in os.environ.get("WHATSAPP_ALERT_TO", "").split(",") if t.strip()]
 
 
-async def notify_whatsapp(lead: dict) -> None:
-    """Counsellor alert. Background task: never raises."""
+async def notify_whatsapp(lead: dict, to_numbers: list[str] | None = None) -> None:
+    """Counsellor alert (assigned counsellor, else WHATSAPP_ALERT_TO). Background task: never raises."""
     if not whatsapp_configured():
         return
     body, variables = lead_payload(lead)
     try:
         tpl = await effective_template("lead")
-        for to in alert_numbers():
+        for to in (to_numbers or alert_numbers()):
             ok, info = await _send(to, body, tpl, variables)
             await _record("lead", ok, info)
             (logger.info if ok else logger.error)("WhatsApp lead alert %s -> %s: %s", lead["id"], to, info)
@@ -164,7 +164,7 @@ async def whatsapp_status() -> dict:
 
 
 # ---------------- Templates: SIDs (admin-editable, env fallback) + WhatsApp approval status
-TEMPLATE_ENV = {"lead": "TWILIO_LEAD_TEMPLATE_SID", "student": "TWILIO_STUDENT_TEMPLATE_SID"}
+TEMPLATE_ENV = {"lead": "TWILIO_LEAD_TEMPLATE_SID", "student": "TWILIO_STUDENT_TEMPLATE_SID", "reminder": "TWILIO_REMINDER_TEMPLATE_SID"}
 RECHECK_SECONDS = 600
 
 

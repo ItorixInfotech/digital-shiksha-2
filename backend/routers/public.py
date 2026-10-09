@@ -6,8 +6,9 @@ from typing import List, Optional
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 
 from lib.db import db
-from lib.email import notify_new_lead, send_student_confirmation
-from lib.whatsapp import notify_whatsapp, send_student_prediction
+from lib.counsellors import alert_lead, get_settings, next_counsellor
+from lib.email import send_student_confirmation
+from lib.whatsapp import send_student_prediction
 from models.content import (
     Article, College, Course, Exam, FacetCount, Lead, LeadIn, Meta, SearchHit,
 )
@@ -177,12 +178,14 @@ async def create_enquiry(body: LeadIn, background: BackgroundTasks):
     send_list = bool(lead.prediction and lead.whatsapp_opt_in) and not await db.leads.find_one(
         {"phone": lead.phone, "whatsapp_opt_in": True, "prediction": {"$ne": None},
          "created_at": {"$gte": lead.created_at - timedelta(hours=24)}})
+    if (await get_settings()).get("auto_assign"):
+        c = await next_counsellor()
+        lead.counsellor_id = c["id"] if c else None
     await db.leads.insert_one(lead.model_dump())
     if send_list:
         background.add_task(_student_list, lead.model_dump())
     if not recent:
-        background.add_task(notify_new_lead, lead.model_dump())
-        background.add_task(notify_whatsapp, lead.model_dump())
+        background.add_task(alert_lead, lead.model_dump())
     if confirm:
         background.add_task(send_student_confirmation, lead.model_dump())
     return lead

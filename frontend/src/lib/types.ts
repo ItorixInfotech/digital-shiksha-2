@@ -126,7 +126,54 @@ export interface LeadIn {
 export interface Lead extends LeadIn {
   id: string;
   status: LeadStatus;
+  counsellor_id: string | null;
   created_at: string;
+}
+
+export interface CounsellorIn {
+  name: string;
+  phone: string;
+  email: string | null;
+  active: boolean;
+}
+
+export interface Counsellor extends CounsellorIn {
+  id: string;
+  created_at: string;
+}
+
+export interface CounsellorWithStats extends Counsellor {
+  total_leads: number;
+  new_leads: number;
+}
+
+export interface CounsellorSettings {
+  auto_assign: boolean;
+  reminder_template_sid: string;
+  last_reminder: string;
+  fallback_numbers: string[];
+}
+
+export interface CounsellorSettingsIn {
+  auto_assign: boolean;
+  reminder_template_sid: string;
+}
+
+export interface LeadAssignIn {
+  counsellor_id: string | null;
+  notify: boolean;
+}
+
+export interface ReminderRecipient {
+  name: string;
+  to: string;
+  leads: number;
+}
+
+export interface ReminderRun {
+  queued: boolean;
+  total_leads: number;
+  recipients: ReminderRecipient[];
 }
 
 export interface SearchHit {

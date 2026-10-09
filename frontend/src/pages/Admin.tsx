@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock } from "lucide-react";
+import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock, Users } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,10 +13,11 @@ import ContentManager from "@/components/admin/ContentManager";
 import PredictorReportPanel from "@/components/admin/PredictorReport";
 import CutoffUploadPanel from "@/components/admin/CutoffUpload";
 import WhatsAppPanel from "@/components/admin/WhatsAppPanel";
+import CounsellorsPanel from "@/components/admin/CounsellorsPanel";
 import type { FieldSpec } from "@/components/admin/ContentManager";
 import { apiDelete, apiGet, apiPatch, apiPost, ApiError } from "@/lib/api";
 import { beginSession, endSession } from "@/lib/session";
-import type { AdminMe, AdminStats, Lead, LeadStatus, WhatsAppStatus } from "@/lib/types";
+import type { AdminMe, AdminStats, CounsellorWithStats, Lead, LeadAssignIn, LeadStatus, WhatsAppStatus } from "@/lib/types";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -97,6 +98,7 @@ const ARTICLE_FIELDS: FieldSpec[] = [
 
 const TABS = [
   { key: "leads", label: "Leads", icon: Inbox },
+  { key: "counsellors", label: "Counsellors", icon: Users },
   { key: "predictor", label: "Predictor Report", icon: BarChart3 },
   { key: "cutoffs", label: "Cutoff Upload", icon: FileSpreadsheet },
   { key: "whatsapp", label: "WhatsApp", icon: MessageCircle },
@@ -145,17 +147,25 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("all");
+  const [owner, setOwner] = useState("all");
+  const counsellors = useQuery({ queryKey: ["admin", "counsellors"], queryFn: () => apiGet<CounsellorWithStats[]>("/admin/counsellors") });
+  const byId = new Map((counsellors.data ?? []).map((c) => [c.id, c]));
   const leads = useQuery({ queryKey: ["admin", "leads"], queryFn: () => apiGet<Lead[]>("/admin/leads") });
   const inval = () => { qc.invalidateQueries({ queryKey: ["admin", "leads"] }); qc.invalidateQueries({ queryKey: ["admin", "stats"] }); };
   const upd = useMutation({ mutationFn: ({ id, s }: { id: string; s: LeadStatus }) => apiPatch<Lead>(`/admin/leads/${id}`, { status: s }), onSuccess: () => { toast.success("Status updated"); inval(); }, onError: () => toast.error("Update failed") });
   const del = useMutation({ mutationFn: (id: string) => apiDelete(`/admin/leads/${id}`), onSuccess: () => { toast.success("Lead deleted"); inval(); } });
+  const assign = useMutation({
+    mutationFn: ({ id, cid }: { id: string; cid: string | null }) => apiPatch<Lead>(`/admin/leads/${id}/assign`, { counsellor_id: cid, notify: true } satisfies LeadAssignIn),
+    onSuccess: (l) => { toast.success(l.counsellor_id ? `Assigned to ${byId.get(l.counsellor_id)?.name ?? "counsellor"} — WhatsApp & email alert queued` : "Lead unassigned"); inval(); qc.invalidateQueries({ queryKey: ["admin", "counsellors"] }); },
+    onError: () => toast.error("Assignment failed"),
+  });
 
-  const rows = (leads.data ?? []).filter((l) => (status === "all" || l.status === status) && (!q || `${l.name} ${l.phone} ${l.city} ${l.course_interest} ${l.college}`.toLowerCase().includes(q.toLowerCase())));
+  const rows = (leads.data ?? []).filter((l) => (status === "all" || l.status === status) && (owner === "all" || (owner === "none" ? !l.counsellor_id : l.counsellor_id === owner)) && (!q || `${l.name} ${l.phone} ${l.city} ${l.course_interest} ${l.college}`.toLowerCase().includes(q.toLowerCase())));
 
   const exportCsv = () => {
-    const head = ["Date", "Name", "Phone", "Email", "City", "Course", "College", "Budget", "Message", "Source", "Status"];
+    const head = ["Date", "Name", "Phone", "Email", "City", "Course", "College", "Budget", "Message", "Source", "Status", "Counsellor"];
     const esc = (v: string) => `"${(v ?? "").replace(/"/g, '""')}"`;
-    const lines = rows.map((l) => [new Date(l.created_at).toLocaleString("en-IN"), l.name, l.phone, l.email ?? "", l.city, l.course_interest, l.college, l.budget, l.message, l.source, l.status].map(esc).join(","));
+    const lines = rows.map((l) => [new Date(l.created_at).toLocaleString("en-IN"), l.name, l.phone, l.email ?? "", l.city, l.course_interest, l.college, l.budget, l.message, l.source, l.status, (l.counsellor_id && byId.get(l.counsellor_id)?.name) || ""].map(esc).join(","));
     const blob = new Blob([[head.join(","), ...lines].join("\n")], { type: "text/csv" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -176,6 +186,14 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
               {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
             </SelectContent>
           </Select>
+          <Select value={owner} onValueChange={(v: string) => setOwner(v)}>
+            <SelectTrigger className="w-44 bg-white" data-testid="admin-leads-counsellor-filter"><SelectValue>{(v) => (v === "all" ? "All counsellors" : v === "none" ? "Unassigned" : byId.get(v as string)?.name ?? "Counsellor")}</SelectValue></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All counsellors</SelectItem>
+              <SelectItem value="none">Unassigned</SelectItem>
+              {(counsellors.data ?? []).map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
           <Button variant="outline" onClick={exportCsv} disabled={!rows.length} data-testid="admin-leads-export-button"><Download className="size-4" /> Export CSV</Button>
         </div>
       </div>
@@ -184,7 +202,7 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
           <MessageCircle className="mt-0.5 size-4 shrink-0" />
           {!whatsappOn ? "Automatic WhatsApp alerts are OFF until Twilio WhatsApp keys are added. Meanwhile use the green buttons to WhatsApp the student or forward a lead to the counsellor in one tap." : (
             <div className="space-y-0.5">
-              <p className="font-semibold">Twilio WhatsApp connected — alerts go to +91 8149 68 9468.{!wa?.lead_template && " Waiting for an approved lead-alert template (TWILIO_LEAD_TEMPLATE_SID)."}</p>
+              <p className="font-semibold">Twilio WhatsApp connected — alerts go to the assigned counsellor (unassigned → +91 8149 68 9468).{!wa?.lead_template && " Waiting for an approved lead-alert template (TWILIO_LEAD_TEMPLATE_SID)."}</p>
               <p>Last counsellor alert: {wa?.last_lead ?? "—"}</p>
               <p>Last student college list: {wa?.last_student ?? "—"}{!wa?.student_template && " (needs TWILIO_STUDENT_TEMPLATE_SID)"}</p>
             </div>
@@ -193,9 +211,9 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
       )}
       <div className="mt-4 rounded-2xl border bg-white">
         <Table data-testid="admin-leads-table">
-          <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Student</TableHead><TableHead>Interest</TableHead><TableHead>Source</TableHead><TableHead>Status</TableHead><TableHead /></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Student</TableHead><TableHead>Interest</TableHead><TableHead>Source</TableHead><TableHead>Counsellor</TableHead><TableHead>Status</TableHead><TableHead /></TableRow></TableHeader>
           <TableBody>
-            {leads.isLoading && <TableRow><TableCell colSpan={6} className="text-slate-500">Loading…</TableCell></TableRow>}
+            {leads.isLoading && <TableRow><TableCell colSpan={7} className="text-slate-500">Loading…</TableCell></TableRow>}
             {rows.map((l) => (
               <TableRow key={l.id} data-testid={`admin-lead-row-${l.id}`}>
                 <TableCell className="whitespace-nowrap text-xs text-slate-500">{new Date(l.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</TableCell>
@@ -213,6 +231,15 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
                 </TableCell>
                 <TableCell className="text-xs text-slate-500">{l.source}</TableCell>
                 <TableCell>
+                  <Select value={l.counsellor_id ?? "none"} onValueChange={(v: string) => assign.mutate({ id: l.id, cid: v === "none" ? null : v })}>
+                    <SelectTrigger size="sm" className={cn("w-40", !l.counsellor_id && "text-slate-400")} data-testid={`admin-lead-assign-${l.id}`}><SelectValue>{(v) => (v === "none" ? "Unassigned" : byId.get(v as string)?.name ?? "Removed")}</SelectValue></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none" data-testid="admin-lead-assign-option-none">Unassigned</SelectItem>
+                      {(counsellors.data ?? []).filter((c) => c.active || c.id === l.counsellor_id).map((c) => <SelectItem key={c.id} value={c.id} data-testid={`admin-lead-assign-option-${c.id}`}>{c.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell>
                   <Select value={l.status} onValueChange={(v: string) => upd.mutate({ id: l.id, s: v as LeadStatus })}>
                     <SelectTrigger size="sm" className={cn("w-36 border-0 font-medium", STATUS_CLS[l.status])} data-testid={`admin-lead-status-${l.id}`}><SelectValue>{(v) => v as string}</SelectValue></SelectTrigger>
                     <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s} data-testid={`admin-lead-status-option-${s.toLowerCase()}`}>{s}</SelectItem>)}</SelectContent>
@@ -220,11 +247,11 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
                   <a href={`https://wa.me/91${l.phone}?text=${encodeURIComponent(`Hi ${l.name.split(" ")[0]}, this is Digital Shiksha regarding your admission enquiry. When is a good time to call you?`)}`} target="_blank" rel="noreferrer" aria-label="WhatsApp student" title="WhatsApp student" data-testid={`admin-lead-whatsapp-${l.id}`} className={cn(buttonVariants({ size: "icon-sm", variant: "ghost" }), "text-[#128C7E]")}><MessageCircle className="size-4" /></a>
-                  <a href={`https://wa.me/${COUNSELLOR_WA}?text=${encodeURIComponent(leadSummary(l))}`} target="_blank" rel="noreferrer" aria-label="Forward to counsellor on WhatsApp" title="Forward to counsellor" data-testid={`admin-lead-forward-${l.id}`} className={cn(buttonVariants({ size: "icon-sm", variant: "ghost" }), "text-[#128C7E]")}><Send className="size-4" /></a>
+                  <a href={`https://wa.me/${l.counsellor_id && byId.get(l.counsellor_id) ? `91${byId.get(l.counsellor_id)!.phone}` : COUNSELLOR_WA}?text=${encodeURIComponent(leadSummary(l))}`} target="_blank" rel="noreferrer" aria-label="Forward to counsellor on WhatsApp" title="Forward to counsellor" data-testid={`admin-lead-forward-${l.id}`} className={cn(buttonVariants({ size: "icon-sm", variant: "ghost" }), "text-[#128C7E]")}><Send className="size-4" /></a>
                 <Button size="icon-sm" variant="ghost" aria-label="Delete lead" data-testid={`admin-lead-delete-${l.id}`} onClick={() => { if (window.confirm(`Delete lead from ${l.name}?`)) del.mutate(l.id); }} className="text-red-600"><Trash2 className="size-4" /></Button></TableCell>
               </TableRow>
             ))}
-            {!leads.isLoading && !rows.length && <TableRow><TableCell colSpan={6} className="py-8 text-center text-slate-500">No enquiries yet.</TableCell></TableRow>}
+            {!leads.isLoading && !rows.length && <TableRow><TableCell colSpan={7} className="py-8 text-center text-slate-500">No enquiries yet.</TableCell></TableRow>}
           </TableBody>
         </Table>
       </div>
@@ -282,6 +309,7 @@ export default function Admin() {
         </div>
         <div className="mt-8">
           {tab === "leads" && <LeadsPanel whatsappOn={stats.data?.whatsapp_alerts} wa={stats.data?.whatsapp} />}
+          {tab === "counsellors" && <CounsellorsPanel />}
           {tab === "predictor" && <PredictorReportPanel />}
           {tab === "cutoffs" && <CutoffUploadPanel />}
           {tab === "whatsapp" && <WhatsAppPanel />}

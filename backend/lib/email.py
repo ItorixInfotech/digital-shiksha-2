@@ -148,9 +148,9 @@ def lead_alert_html(lead: dict) -> str:
     )
 
 
-async def notify_new_lead(lead: dict) -> None:
-    """Background task: never raises, so a mail outage never breaks lead capture."""
-    to = os.environ.get("LEAD_ALERT_EMAIL")
+async def notify_new_lead(lead: dict, to: str | None = None) -> None:
+    """Owner inbox by default (or a counsellor's email). Background task: never raises."""
+    to = to or os.environ.get("LEAD_ALERT_EMAIL")
     if not to:
         return
     try:

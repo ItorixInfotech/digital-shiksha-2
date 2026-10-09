@@ -142,6 +142,7 @@ class LeadIn(BaseModel):
 class Lead(LeadIn):
     id: str = Field(default_factory=_id)
     status: LeadStatus = "New"
+    counsellor_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
