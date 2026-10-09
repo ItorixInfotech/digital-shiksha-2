@@ -26,6 +26,11 @@ class CutoffRow(BaseModel):
     category: str = "General"  # General | OBC | EWS | SC | ST
 
 
+class FaqItem(BaseModel):
+    question: str = Field(min_length=3, max_length=300)
+    answer: str = Field(min_length=3, max_length=2000)
+
+
 class SeoMeta(BaseModel):
     """On-page SEO overrides; empty fields fall back to auto-generated defaults on the page."""
     meta_title: str = Field(default="", max_length=120)
@@ -62,6 +67,7 @@ class CollegeIn(BaseModel):
     top_recruiters: List[str] = []
     facilities: List[str] = []
     featured: bool = False
+    faqs: List[FaqItem] = []
     seo: SeoMeta = Field(default_factory=SeoMeta)
 
 
@@ -105,6 +111,7 @@ class ExamIn(BaseModel):
     overview: str = ""
     syllabus: List[str] = []
     website: str = ""
+    faqs: List[FaqItem] = []
     seo: SeoMeta = Field(default_factory=SeoMeta)
 
 

@@ -9,6 +9,7 @@ from lib.dates import today_iso
 from lib.db import db
 from models.seo import PageSeo, SeoPages, SeoPagesIn
 from routers.admin import require_admin
+from routers.landing import list_landing
 
 router = APIRouter()
 KEY = "seo_pages"
@@ -76,6 +77,9 @@ async def sitemap(request: Request):
             if canon and not canon.startswith(base):
                 continue  # canonical points elsewhere → don't list this duplicate
             urls.append((canon[len(base):] if canon else f"{prefix}{d['slug']}", "weekly"))
+    for lp in await list_landing():
+        if not (lp.override and lp.override.seo.noindex):
+            urls.append((f"/{lp.slug}", "weekly"))
     body = "".join(f"<url><loc>{escape(base + path)}</loc><changefreq>{freq}</changefreq></url>" for path, freq in dict.fromkeys(urls))
     xml = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
     return Response(xml, media_type="application/xml")

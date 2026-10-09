@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock, Users, SearchCheck } from "lucide-react";
+import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock, Users, SearchCheck, MapPinned } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import CutoffUploadPanel from "@/components/admin/CutoffUpload";
 import WhatsAppPanel from "@/components/admin/WhatsAppPanel";
 import CounsellorsPanel from "@/components/admin/CounsellorsPanel";
 import SeoPagesPanel from "@/components/admin/SeoPagesPanel";
+import LandingManager from "@/components/admin/LandingManager";
 import { Seo } from "@/components/Seo";
 import type { FieldSpec } from "@/components/admin/ContentManager";
 import { apiDelete, apiGet, apiPatch, apiPost, ApiError } from "@/lib/api";
@@ -108,6 +109,7 @@ const TABS = [
   { key: "courses", label: "Courses", icon: GraduationCap },
   { key: "exams", label: "Exams", icon: FileText },
   { key: "articles", label: "Articles", icon: Newspaper },
+  { key: "landing", label: "City Pages", icon: MapPinned },
   { key: "seo", label: "SEO → Pages", icon: SearchCheck },
 ] as const;
 type TabKey = (typeof TABS)[number]["key"];
@@ -316,12 +318,13 @@ export default function Admin() {
           {tab === "leads" && <LeadsPanel whatsappOn={stats.data?.whatsapp_alerts} wa={stats.data?.whatsapp} />}
           {tab === "counsellors" && <CounsellorsPanel />}
           {tab === "seo" && <SeoPagesPanel />}
+          {tab === "landing" && <LandingManager />}
           {tab === "predictor" && <PredictorReportPanel />}
           {tab === "cutoffs" && <CutoffUploadPanel />}
           {tab === "whatsapp" && <WhatsAppPanel />}
-          {tab === "colleges" && <ContentManager resource="colleges" title="Colleges" fields={COLLEGE_FIELDS} publicPath="/colleges" columns={[{ key: "name", label: "Name" }, { key: "city", label: "City" }, { key: "type", label: "Type" }, { key: "nirf_rank", label: "NIRF" }]} />}
+          {tab === "colleges" && <ContentManager resource="colleges" title="Colleges" fields={COLLEGE_FIELDS} publicPath="/colleges" faqs columns={[{ key: "name", label: "Name" }, { key: "city", label: "City" }, { key: "type", label: "Type" }, { key: "nirf_rank", label: "NIRF" }]} />}
           {tab === "courses" && <ContentManager resource="courses" title="Courses" fields={COURSE_FIELDS} publicPath="/courses" columns={[{ key: "name", label: "Name" }, { key: "stream", label: "Stream" }, { key: "level", label: "Level" }, { key: "duration", label: "Duration" }]} />}
-          {tab === "exams" && <ContentManager resource="exams" title="Exams" fields={EXAM_FIELDS} publicPath="/exams" columns={[{ key: "name", label: "Name" }, { key: "stream", label: "Stream" }, { key: "level", label: "Level" }, { key: "exam_date", label: "Date" }]} />}
+          {tab === "exams" && <ContentManager resource="exams" title="Exams" fields={EXAM_FIELDS} publicPath="/exams" faqs columns={[{ key: "name", label: "Name" }, { key: "stream", label: "Stream" }, { key: "level", label: "Level" }, { key: "exam_date", label: "Date" }]} />}
           {tab === "articles" && <ContentManager resource="articles" title="Articles" fields={ARTICLE_FIELDS} publicPath="/news" columns={[{ key: "title", label: "Title" }, { key: "category", label: "Category" }, { key: "published_at", label: "Published" }]} />}
         </div>
       </main>

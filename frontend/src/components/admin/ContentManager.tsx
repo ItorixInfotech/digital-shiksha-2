@@ -13,8 +13,10 @@ import { apiDelete, apiGet, apiPost, apiPut, ApiError } from "@/lib/api";
 import { slugify } from "@/lib/site";
 import SeoEditor, { type SeoForm } from "@/components/admin/SeoEditor";
 import { useSeoPages } from "@/components/Seo";
-import { defaultSeo, EMPTY_SEO } from "@/lib/seo";
-import type { SeoMeta } from "@/lib/types";
+import SeoBadge from "@/components/admin/SeoBadge";
+import FaqEditor, { cleanFaqs } from "@/components/admin/FaqEditor";
+import { defaultSeo, EMPTY_SEO, entityScore } from "@/lib/seo";
+import type { FaqItem, SeoMeta } from "@/lib/types";
 
 const toSeoForm = (s?: SeoMeta): SeoForm => { const v = { ...EMPTY_SEO, ...s }; return { ...v, keywords: v.keywords.join(", ") }; };
 const fromSeoForm = (f: SeoForm): SeoMeta => ({
@@ -41,6 +43,7 @@ interface Props {
   fields: FieldSpec[];
   columns: { key: string; label: string }[];
   publicPath: string;
+  faqs?: boolean;
 }
 
 function toForm(fields: FieldSpec[], row?: Row): FormState {
@@ -68,13 +71,15 @@ function toPayload(fields: FieldSpec[], f: FormState): Record<string, unknown> {
   return out;
 }
 
-export default function ContentManager({ resource, title, fields, columns, publicPath }: Props) {
+export default function ContentManager({ resource, title, fields, columns, publicPath, faqs: withFaqs = false }: Props) {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [editing, setEditing] = useState<Row | null | undefined>(undefined); // undefined = closed, null = new
   const [form, setForm] = useState<FormState>({});
   const [seo, setSeo] = useState<SeoForm>(toSeoForm());
   const seoPages = useSeoPages();
+  const year = seoPages.data?.year ?? new Date().getFullYear();
+  const [faqs, setFaqs] = useState<FaqItem[]>([]);
   const [confirmDel, setConfirmDel] = useState<Row | null>(null);
 
   const list = useQuery({ queryKey: [resource, "admin"], queryFn: () => apiGet<Row[]>(`/${resource}${resource === "colleges" ? "?limit=500" : ""}`) });
@@ -91,13 +96,13 @@ export default function ContentManager({ resource, title, fields, columns, publi
     onError: () => toast.error("Delete failed"),
   });
 
-  const open = (row: Row | null) => { setForm(toForm(fields, row ?? undefined)); setSeo(toSeoForm(row?.seo as SeoMeta | undefined)); setEditing(row); };
+  const open = (row: Row | null) => { setForm(toForm(fields, row ?? undefined)); setSeo(toSeoForm(row?.seo as SeoMeta | undefined)); setFaqs((row?.faqs as FaqItem[] | undefined) ?? []); setEditing(row); };
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     for (const s of fields) if (s.required && !String(form[s.key] ?? "").trim()) return toast.error(`${s.label} is required`);
     let body: Record<string, unknown>;
     try { body = toPayload(fields, form); } catch { return toast.error("Invalid JSON in one of the fields"); }
-    save.mutate({ ...body, seo: fromSeoForm(seo) });
+    save.mutate({ ...body, seo: fromSeoForm(seo), ...(withFaqs ? { faqs: cleanFaqs(faqs) } : {}) });
   };
 
   const rows = useMemo(() => (list.data ?? []).filter((r) => !q || JSON.stringify([r.name, r.title, r.slug]).toLowerCase().includes(q.toLowerCase())), [list.data, q]);
@@ -117,9 +122,9 @@ export default function ContentManager({ resource, title, fields, columns, publi
 
       <div className="mt-4 rounded-2xl border bg-white">
         <Table data-testid={`admin-${resource}-table`}>
-          <TableHeader><TableRow>{columns.map((c) => <TableHead key={c.key}>{c.label}</TableHead>)}<TableHead className="w-28 text-right">Actions</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow>{columns.map((c) => <TableHead key={c.key}>{c.label}</TableHead>)}<TableHead>SEO</TableHead><TableHead className="w-28 text-right">Actions</TableHead></TableRow></TableHeader>
           <TableBody>
-            {list.isLoading && <TableRow><TableCell colSpan={columns.length + 1} className="text-slate-500">Loading…</TableCell></TableRow>}
+            {list.isLoading && <TableRow><TableCell colSpan={columns.length + 2} className="text-slate-500">Loading…</TableCell></TableRow>}
             {rows.map((r) => (
               <TableRow key={r.id} data-testid={`admin-${resource}-row-${r.slug}`}>
                 {columns.map((c, i) => (
@@ -127,13 +132,14 @@ export default function ContentManager({ resource, title, fields, columns, publi
                     {i === 0 ? <a href={`${publicPath}/${r.slug}`} target="_blank" rel="noreferrer" className="hover:text-brand-red">{String(r[c.key] ?? "")}</a> : Array.isArray(r[c.key]) ? (r[c.key] as string[]).join(", ") : String(r[c.key] ?? "—")}
                   </TableCell>
                 ))}
+                <TableCell><SeoBadge score={entityScore(resource, r, year)} testid={`admin-${resource}-seo-score-${r.slug}`} /></TableCell>
                 <TableCell className="text-right">
                   <Button size="icon-sm" variant="ghost" aria-label="Edit" data-testid={`admin-${resource}-edit-${r.slug}`} onClick={() => open(r)}><Pencil className="size-4" /></Button>
                   <Button size="icon-sm" variant="ghost" aria-label="Delete" data-testid={`admin-${resource}-delete-${r.slug}`} onClick={() => setConfirmDel(r)} className="text-red-600 hover:text-red-700"><Trash2 className="size-4" /></Button>
                 </TableCell>
               </TableRow>
             ))}
-            {!list.isLoading && !rows.length && <TableRow><TableCell colSpan={columns.length + 1} className="text-slate-500">No records.</TableCell></TableRow>}
+            {!list.isLoading && !rows.length && <TableRow><TableCell colSpan={columns.length + 2} className="text-slate-500">No records.</TableCell></TableRow>}
           </TableBody>
         </Table>
       </div>
@@ -164,7 +170,9 @@ export default function ContentManager({ resource, title, fields, columns, publi
                 </div>
               );
             })}
-            <SeoEditor value={seo} onChange={setSeo} defaults={defaultSeo(resource, form, seoPages.data?.year ?? new Date().getFullYear())}
+            {withFaqs && <FaqEditor value={faqs} onChange={setFaqs} testid={`admin-${resource}-faqs`} />}
+            {editing !== undefined && (() => { const sc = entityScore(resource, { ...toPayload(fields.filter((f) => f.type !== "json"), form), seo: fromSeoForm(seo), faqs: cleanFaqs(faqs) }, year); return <div className="flex items-center gap-2 text-sm sm:col-span-2"><span className="font-medium">Live SEO score</span><SeoBadge score={sc} testid={`admin-${resource}-live-seo-score`} /></div>; })()}
+            <SeoEditor value={seo} onChange={setSeo} defaults={defaultSeo(resource, form, year)}
               path={`${publicPath}/${String(form.slug ?? "")}`} testid={`admin-${resource}-seo`} />
             <DialogFooter className="sm:col-span-2">
               <Button type="button" variant="outline" onClick={() => setEditing(undefined)} data-testid={`admin-${resource}-cancel-button`}>Cancel</Button>

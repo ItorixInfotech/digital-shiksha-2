@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BookMarked, Building, CalendarDays, Clock, Globe, Monitor } from "lucide-react";
 import CollegeCard from "@/components/CollegeCard";
 import EnquiryForm from "@/components/EnquiryForm";
+import FaqSection from "@/components/FaqSection";
 import { EmptyState, PageHeader } from "@/components/Common";
 import { apiGet } from "@/lib/api";
 import type { College, Exam } from "@/lib/types";
@@ -43,6 +44,7 @@ export default function ExamDetail() {
               <div className="mt-4 grid gap-5 md:grid-cols-2">{accepting.map((c) => <CollegeCard key={c.id} c={c} />)}</div>
             </div>
           )}
+          <FaqSection faqs={e.faqs ?? []} title={`${e.name} FAQs`} testid="exam-faq" />
         </div>
         <aside className="lg:col-span-4">
           <div className="sticky top-32 rounded-2xl border bg-white p-6 shadow-sm">

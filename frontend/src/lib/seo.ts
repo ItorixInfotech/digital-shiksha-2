@@ -1,5 +1,5 @@
 import { SITE } from "@/lib/site";
-import type { SeoMeta } from "@/lib/types";
+import type { FaqItem, SeoMeta } from "@/lib/types";
 
 export type SeoKind = "colleges" | "courses" | "exams" | "articles";
 export const EMPTY_SEO: SeoMeta = { meta_title: "", meta_description: "", keywords: [], canonical_url: "", og_image: "", noindex: false };
@@ -93,5 +93,54 @@ export function entityLd(kind: SeoKind, raw: object, description: string): objec
       datePublished: date || undefined, dateModified: date || undefined, author: { "@type": "Organization", name: str(r.author) || SITE.name }, publisher: publisher(),
       mainEntityOfPage: absUrl(path), keywords: list(r.tags).join(", ") || undefined };
   }
-  return main ? [main, crumbs] : [crumbs];
+  const faqs = (r.faqs as FaqItem[] | undefined) ?? [];
+  return [...(main ? [main] : []), crumbs, ...(faqs.length ? [faqLd(faqs)] : [])];
+}
+
+export function faqLd(faqs: FaqItem[]) {
+  return {
+    "@context": "https://schema.org", "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.question, acceptedAnswer: { "@type": "Answer", text: f.answer } })),
+  };
+}
+
+export interface SeoCheck { label: string; ok: boolean; fix: string }
+export interface SeoScore { score: number; passed: number; level: "green" | "amber" | "red"; checks: SeoCheck[] }
+export interface SeoScoreInput {
+  title: string;
+  description: string;
+  keywords: string[];
+  hasImage: boolean;
+  bodyLength: number;
+  faqCount: number | null; // null = FAQs not applicable (courses, articles)
+  noindex: boolean;
+}
+
+/** Red/amber/green on-page SEO score from the effective (override or auto) values. */
+export function seoScore(i: SeoScoreInput): SeoScore {
+  const kw = (i.keywords[0] ?? "").toLowerCase();
+  const checks: SeoCheck[] = [
+    { label: `Title length ${i.title.length} (30–${TITLE_MAX})`, ok: i.title.length >= 30 && i.title.length <= TITLE_MAX, fix: `Title is ${i.title.length} chars — keep it 30–${TITLE_MAX}` },
+    { label: `Description length ${i.description.length} (70–${DESC_MAX})`, ok: i.description.length >= 70 && i.description.length <= DESC_MAX, fix: `Description is ${i.description.length} chars — keep it 70–${DESC_MAX}` },
+    { label: `Focus keyword “${i.keywords[0] ?? ""}” used`, ok: !!kw && `${i.title} ${i.description}`.toLowerCase().includes(kw), fix: kw ? `Use the focus keyword “${i.keywords[0]}” in the title or description` : "Add a focus keyword" },
+    { label: "Social share image set", ok: i.hasImage, fix: "Add an OG / cover image" },
+    { label: "Content has 300+ characters", ok: i.bodyLength >= 300, fix: `Content is ${i.bodyLength} chars — write at least 300` },
+    ...(i.faqCount === null ? [] : [{ label: `${i.faqCount} FAQ(s) added`, ok: i.faqCount > 0, fix: "Add FAQs for Google FAQ rich results" }]),
+    { label: "Indexable by Google", ok: !i.noindex, fix: "Page is set to noindex — Google won't show it" },
+  ];
+  const passed = checks.filter((c) => c.ok).length;
+  const score = Math.round((passed / checks.length) * 100);
+  return { score, passed, checks, level: score >= 80 ? "green" : score >= 50 ? "amber" : "red" };
+}
+
+/** Score for an admin content row (API record or form state). */
+export function entityScore(kind: SeoKind, raw: object, year: number): SeoScore {
+  const r = raw as Record<string, unknown>;
+  const s = { ...EMPTY_SEO, ...(r.seo as Partial<SeoMeta> | undefined) };
+  const d = defaultSeo(kind, r, year);
+  return seoScore({
+    title: s.meta_title || d.title, description: s.meta_description || d.description, keywords: s.keywords,
+    hasImage: !!(s.og_image || str(r.image)), bodyLength: str(kind === "articles" ? r.content : r.overview).length,
+    faqCount: kind === "colleges" || kind === "exams" ? ((r.faqs as unknown[] | undefined) ?? []).length : null, noindex: s.noindex,
+  });
 }

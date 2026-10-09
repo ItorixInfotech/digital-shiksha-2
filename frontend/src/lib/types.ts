@@ -16,6 +16,57 @@ export interface CutoffRow {
   category: string;
 }
 
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface LandingOverrideIn {
+  intro: string;
+  faqs: FaqItem[];
+  seo: SeoMeta;
+}
+
+export interface LandingSummary {
+  slug: string;
+  stream: string;
+  city: string;
+  label: string;
+  count: number;
+  customised: boolean;
+  default_title: string;
+  default_description: string;
+  override: LandingOverrideIn | null;
+}
+
+export interface LandingStats {
+  count: number;
+  fees_min: number;
+  fees_max: number;
+  avg_fees: number;
+  avg_package: number;
+  top_package: number;
+  exams: string[];
+}
+
+export interface LandingLink {
+  slug: string;
+  label: string;
+  count: number;
+}
+
+export interface LandingPage extends LandingSummary {
+  year: number;
+  h1: string;
+  intro: string;
+  faqs: FaqItem[];
+  seo: SeoMeta;
+  stats: LandingStats;
+  colleges: College[];
+  same_city: LandingLink[];
+  same_stream: LandingLink[];
+}
+
 export interface SeoMeta {
   meta_title: string;
   meta_description: string;
@@ -75,6 +126,7 @@ export interface CollegeIn {
   top_recruiters: string[];
   facilities: string[];
   featured: boolean;
+  faqs: FaqItem[];
   seo: SeoMeta;
 }
 export interface College extends CollegeIn {
@@ -116,6 +168,7 @@ export interface ExamIn {
   overview: string;
   syllabus: string[];
   website: string;
+  faqs: FaqItem[];
   seo: SeoMeta;
 }
 export interface Exam extends ExamIn {

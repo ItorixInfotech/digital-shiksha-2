@@ -4,6 +4,7 @@ import { SITE } from "@/lib/site";
 
 const COLS = [
   { title: "Top Colleges", links: [["Engineering Colleges", "/colleges?stream=Engineering"], ["MBA Colleges", "/colleges?stream=Management"], ["Medical Colleges", "/colleges?stream=Medical"], ["Law Colleges", "/colleges?stream=Law"], ["Colleges in Pune", "/colleges?city=Pune"], ["Colleges in Mumbai", "/colleges?city=Mumbai"]] },
+  { title: "Popular Searches", links: [["Engineering Colleges in Pune", "/engineering-colleges-in-pune"], ["Engineering Colleges in Mumbai", "/engineering-colleges-in-mumbai"], ["MBA Colleges in Pune", "/mba-colleges-in-pune"], ["MBA Colleges in Mumbai", "/mba-colleges-in-mumbai"], ["Medical Colleges in Pune", "/medical-colleges-in-pune"], ["Law Colleges in Pune", "/law-colleges-in-pune"]] },
   { title: "Top Courses", links: [["B.Tech", "/courses/btech"], ["MBA", "/courses/mba"], ["MBBS", "/courses/mbbs"], ["BBA", "/courses/bba"], ["BA LLB", "/courses/ba-llb"], ["All Courses", "/courses"]] },
   { title: "Top Exams", links: [["JEE Main", "/exams/jee-main"], ["NEET UG", "/exams/neet-ug"], ["MHT CET", "/exams/mht-cet"], ["CAT", "/exams/cat"], ["CLAT", "/exams/clat"], ["All Exams", "/exams"]] },
   { title: "Digital Shiksha", links: [["Free Counselling", "/consultation"], ["College Predictor", "/predictor"], ["Compare Colleges", "/compare"], ["News & Articles", "/news"], ["Admin Login", "/admin/login"]] },
@@ -29,7 +30,7 @@ export default function Footer() {
               <a href={SITE.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" data-testid="footer-instagram-link" className="grid size-9 place-items-center rounded-full bg-white/10 hover:bg-brand-red transition-colors"><Instagram className="size-4" /></a>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-8">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 xl:grid-cols-5 lg:col-span-8">
             {COLS.map((c) => (
               <div key={c.title}>
                 <h4 className="text-sm font-semibold text-white">{c.title}</h4>

@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import EnquiryForm from "@/components/EnquiryForm";
+import FaqSection from "@/components/FaqSection";
 import { EmptyState } from "@/components/Common";
 import { apiGet } from "@/lib/api";
 import type { College } from "@/lib/types";
@@ -154,6 +155,7 @@ export default function CollegeDetail() {
               <div className="mt-4 grid gap-3 sm:grid-cols-2">{c.facilities.map((f) => <p key={f} className="flex items-center gap-2 text-slate-700"><Check className="size-4 text-brand-green" /> {f}</p>)}</div>
             </div>
           )}
+          <FaqSection faqs={c.faqs ?? []} title={`FAQs about ${c.short_name || c.name}`} testid="college-faq" />
         </motion.div>
 
         <aside className="lg:col-span-4">
