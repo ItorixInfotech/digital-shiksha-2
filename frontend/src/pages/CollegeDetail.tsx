@@ -24,7 +24,7 @@ export default function CollegeDetail() {
   const { data: c, isLoading, isError } = useQuery({ queryKey: ["college", slug], queryFn: () => apiGet<College>(`/colleges/${slug}`) });
 
   if (isLoading) return <div className="mx-auto max-w-7xl px-4 py-20"><div className="h-64 animate-pulse rounded-2xl bg-slate-200" /></div>;
-  if (isError || !c) return <div className="mx-auto max-w-3xl px-4 py-20"><EmptyState title="College not found" body="It may have been removed. Browse all colleges instead." testid="college-not-found" /><div className="mt-4 text-center"><Link to="/colleges" className="font-semibold text-brand-red">Browse colleges →</Link></div></div>;
+  if (isError || !c) return <div className="mx-auto max-w-3xl px-4 py-20"><EmptyState title="College not found" body="It may have been removed. Browse all colleges instead." testid="college-not-found" /><div className="mt-4 text-center"><Link to="/colleges" className="font-semibold text-brand-leaf">Browse colleges →</Link></div></div>;
 
   const inCompare = compare.includes(c.slug);
   const facts = [
@@ -90,7 +90,7 @@ export default function CollegeDetail() {
                 <h2 className="text-xl font-semibold">About {c.short_name || c.name}</h2>
                 <p className="mt-3 leading-relaxed text-slate-600" data-testid="college-overview">{c.overview}</p>
                 <h3 className="mt-6 font-semibold">Streams offered</h3>
-                <div className="mt-2 flex flex-wrap gap-2">{c.streams.map((s) => <Link key={s} to={`/colleges?stream=${encodeURIComponent(s)}`} className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700 hover:bg-red-50 hover:text-brand-red transition-colors">{s}</Link>)}</div>
+                <div className="mt-2 flex flex-wrap gap-2">{c.streams.map((s) => <Link key={s} to={`/colleges?stream=${encodeURIComponent(s)}`} className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700 hover:bg-red-50 hover:text-brand-leaf transition-colors">{s}</Link>)}</div>
                 <h3 className="mt-6 font-semibold">Exams accepted</h3>
                 <div className="mt-2 flex flex-wrap gap-2">{c.exams_accepted.map((e) => <span key={e} className="rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-brand-blue">{e}</span>)}</div>
               </div>
@@ -143,7 +143,7 @@ export default function CollegeDetail() {
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-xl bg-green-50 p-4"><p className="text-xs text-green-800">Average package</p><p className="text-2xl font-bold text-green-900">{c.avg_package ? `₹${c.avg_package} LPA` : "—"}</p></div>
                 <div className="rounded-xl bg-indigo-50 p-4"><p className="text-xs text-indigo-800">Highest package</p><p className="text-2xl font-bold text-indigo-900">{c.highest_package ? `₹${c.highest_package} LPA` : "—"}</p></div>
-                <div className="rounded-xl bg-red-50 p-4"><p className="text-xs text-red-800">Placement rate</p><p className="text-2xl font-bold text-red-900">{c.placement_rate ? `${c.placement_rate}%` : "—"}</p></div>
+                <div className="rounded-xl bg-green-50 p-4"><p className="text-xs text-brand-leaf">Placement rate</p><p className="text-2xl font-bold text-brand-leaf">{c.placement_rate ? `${c.placement_rate}%` : "—"}</p></div>
               </div>
               <h3 className="mt-6 font-semibold">Top recruiters</h3>
               <div className="mt-2 flex flex-wrap gap-2">{c.top_recruiters.map((r) => <span key={r} className="rounded-lg border px-3 py-1.5 text-sm text-slate-700">{r}</span>)}</div>
@@ -160,7 +160,7 @@ export default function CollegeDetail() {
 
         <aside className="lg:col-span-4">
           <div className="sticky top-44 rounded-2xl border bg-white p-6 shadow-sm" data-testid="college-lead-panel">
-            <p className="text-xs font-bold uppercase tracking-wider text-brand-red">Free counselling</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf">Free counselling</p>
             <h3 className="mt-1 text-lg font-semibold">Want admission in {c.short_name}?</h3>
             <p className="mt-1 text-sm text-slate-500">Get cutoff prediction, fee details & seat guidance.</p>
             <div className="mt-4"><EnquiryForm testid="college-lead" prefill={{ college: c.name, source: "college-sidebar" }} /></div>

@@ -16,7 +16,7 @@ export default function CourseDetail() {
   const exams = useQuery({ queryKey: ["exams", "all"], queryFn: () => apiGet<Exam[]>("/exams") });
 
   if (isLoading) return <div className="mx-auto max-w-7xl px-4 py-20"><div className="h-48 animate-pulse rounded-2xl bg-slate-200" /></div>;
-  if (isError || !c) return <div className="mx-auto max-w-3xl px-4 py-20"><EmptyState title="Course not found" testid="course-not-found" /><p className="mt-4 text-center"><Link to="/courses" className="font-semibold text-brand-red">All courses →</Link></p></div>;
+  if (isError || !c) return <div className="mx-auto max-w-3xl px-4 py-20"><EmptyState title="Course not found" testid="course-not-found" /><p className="mt-4 text-center"><Link to="/courses" className="font-semibold text-brand-leaf">All courses →</Link></p></div>;
 
   const examLink = (name: string) => exams.data?.find((e) => e.name === name)?.slug;
   const facts = [[Clock, "Duration", c.duration], [GraduationCap, "Level", c.level], [IndianRupee, "Average fees", c.avg_fees], [Wallet, "Average salary", c.avg_salary]] as const;
@@ -24,7 +24,7 @@ export default function CourseDetail() {
   return (
     <div data-testid="course-detail-page">
       <EntitySeo kind="courses" item={c} />
-      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Courses", to: "/courses" }, { label: c.name }]} title={<>{c.name}: <span className="text-red-400">{c.full_name}</span></>} subtitle={`${c.stream} • Admission 2026, fees, eligibility, entrance exams & career scope`} testid="course-header" />
+      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Courses", to: "/courses" }, { label: c.name }]} title={<>{c.name}: <span className="text-brand-leaf-soft">{c.full_name}</span></>} subtitle={`${c.stream} • Admission 2026, fees, eligibility, entrance exams & career scope`} testid="course-header" />
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:px-8">
         <div className="space-y-6 lg:col-span-8">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

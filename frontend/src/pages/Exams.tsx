@@ -32,8 +32,8 @@ export default function Exams() {
           ))}
         </div>
         <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1">
-          <button type="button" onClick={() => set("stream", "")} data-testid="exams-stream-all" className={cn("shrink-0 rounded-lg px-3 py-1.5 text-sm transition-colors", !stream ? "bg-red-50 font-semibold text-brand-red" : "text-slate-600 hover:bg-white")}>All streams</button>
-          {streams.map((s) => <button key={s} type="button" onClick={() => set("stream", s)} data-testid={`exams-stream-${slugify(s)}`} className={cn("shrink-0 rounded-lg px-3 py-1.5 text-sm transition-colors", stream === s ? "bg-red-50 font-semibold text-brand-red" : "text-slate-600 hover:bg-white")}>{s}</button>)}
+          <button type="button" onClick={() => set("stream", "")} data-testid="exams-stream-all" className={cn("shrink-0 rounded-lg px-3 py-1.5 text-sm transition-colors", !stream ? "bg-red-50 font-semibold text-brand-leaf" : "text-slate-600 hover:bg-white")}>All streams</button>
+          {streams.map((s) => <button key={s} type="button" onClick={() => set("stream", s)} data-testid={`exams-stream-${slugify(s)}`} className={cn("shrink-0 rounded-lg px-3 py-1.5 text-sm transition-colors", stream === s ? "bg-red-50 font-semibold text-brand-leaf" : "text-slate-600 hover:bg-white")}>{s}</button>)}
         </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -45,9 +45,9 @@ export default function Exams() {
                 <span className="grid size-14 shrink-0 place-items-center rounded-xl bg-brand-navy text-center text-[11px] font-bold leading-tight text-white">{e.name.split(" ")[0]}</span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-lg font-semibold text-slate-900 group-hover:text-brand-red transition-colors">{e.name}</p>
+                    <p className="text-lg font-semibold text-slate-900 group-hover:text-brand-leaf transition-colors">{e.name}</p>
                     <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-600">{e.level}</span>
-                    <span className="rounded bg-red-50 px-1.5 py-0.5 text-[11px] font-semibold text-brand-red">{e.stream}</span>
+                    <span className="rounded bg-red-50 px-1.5 py-0.5 text-[11px] font-semibold text-brand-leaf">{e.stream}</span>
                   </div>
                   <p className="truncate text-sm text-slate-500">{e.full_name}</p>
                   <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-600">

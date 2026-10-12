@@ -29,7 +29,7 @@ function FacetGroup({ title, param, items, value, onPick }: { title: string; par
           const active = value === f.name;
           return (
             <button key={f.name} type="button" data-testid={`filter-${param}-${slugify(f.name)}`} onClick={() => onPick(param, active ? "" : f.name)}
-              className={cn("flex items-center justify-between rounded-md px-2.5 py-1.5 text-left text-sm transition-colors", active ? "bg-red-50 font-semibold text-brand-red" : "text-slate-600 hover:bg-slate-50")}>
+              className={cn("flex items-center justify-between rounded-md px-2.5 py-1.5 text-left text-sm transition-colors", active ? "bg-red-50 font-semibold text-brand-leaf" : "text-slate-600 hover:bg-slate-50")}>
               <span>{f.name}</span><span className="text-xs text-slate-400">{f.count}</span>
             </button>
           );
@@ -74,7 +74,7 @@ export default function Colleges() {
         <div className="mt-2 grid gap-0.5">
           {FEES.map(([v, l]) => (
             <button key={l} type="button" data-testid={`filter-fees-${v || "any"}`} onClick={() => set("max_fees", v)}
-              className={cn("rounded-md px-2.5 py-1.5 text-left text-sm transition-colors", get("max_fees") === v ? "bg-red-50 font-semibold text-brand-red" : "text-slate-600 hover:bg-slate-50")}>{l}</button>
+              className={cn("rounded-md px-2.5 py-1.5 text-left text-sm transition-colors", get("max_fees") === v ? "bg-red-50 font-semibold text-brand-leaf" : "text-slate-600 hover:bg-slate-50")}>{l}</button>
           ))}
         </div>
       </div>
@@ -98,7 +98,7 @@ export default function Colleges() {
         <aside className="sticky top-32 hidden rounded-2xl border bg-white p-5 lg:col-span-3 lg:block">
           <div className="mb-4 flex items-center justify-between">
             <p className="font-semibold text-slate-900">Filters</p>
-            {active.length > 0 && <button type="button" onClick={clear} className="text-xs font-semibold text-brand-red" data-testid="filters-clear-button">Clear all</button>}
+            {active.length > 0 && <button type="button" onClick={clear} className="text-xs font-semibold text-brand-leaf" data-testid="filters-clear-button">Clear all</button>}
           </div>
           {filters}
         </aside>

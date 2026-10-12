@@ -21,7 +21,7 @@ function Links({ title, links, testid }: { title: string; links: LandingLink[]; 
       <div className="mt-3 flex flex-wrap gap-2">
         {links.map((l) => (
           <Link key={l.slug} to={`/${l.slug}`} data-testid={`${testid}-${l.slug}`}
-            className="rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-sm text-slate-700 hover:-translate-y-px hover:border-brand-red hover:text-brand-red transition-[transform,color,border-color]">
+            className="rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-sm text-slate-700 hover:-translate-y-px hover:border-brand-red hover:text-brand-leaf transition-[transform,color,border-color]">
             {l.label} <span className="text-xs text-slate-400">({l.count})</span>
           </Link>
         ))}
@@ -64,7 +64,7 @@ export default function Landing() {
           {stats.map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i, duration: 0.3 }}
               className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur-md" data-testid={s.testid}>
-              <s.icon className="size-4 text-red-300" />
+              <s.icon className="size-4 text-brand-leaf-soft" />
               <p className="mt-2 text-2xl font-bold tracking-tight">{s.value}</p>
               <p className="text-xs text-slate-400">{s.label}</p>
             </motion.div>

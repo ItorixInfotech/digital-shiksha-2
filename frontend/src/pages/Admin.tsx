@@ -61,7 +61,7 @@ export function AdminLogin() {
       <Toaster richColors />
       <form onSubmit={(e) => { e.preventDefault(); login.mutate(); }} className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl animate-fade-up">
         <img src={SITE.logo} alt="Digital Shiksha" className="h-14 w-auto" />
-        <h1 className="mt-6 flex items-center gap-2 text-xl font-semibold"><Lock className="size-5 text-brand-red" /> Admin login</h1>
+        <h1 className="mt-6 flex items-center gap-2 text-xl font-semibold"><Lock className="size-5 text-brand-leaf" /> Admin login</h1>
         <p className="mt-1 text-sm text-slate-500">Manage leads, colleges, courses, exams and articles.</p>
         <div className="mt-6 grid gap-4">
           <div className="grid gap-1.5"><Label htmlFor="admin-u">Username</Label><Input id="admin-u" data-testid="admin-login-username-input" value={u} onChange={(e) => setU(e.target.value)} autoComplete="username" /></div>
@@ -70,7 +70,7 @@ export function AdminLogin() {
             {login.isPending && <Loader2 className="size-4 animate-spin" />} Sign in
           </Button>
         </div>
-        <a href="/" className="mt-6 block text-center text-sm text-slate-500 hover:text-brand-red" data-testid="admin-login-back-link">← Back to website</a>
+        <a href="/" className="mt-6 block text-center text-sm text-slate-500 hover:text-brand-leaf" data-testid="admin-login-back-link">← Back to website</a>
       </form>
     </div>
   );
@@ -240,7 +240,7 @@ export default function Admin() {
             <h1 className="text-2xl font-bold tracking-tight">Welcome, {me.data?.username}</h1>
             <p className="text-sm text-slate-500">Digital Shiksha content & lead management</p>
           </div>
-          <a href="/" target="_blank" rel="noreferrer" className="text-sm font-semibold text-brand-blue hover:text-brand-red" data-testid="admin-view-site-link">View website ↗</a>
+          <a href="/" target="_blank" rel="noreferrer" className="text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid="admin-view-site-link">View website ↗</a>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
           {cards.map(([l, v]) => (

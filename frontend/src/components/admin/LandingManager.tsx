@@ -91,7 +91,7 @@ export default function LandingManager({ editSlug, onClose }: { editSlug?: strin
             {list.isLoading && <TableRow><TableCell colSpan={5} className="text-slate-500">Loading…</TableCell></TableRow>}
             {rows.map((l) => (
               <TableRow key={l.slug} data-testid={`admin-landing-row-${l.slug}`}>
-                <TableCell><a href={`/${l.slug}`} target="_blank" rel="noreferrer" className="font-medium hover:text-brand-red">{l.label}</a><p className="text-xs text-slate-400">/{l.slug}</p></TableCell>
+                <TableCell><a href={`/${l.slug}`} target="_blank" rel="noreferrer" className="font-medium hover:text-brand-leaf">{l.label}</a><p className="text-xs text-slate-400">/{l.slug}</p></TableCell>
                 <TableCell className="text-slate-600">{l.count}</TableCell>
                 <TableCell className="text-xs">{l.customised ? <span className="rounded-md bg-teal-50 px-2 py-0.5 font-semibold text-teal-800">Customised</span> : <span className="text-slate-400">Auto</span>}</TableCell>
                 <TableCell><SeoBadge score={landingScore(l)} testid={`admin-landing-seo-score-${l.slug}`} /></TableCell>

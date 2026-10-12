@@ -15,7 +15,7 @@ export default function ExamDetail() {
   const colleges = useQuery({ queryKey: ["colleges", "all"], queryFn: () => apiGet<College[]>("/colleges") });
 
   if (isLoading) return <div className="mx-auto max-w-7xl px-4 py-20"><div className="h-48 animate-pulse rounded-2xl bg-slate-200" /></div>;
-  if (isError || !e) return <div className="mx-auto max-w-3xl px-4 py-20"><EmptyState title="Exam not found" testid="exam-not-found" /><p className="mt-4 text-center"><Link to="/exams" className="font-semibold text-brand-red">All exams →</Link></p></div>;
+  if (isError || !e) return <div className="mx-auto max-w-3xl px-4 py-20"><EmptyState title="Exam not found" testid="exam-not-found" /><p className="mt-4 text-center"><Link to="/exams" className="font-semibold text-brand-leaf">All exams →</Link></p></div>;
 
   const accepting = (colleges.data ?? []).filter((c) => c.exams_accepted.includes(e.name)).slice(0, 4);
   const facts = [[CalendarDays, "Exam date", e.exam_date], [Clock, "Application deadline", e.application_deadline], [Monitor, "Mode", e.mode], [Building, "Conducted by", e.conducting_body]] as const;

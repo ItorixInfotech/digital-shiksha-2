@@ -177,7 +177,7 @@ export default function ContentManager({ resource, title, fields, columns, publi
               <TableRow key={r.id} data-testid={`admin-${resource}-row-${r.slug}`}>
                 {columns.map((c, i) => (
                   <TableCell key={c.key} className={i === 0 ? "max-w-xs truncate font-medium" : "text-slate-600"}>
-                    {i === 0 ? <a href={`${publicPath}/${r.slug}`} target="_blank" rel="noreferrer" className="hover:text-brand-red">{String(r[c.key] ?? "")}</a> : Array.isArray(r[c.key]) ? (r[c.key] as string[]).join(", ") : String(r[c.key] ?? "—")}
+                    {i === 0 ? <a href={`${publicPath}/${r.slug}`} target="_blank" rel="noreferrer" className="hover:text-brand-leaf">{String(r[c.key] ?? "")}</a> : Array.isArray(r[c.key]) ? (r[c.key] as string[]).join(", ") : String(r[c.key] ?? "—")}
                   </TableCell>
                 ))}
                 <TableCell><SeoBadge score={entityScore(resource, r, year)} testid={`admin-${resource}-seo-score-${r.slug}`} /></TableCell>

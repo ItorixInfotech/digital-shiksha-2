@@ -53,7 +53,7 @@ export default function Home() {
               <BadgeCheck className="size-4" /> Counselling • Admission • India-only
             </span>
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-              Your gateway to the <span className="text-red-400">best colleges</span> in India.
+              Your gateway to the <span className="text-brand-leaf-soft">best colleges</span> in India.
             </h1>
             <p className="mt-5 max-w-xl text-lg text-slate-300">
               Explore {meta.data?.totals.colleges ?? "top"} colleges, {meta.data?.totals.courses ?? "40+"} courses and {meta.data?.totals.exams ?? "30+"} entrance exams — then let our Pune experts handle your admission end-to-end.
@@ -87,14 +87,14 @@ export default function Home() {
 
       {/* STREAMS */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8" data-testid="home-streams">
-        <SectionTitle overline="Explore by stream" title="Top study streams in India" action={<Link to="/courses" className="flex items-center gap-1 text-sm font-semibold text-brand-blue hover:text-brand-red" data-testid="home-all-courses-link">All courses <ArrowRight className="size-4" /></Link>} />
+        <SectionTitle overline="Explore by stream" title="Top study streams in India" action={<Link to="/courses" className="flex items-center gap-1 text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid="home-all-courses-link">All courses <ArrowRight className="size-4" /></Link>} />
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {STREAMS.slice(0, 18).map((s) => (
             <Link key={s.name} to={`/colleges?stream=${encodeURIComponent(s.name)}`} data-testid={`home-stream-${slugify(s.name)}`}
               className="group flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md transition-[transform,box-shadow,border-color]">
               <span className={`grid size-10 place-items-center rounded-lg ${s.tint}`}><s.icon className="size-5" /></span>
               <span>
-                <span className="block text-sm font-semibold text-slate-900 group-hover:text-brand-red transition-colors">{s.name}</span>
+                <span className="block text-sm font-semibold text-slate-900 group-hover:text-brand-leaf transition-colors">{s.name}</span>
                 <span className="text-xs text-slate-500">{count(s.name) ? `${count(s.name)} colleges` : "Explore"}</span>
               </span>
             </Link>
@@ -105,7 +105,7 @@ export default function Home() {
       {/* TOP COLLEGES */}
       <section className="border-y bg-white py-16" data-testid="home-top-colleges">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <SectionTitle overline="Top ranked" title="Top colleges in India" action={<Link to={`/colleges?stream=${encodeURIComponent(tab)}`} className="flex items-center gap-1 text-sm font-semibold text-brand-blue hover:text-brand-red" data-testid="home-view-all-colleges-link">View all {tab} colleges <ArrowRight className="size-4" /></Link>} />
+          <SectionTitle overline="Top ranked" title="Top colleges in India" action={<Link to={`/colleges?stream=${encodeURIComponent(tab)}`} className="flex items-center gap-1 text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid="home-view-all-colleges-link">View all {tab} colleges <ArrowRight className="size-4" /></Link>} />
           <Tabs value={tab} onValueChange={(v) => setTab(v as string)} className="mt-6">
             <TabsList className="no-scrollbar max-w-full overflow-x-auto">
               {TOP_TABS.map((t) => <TabsTrigger key={t} value={t} data-testid={`home-top-tab-${slugify(t)}`}>{t}</TabsTrigger>)}
@@ -127,22 +127,22 @@ export default function Home() {
             {popular.map((c) => (
               <Link key={c.id} to={`/courses/${c.slug}`} data-testid={`home-course-${c.slug}`} className="group flex items-center justify-between rounded-xl border bg-white p-4 hover:border-slate-300 hover:shadow-md transition-[box-shadow,border-color]">
                 <span className="min-w-0">
-                  <span className="block font-semibold text-slate-900 group-hover:text-brand-red transition-colors">{c.name}</span>
+                  <span className="block font-semibold text-slate-900 group-hover:text-brand-leaf transition-colors">{c.name}</span>
                   <span className="block truncate text-xs text-slate-500">{c.duration} • {c.level} • {c.avg_fees}</span>
                 </span>
-                <ArrowRight className="size-4 shrink-0 text-slate-400 group-hover:translate-x-0.5 group-hover:text-brand-red transition-[transform,color]" />
+                <ArrowRight className="size-4 shrink-0 text-slate-400 group-hover:translate-x-0.5 group-hover:text-brand-leaf transition-[transform,color]" />
               </Link>
             ))}
             {courses.isLoading && <p className="text-sm text-slate-500">Loading courses…</p>}
           </div>
         </div>
         <div className="lg:col-span-5" data-testid="home-upcoming-exams">
-          <SectionTitle overline="Entrance exams" title="Upcoming exams 2026" action={<Link to="/exams" className="text-sm font-semibold text-brand-blue hover:text-brand-red" data-testid="home-all-exams-link">All exams</Link>} />
+          <SectionTitle overline="Entrance exams" title="Upcoming exams 2026" action={<Link to="/exams" className="text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid="home-all-exams-link">All exams</Link>} />
           <ul className="mt-6 divide-y rounded-2xl border bg-white">
             {upcoming.map((e) => (
               <li key={e.id}>
                 <Link to={`/exams/${e.slug}`} data-testid={`home-exam-${e.slug}`} className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors">
-                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-red-50 text-brand-red"><CalendarDays className="size-5" /></span>
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-red-50 text-brand-leaf"><CalendarDays className="size-5" /></span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-semibold text-slate-900">{e.name}</span>
                     <span className="block truncate text-xs text-slate-500">{e.conducting_body} • {e.mode}</span>
@@ -162,7 +162,7 @@ export default function Home() {
           <div className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-brand-teal/30 blur-3xl" />
           <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-red-300">New • College Predictor 2026</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf-soft">New • College Predictor 2026</p>
               <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Got your MHT CET, JEE or NEET score?</h2>
               <p className="mt-2 max-w-xl text-slate-200">See which Pune & Mumbai colleges you can likely get — based on last year's closing cutoffs.</p>
             </div>
@@ -176,7 +176,7 @@ export default function Home() {
         <SectionTitle overline="By location" title="Explore colleges by city" />
         <div className="mt-6 flex flex-wrap gap-3">
           {CITIES.map((c) => (
-            <Link key={c} to={`/colleges?city=${encodeURIComponent(c)}`} data-testid={`home-city-${slugify(c)}`} className="flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-brand-red hover:text-brand-red transition-colors">
+            <Link key={c} to={`/colleges?city=${encodeURIComponent(c)}`} data-testid={`home-city-${slugify(c)}`} className="flex items-center gap-2 rounded-full border bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-brand-red hover:text-brand-leaf transition-colors">
               <MapPin className="size-4" /> {c}
             </Link>
           ))}
@@ -187,7 +187,7 @@ export default function Home() {
       <section className="bg-brand-navy text-white" data-testid="home-consultation">
         <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-12 lg:px-8 lg:py-20">
           <div className="lg:col-span-6">
-            <p className="text-xs font-bold uppercase tracking-wider text-red-400">Digital Shiksha — top admission consultant</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf-soft">Digital Shiksha — top admission consultant</p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Book your free consultation</h2>
             <p className="mt-4 max-w-lg text-slate-300">Looking for a trusted admission consultant in Pune or Mumbai? Our counsellors with 16+ years of experience help you pick the right course and college, and secure your seat.</p>
             <div className="mt-8 grid gap-5 sm:grid-cols-2">
@@ -222,14 +222,14 @@ export default function Home() {
 
       {/* NEWS */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8" data-testid="home-news">
-        <SectionTitle overline="Latest updates" title="Admission news & articles" action={<Link to="/news" className="flex items-center gap-1 text-sm font-semibold text-brand-blue hover:text-brand-red" data-testid="home-all-news-link">All news <ArrowRight className="size-4" /></Link>} />
+        <SectionTitle overline="Latest updates" title="Admission news & articles" action={<Link to="/news" className="flex items-center gap-1 text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid="home-all-news-link">All news <ArrowRight className="size-4" /></Link>} />
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           {(articles.data ?? []).slice(0, 3).map((a) => (
             <Link key={a.id} to={`/news/${a.slug}`} data-testid={`home-article-${a.slug}`} className="group overflow-hidden rounded-2xl border bg-white hover:-translate-y-0.5 hover:shadow-lg transition-[transform,box-shadow]">
               <img src={a.image} alt="" loading="lazy" className="h-44 w-full object-cover" />
               <div className="p-5">
-                <p className="text-xs font-bold uppercase tracking-wider text-brand-red">{a.category}</p>
-                <h3 className="mt-2 line-clamp-2 font-semibold text-slate-900 group-hover:text-brand-red transition-colors">{a.title}</h3>
+                <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf">{a.category}</p>
+                <h3 className="mt-2 line-clamp-2 font-semibold text-slate-900 group-hover:text-brand-leaf transition-colors">{a.title}</h3>
                 <p className="mt-2 line-clamp-2 text-sm text-slate-500">{a.excerpt}</p>
               </div>
             </Link>
@@ -244,7 +244,7 @@ export default function Home() {
           <div className="divide-y rounded-2xl border lg:col-span-8">
             {FAQ.map(([q, a], i) => (
               <div key={q}>
-                <button type="button" data-testid={`home-faq-toggle-${i}`} onClick={() => setFaq(faq === i ? -1 : i)} className="flex w-full items-center justify-between gap-4 p-5 text-left font-semibold text-slate-900 hover:text-brand-red transition-colors">
+                <button type="button" data-testid={`home-faq-toggle-${i}`} onClick={() => setFaq(faq === i ? -1 : i)} className="flex w-full items-center justify-between gap-4 p-5 text-left font-semibold text-slate-900 hover:text-brand-leaf transition-colors">
                   {q} <ChevronDown className={`size-5 shrink-0 transition-transform ${faq === i ? "rotate-180" : ""}`} />
                 </button>
                 {faq === i && <p className="px-5 pb-5 text-sm leading-relaxed text-slate-600 animate-fade-up">{a}</p>}

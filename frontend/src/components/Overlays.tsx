@@ -63,7 +63,7 @@ export function CompareBar() {
           {compare.map((s, i) => (
             <span key={s} className="flex items-center gap-1 rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-brand-blue" data-testid={`compare-bar-item-${s}`}>
               {names[i]}
-              <button type="button" aria-label="Remove" data-testid={`compare-bar-remove-${s}`} onClick={() => toggleCompare(s)} className="hover:text-brand-red"><X className="size-3.5" /></button>
+              <button type="button" aria-label="Remove" data-testid={`compare-bar-remove-${s}`} onClick={() => toggleCompare(s)} className="hover:text-brand-leaf"><X className="size-3.5" /></button>
             </span>
           ))}
         </div>

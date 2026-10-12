@@ -21,7 +21,7 @@ const LINKS = [
 ];
 
 const linkCls = ({ isActive }: { isActive: boolean }) =>
-  cn("rounded-md px-3 py-2 text-[15px] font-medium transition-colors", isActive ? "text-brand-red" : "text-slate-700 hover:text-brand-red");
+  cn("rounded-md px-3 py-2 text-[15px] font-medium transition-colors", isActive ? "text-brand-leaf" : "text-slate-700 hover:text-brand-leaf");
 
 export function Logo({ className = "h-11" }: { className?: string }) {
   return <img src={SITE.logo} alt="Digital Shiksha — Counselling & Admission" className={cn("w-auto select-none", className)} />;
@@ -56,12 +56,12 @@ export default function Navbar() {
 
           <nav className="ml-4 hidden items-center gap-0.5 lg:flex" data-testid="main-nav">
             <DropdownMenu>
-              <DropdownMenuTrigger data-testid="nav-colleges-dropdown" className="flex items-center gap-1 rounded-md px-3 py-2 text-[15px] font-medium text-slate-700 outline-none hover:text-brand-red transition-colors">
+              <DropdownMenuTrigger data-testid="nav-colleges-dropdown" className="flex items-center gap-1 rounded-md px-3 py-2 text-[15px] font-medium text-slate-700 outline-none hover:text-brand-leaf transition-colors">
                 Colleges <ChevronDown className="size-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[520px] p-2">
                 <div className="grid grid-cols-2 gap-0.5">
-                  <DropdownMenuItem data-testid="nav-colleges-all" onClick={() => nav("/colleges")} className="col-span-2 font-semibold text-brand-red">
+                  <DropdownMenuItem data-testid="nav-colleges-all" onClick={() => nav("/colleges")} className="col-span-2 font-semibold text-brand-leaf">
                     All colleges in India →
                   </DropdownMenuItem>
                   {STREAMS.slice(0, 16).map((s) => (

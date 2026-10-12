@@ -13,6 +13,9 @@
     --color-brand-blue: #1E3A8A;
     --color-brand-teal: #0D9488;
     --color-brand-green: #16A34A;
+    /* Logo green (ADMISSION pill) — used for all brand-accent text; -soft tint for text on dark navy */
+    --color-brand-leaf: #03541C;
+    --color-brand-leaf-soft: #6FD08C;
     --color-brand-ink: #0B192C;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);

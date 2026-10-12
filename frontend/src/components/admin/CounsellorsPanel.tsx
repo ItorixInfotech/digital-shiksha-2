@@ -117,7 +117,7 @@ export default function CounsellorsPanel() {
           </div>
 
           <div className="rounded-2xl border bg-brand-ink p-5 text-white" data-testid="admin-reminders-card">
-            <h3 className="flex items-center gap-2 font-semibold"><BellRing className="size-4 text-red-300" /> Morning follow-up reminders</h3>
+            <h3 className="flex items-center gap-2 font-semibold"><BellRing className="size-4 text-brand-leaf-soft" /> Morning follow-up reminders</h3>
             <p className="mt-1 text-sm text-slate-300">Every day at <strong className="text-white">8:00 AM IST</strong> each counsellor gets a WhatsApp (and email) listing their leads still in “New”.</p>
             <p className="mt-3 text-xs text-slate-300" data-testid="admin-last-reminder">Last run: {s?.last_reminder ?? "—"}</p>
             <Button onClick={() => remind.mutate()} disabled={remind.isPending} className="mt-4 bg-brand-red text-white hover:bg-red-700" data-testid="admin-send-reminders-button">

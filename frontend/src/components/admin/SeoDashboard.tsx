@@ -81,7 +81,7 @@ export default function SeoDashboard() {
     <div data-testid="admin-seo-dashboard">
       <div className="flex flex-wrap items-end gap-3">
         <div>
-          <h2 className="flex items-center gap-2 text-xl font-semibold"><Wrench className="size-5 text-brand-red" /> SEO fix list</h2>
+          <h2 className="flex items-center gap-2 text-xl font-semibold"><Wrench className="size-5 text-brand-leaf" /> SEO fix list</h2>
           <p className="mt-1 text-sm text-slate-500">Every red and amber page in one place, quickest fixes first. <span className="font-semibold text-slate-800" data-testid="admin-seo-todo-count">{todo}</span> page(s) need attention.</p>
           <p className="mt-0.5 text-xs text-slate-400">A report is emailed every Monday at 9:00 AM IST to enquiry@digitalshiksha.in.</p>
         </div>
@@ -138,7 +138,7 @@ export default function SeoDashboard() {
               return (
                 <TableRow key={`${i.kind}-${i.slug}`} data-testid={tid}>
                   <TableCell className="max-w-xs whitespace-normal">
-                    <a href={i.url} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-medium hover:text-brand-red">{i.name} <ExternalLink className="size-3 text-slate-400" /></a>
+                    <a href={i.url} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-medium hover:text-brand-leaf">{i.name} <ExternalLink className="size-3 text-slate-400" /></a>
                   </TableCell>
                   <TableCell className="text-xs text-slate-500">{KINDS.find((k) => k.key === i.kind)?.label}</TableCell>
                   <TableCell><SeoBadge score={i.score} testid={`${tid}-score`} /></TableCell>

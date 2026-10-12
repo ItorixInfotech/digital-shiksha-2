@@ -16,9 +16,9 @@ export default function FaqSection({ faqs, title = "Frequently asked questions",
           return (
             <div key={f.question} data-testid={`${testid}-item-${i}`}>
               <button type="button" onClick={() => setOpen(isOpen ? null : i)} aria-expanded={isOpen} data-testid={`${testid}-toggle-${i}`}
-                className="flex w-full items-center justify-between gap-4 py-4 text-left font-medium text-slate-900 hover:text-brand-red transition-colors">
+                className="flex w-full items-center justify-between gap-4 py-4 text-left font-medium text-slate-900 hover:text-brand-leaf transition-colors">
                 <span>{f.question}</span>
-                <ChevronDown className={cn("size-4 shrink-0 text-slate-400 transition-transform duration-200", isOpen && "rotate-180 text-brand-red")} />
+                <ChevronDown className={cn("size-4 shrink-0 text-slate-400 transition-transform duration-200", isOpen && "rotate-180 text-brand-leaf")} />
               </button>
               <div className={cn("grid transition-[grid-template-rows,opacity] duration-300 ease-out", isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
                 <p className="overflow-hidden pb-0 text-sm leading-relaxed text-slate-600" data-testid={`${testid}-answer-${i}`}><span className="block pb-4">{f.answer}</span></p>

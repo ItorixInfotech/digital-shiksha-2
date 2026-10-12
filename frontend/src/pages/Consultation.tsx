@@ -29,10 +29,10 @@ export function Consultation() {
             ))}
           </ol>
           <div className="mt-10 space-y-4 rounded-2xl border bg-white p-6" data-testid="contact-details">
-            <a href={SITE.phoneHref} className="flex items-center gap-3 text-slate-800 hover:text-brand-red transition-colors" data-testid="consultation-phone-link"><Phone className="size-5 text-brand-red" /> {SITE.phone}</a>
-            <a href={SITE.whatsappHref} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-slate-800 hover:text-brand-red transition-colors" data-testid="consultation-whatsapp-link"><MessageCircle className="size-5 text-[#25D366]" /> Chat on WhatsApp</a>
-            <a href={`mailto:${SITE.email}`} className="flex items-center gap-3 text-slate-800 hover:text-brand-red transition-colors" data-testid="consultation-email-link"><Mail className="size-5 text-brand-red" /> {SITE.email}</a>
-            <a href={SITE.mapHref} target="_blank" rel="noreferrer" className="flex items-start gap-3 text-slate-800 hover:text-brand-red transition-colors" data-testid="consultation-address-link"><MapPin className="mt-0.5 size-5 shrink-0 text-brand-red" /> {SITE.address}</a>
+            <a href={SITE.phoneHref} className="flex items-center gap-3 text-slate-800 hover:text-brand-leaf transition-colors" data-testid="consultation-phone-link"><Phone className="size-5 text-brand-leaf" /> {SITE.phone}</a>
+            <a href={SITE.whatsappHref} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-slate-800 hover:text-brand-leaf transition-colors" data-testid="consultation-whatsapp-link"><MessageCircle className="size-5 text-[#25D366]" /> Chat on WhatsApp</a>
+            <a href={`mailto:${SITE.email}`} className="flex items-center gap-3 text-slate-800 hover:text-brand-leaf transition-colors" data-testid="consultation-email-link"><Mail className="size-5 text-brand-leaf" /> {SITE.email}</a>
+            <a href={SITE.mapHref} target="_blank" rel="noreferrer" className="flex items-start gap-3 text-slate-800 hover:text-brand-leaf transition-colors" data-testid="consultation-address-link"><MapPin className="mt-0.5 size-5 shrink-0 text-brand-leaf" /> {SITE.address}</a>
             <p className="flex items-center gap-3 text-slate-600"><Clock className="size-5 text-slate-400" /> Mon – Sat, 10:00 AM – 7:00 PM</p>
           </div>
         </div>
@@ -55,10 +55,10 @@ export function NotFound() {
   return (
     <div className="mx-auto max-w-xl px-4 py-24 text-center" data-testid="not-found-page">
       <Seo title="Page not found | Digital Shiksha" description="This page does not exist." noindex />
-      <p className="text-6xl font-bold text-brand-red">404</p>
+      <p className="text-6xl font-bold text-brand-leaf">404</p>
       <h1 className="mt-4 text-2xl font-semibold">Page not found</h1>
       <p className="mt-2 text-slate-500">The page you're looking for doesn't exist.</p>
-      <Link to="/" className="mt-6 inline-block font-semibold text-brand-blue hover:text-brand-red" data-testid="not-found-home-link">← Back to home</Link>
+      <Link to="/" className="mt-6 inline-block font-semibold text-brand-blue hover:text-brand-leaf" data-testid="not-found-home-link">← Back to home</Link>
     </div>
   );
 }

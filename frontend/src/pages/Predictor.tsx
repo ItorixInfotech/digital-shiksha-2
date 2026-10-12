@@ -82,7 +82,7 @@ export default function Predictor() {
   return (
     <div data-testid="predictor-page">
       <PageSeo page="predictor" />
-      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "College Predictor" }]} title={<>College Predictor <span className="text-red-400">2026</span></>}
+      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "College Predictor" }]} title={<>College Predictor <span className="text-brand-leaf-soft">2026</span></>}
         subtitle="Enter your MHT CET, JEE Main, NEET or MBA CET score and see which Pune & Mumbai colleges you can likely get, based on last year's closing cutoffs." testid="predictor-header">
         <form onSubmit={submit} className="mt-8 grid max-w-4xl gap-4 rounded-2xl bg-white p-5 text-slate-900 shadow-2xl sm:grid-cols-12 sm:items-end" data-testid="predictor-form">
           <div className="grid gap-1.5 sm:col-span-3">
@@ -173,7 +173,7 @@ export default function Predictor() {
                         <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1", CHANCE[r.chance].cls)} title={CHANCE[r.chance].desc}>{CHANCE[r.chance].label}</span>
                         <span className="text-xs text-slate-500">{r.type} • {r.city}</span>
                       </div>
-                      <Link to={`/colleges/${r.college_slug}`} className="mt-1 block font-semibold text-slate-900 hover:text-brand-red transition-colors" data-testid={`predictor-result-link-${r.college_slug}`}>{r.college_name}</Link>
+                      <Link to={`/colleges/${r.college_slug}`} className="mt-1 block font-semibold text-slate-900 hover:text-brand-leaf transition-colors" data-testid={`predictor-result-link-${r.college_slug}`}>{r.college_name}</Link>
                       <p className="text-sm text-slate-600">{r.course}</p>
                     </div>
                     <div className="grid grid-cols-3 gap-4 text-sm sm:w-[380px]">

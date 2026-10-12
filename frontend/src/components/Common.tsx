@@ -34,7 +34,7 @@ export function SectionTitle({ overline, title, action }: { overline?: string; t
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
-        {overline && <p className="text-xs font-bold uppercase tracking-wider text-brand-red">{overline}</p>}
+        {overline && <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf">{overline}</p>}
         <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">{title}</h2>
       </div>
       {action}

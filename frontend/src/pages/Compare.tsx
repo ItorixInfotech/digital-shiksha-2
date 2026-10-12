@@ -50,7 +50,7 @@ export default function Compare() {
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         {compare.length < MAX_COMPARE && (
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border bg-white p-4">
-            <Plus className="size-5 text-brand-red" />
+            <Plus className="size-5 text-brand-leaf" />
             <span className="text-sm font-semibold">Add a college</span>
             <Select value="" onValueChange={(v: string) => v && toggleCompare(v)}>
               <SelectTrigger className="w-full bg-white sm:w-96" data-testid="compare-add-select"><SelectValue>{() => <span className="text-slate-400">{isLoading ? "Loading…" : "Select college to compare"}</span>}</SelectValue></SelectTrigger>
@@ -65,7 +65,7 @@ export default function Compare() {
           <div className="mt-8 rounded-2xl border border-dashed bg-white p-12 text-center" data-testid="compare-empty">
             <p className="text-lg font-semibold">No colleges selected yet</p>
             <p className="mt-1 text-sm text-slate-500">Use the selector above or tick “Compare” on any college card.</p>
-            <Link to="/colleges" className="mt-4 inline-block font-semibold text-brand-red" data-testid="compare-browse-link">Browse colleges →</Link>
+            <Link to="/colleges" className="mt-4 inline-block font-semibold text-brand-leaf" data-testid="compare-browse-link">Browse colleges →</Link>
           </div>
         ) : (
           <div className="mt-8 overflow-x-auto rounded-2xl border bg-white" data-testid="compare-table">
@@ -77,9 +77,9 @@ export default function Compare() {
                     <th key={c.slug} className="p-4 text-left align-top" data-testid={`compare-col-${c.slug}`}>
                       <div className="relative">
                         <img src={c.image} alt="" className="h-24 w-full rounded-lg object-cover" />
-                        <button type="button" aria-label="Remove" onClick={() => toggleCompare(c.slug)} data-testid={`compare-remove-${c.slug}`} className="absolute right-2 top-2 grid size-7 place-items-center rounded-full bg-white/95 text-slate-700 shadow hover:text-brand-red"><X className="size-4" /></button>
+                        <button type="button" aria-label="Remove" onClick={() => toggleCompare(c.slug)} data-testid={`compare-remove-${c.slug}`} className="absolute right-2 top-2 grid size-7 place-items-center rounded-full bg-white/95 text-slate-700 shadow hover:text-brand-leaf"><X className="size-4" /></button>
                       </div>
-                      <Link to={`/colleges/${c.slug}`} className="mt-3 block font-semibold text-slate-900 hover:text-brand-red">{c.name}</Link>
+                      <Link to={`/colleges/${c.slug}`} className="mt-3 block font-semibold text-slate-900 hover:text-brand-leaf">{c.name}</Link>
                     </th>
                   ))}
                 </tr>

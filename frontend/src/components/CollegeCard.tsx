@@ -29,7 +29,7 @@ export default function CollegeCard({ c, layout = "grid" }: { c: College; layout
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <Link to={`/colleges/${c.slug}`} data-testid={`college-card-name-${c.slug}`} className="line-clamp-2 text-[17px] font-semibold leading-snug text-slate-900 hover:text-brand-red transition-colors">
+            <Link to={`/colleges/${c.slug}`} data-testid={`college-card-name-${c.slug}`} className="line-clamp-2 text-[17px] font-semibold leading-snug text-slate-900 hover:text-brand-leaf transition-colors">
               {c.name}
             </Link>
             <p className="mt-1 flex items-center gap-1 text-sm text-slate-500"><MapPin className="size-3.5" /> {c.city}, {c.state}{c.established ? ` • Est. ${c.established}` : ""}</p>

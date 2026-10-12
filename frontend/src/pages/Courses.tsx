@@ -35,9 +35,9 @@ export default function Courses() {
           ))}
         </div>
         <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1" data-testid="courses-stream-filter">
-          <button type="button" onClick={() => set("stream", "")} data-testid="courses-stream-all" className={cn("shrink-0 rounded-lg px-3 py-1.5 text-sm transition-colors", !stream ? "bg-red-50 font-semibold text-brand-red" : "text-slate-600 hover:bg-white")}>All streams</button>
+          <button type="button" onClick={() => set("stream", "")} data-testid="courses-stream-all" className={cn("shrink-0 rounded-lg px-3 py-1.5 text-sm transition-colors", !stream ? "bg-red-50 font-semibold text-brand-leaf" : "text-slate-600 hover:bg-white")}>All streams</button>
           {streams.map((s) => (
-            <button key={s} type="button" onClick={() => set("stream", s)} data-testid={`courses-stream-${slugify(s)}`} className={cn("shrink-0 rounded-lg px-3 py-1.5 text-sm transition-colors", stream === s ? "bg-red-50 font-semibold text-brand-red" : "text-slate-600 hover:bg-white")}>{s}</button>
+            <button key={s} type="button" onClick={() => set("stream", s)} data-testid={`courses-stream-${slugify(s)}`} className={cn("shrink-0 rounded-lg px-3 py-1.5 text-sm transition-colors", stream === s ? "bg-red-50 font-semibold text-brand-leaf" : "text-slate-600 hover:bg-white")}>{s}</button>
           ))}
         </div>
 
@@ -51,14 +51,14 @@ export default function Courses() {
                 <div className="flex items-center gap-3">
                   <span className={`grid size-9 place-items-center rounded-lg ${d.tint}`}><d.icon className="size-5" /></span>
                   <h2 className="text-xl font-semibold text-slate-900">{g}</h2>
-                  <Link to={`/colleges?stream=${encodeURIComponent(g)}`} className="ml-auto text-sm font-semibold text-brand-blue hover:text-brand-red" data-testid={`courses-group-colleges-${slugify(g)}`}>{g} colleges →</Link>
+                  <Link to={`/colleges?stream=${encodeURIComponent(g)}`} className="ml-auto text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid={`courses-group-colleges-${slugify(g)}`}>{g} colleges →</Link>
                 </div>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {filtered.filter((c) => c.stream === g).map((c) => (
                     <Link key={c.id} to={`/courses/${c.slug}`} data-testid={`course-card-${c.slug}`} className="group flex flex-col rounded-2xl border bg-white p-5 hover:-translate-y-0.5 hover:shadow-lg transition-[transform,box-shadow]">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="text-lg font-semibold text-slate-900 group-hover:text-brand-red transition-colors">{c.name}</p>
+                          <p className="text-lg font-semibold text-slate-900 group-hover:text-brand-leaf transition-colors">{c.name}</p>
                           <p className="text-sm text-slate-500">{c.full_name}</p>
                         </div>
                         <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-brand-blue">{c.level}</span>
@@ -67,7 +67,7 @@ export default function Courses() {
                         <p className="flex items-center gap-2"><Clock className="size-4 text-slate-400" /> {c.duration}</p>
                         <p className="flex items-center gap-2"><IndianRupee className="size-4 text-slate-400" /> {c.avg_fees}</p>
                       </div>
-                      <p className="mt-auto flex items-center gap-1 pt-4 text-sm font-semibold text-brand-red">View details <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" /></p>
+                      <p className="mt-auto flex items-center gap-1 pt-4 text-sm font-semibold text-brand-leaf">View details <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" /></p>
                     </Link>
                   ))}
                 </div>

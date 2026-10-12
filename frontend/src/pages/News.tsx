@@ -34,8 +34,8 @@ export function News() {
               <Link to={`/news/${lead.slug}`} data-testid={`news-article-${lead.slug}`} className="group mt-8 grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-2">
                 <img src={lead.image} alt="" className="h-64 w-full object-cover lg:h-full" />
                 <div className="p-6 lg:p-10">
-                  <p className="text-xs font-bold uppercase tracking-wider text-brand-red">{lead.category}</p>
-                  <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 group-hover:text-brand-red transition-colors sm:text-3xl">{lead.title}</h2>
+                  <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf">{lead.category}</p>
+                  <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 group-hover:text-brand-leaf transition-colors sm:text-3xl">{lead.title}</h2>
                   <p className="mt-3 text-slate-600">{lead.excerpt}</p>
                   <p className="mt-5 text-sm text-slate-500">{lead.author} • {fmt(lead.published_at)}</p>
                 </div>
@@ -45,8 +45,8 @@ export function News() {
                   <Link key={a.id} to={`/news/${a.slug}`} data-testid={`news-article-${a.slug}`} className="group overflow-hidden rounded-2xl border bg-white hover:-translate-y-0.5 hover:shadow-lg transition-[transform,box-shadow]">
                     <img src={a.image} alt="" loading="lazy" className="h-44 w-full object-cover" />
                     <div className="p-5">
-                      <p className="text-xs font-bold uppercase tracking-wider text-brand-red">{a.category}</p>
-                      <h3 className="mt-2 line-clamp-2 font-semibold text-slate-900 group-hover:text-brand-red transition-colors">{a.title}</h3>
+                      <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf">{a.category}</p>
+                      <h3 className="mt-2 line-clamp-2 font-semibold text-slate-900 group-hover:text-brand-leaf transition-colors">{a.title}</h3>
                       <p className="mt-2 line-clamp-2 text-sm text-slate-500">{a.excerpt}</p>
                       <p className="mt-3 text-xs text-slate-400">{fmt(a.published_at)}</p>
                     </div>
@@ -66,7 +66,7 @@ export function ArticleDetail() {
   const all = useQuery({ queryKey: ["articles", ""], queryFn: () => apiGet<Article[]>("/articles") });
 
   if (isLoading) return <div className="mx-auto max-w-4xl px-4 py-20"><div className="h-48 animate-pulse rounded-2xl bg-slate-200" /></div>;
-  if (isError || !a) return <div className="mx-auto max-w-3xl px-4 py-20"><EmptyState title="Article not found" testid="article-not-found" /><p className="mt-4 text-center"><Link to="/news" className="font-semibold text-brand-red">All news →</Link></p></div>;
+  if (isError || !a) return <div className="mx-auto max-w-3xl px-4 py-20"><EmptyState title="Article not found" testid="article-not-found" /><p className="mt-4 text-center"><Link to="/news" className="font-semibold text-brand-leaf">All news →</Link></p></div>;
   const related = (all.data ?? []).filter((x) => x.slug !== a.slug).slice(0, 3);
 
   return (
@@ -96,7 +96,7 @@ export function ArticleDetail() {
           {related.length > 0 && (
             <div className="rounded-2xl border bg-white p-6">
               <h3 className="font-semibold">Related articles</h3>
-              <ul className="mt-3 space-y-3">{related.map((r) => <li key={r.id}><Link to={`/news/${r.slug}`} data-testid={`related-article-${r.slug}`} className="text-sm font-medium text-slate-700 hover:text-brand-red transition-colors">{r.title}</Link></li>)}</ul>
+              <ul className="mt-3 space-y-3">{related.map((r) => <li key={r.id}><Link to={`/news/${r.slug}`} data-testid={`related-article-${r.slug}`} className="text-sm font-medium text-slate-700 hover:text-brand-leaf transition-colors">{r.title}</Link></li>)}</ul>
             </div>
           )}
         </aside>

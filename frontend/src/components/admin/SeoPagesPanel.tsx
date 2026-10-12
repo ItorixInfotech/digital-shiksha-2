@@ -41,8 +41,8 @@ export default function SeoPagesPanel() {
           <p className="mt-1 text-sm text-slate-500">Meta title, description and share image for the main website pages. College, course, exam and article SEO is edited inside each record.</p>
         </div>
         <div className="ml-auto flex gap-2">
-          <a href="/sitemap.xml" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:text-brand-red" data-testid="admin-seo-sitemap-link"><FileCode2 className="size-4" /> sitemap.xml <ExternalLink className="size-3" /></a>
-          <a href="/robots.txt" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:text-brand-red" data-testid="admin-seo-robots-link">robots.txt <ExternalLink className="size-3" /></a>
+          <a href="/sitemap.xml" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:text-brand-leaf" data-testid="admin-seo-sitemap-link"><FileCode2 className="size-4" /> sitemap.xml <ExternalLink className="size-3" /></a>
+          <a href="/robots.txt" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:text-brand-leaf" data-testid="admin-seo-robots-link">robots.txt <ExternalLink className="size-3" /></a>
         </div>
       </div>
       <div className="mt-5 grid gap-5 lg:grid-cols-[240px_1fr]">
