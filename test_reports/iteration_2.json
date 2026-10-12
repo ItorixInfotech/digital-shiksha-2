@@ -1,0 +1,77 @@
+{
+  "iteration": 2,
+  "passed": 10,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Production readiness probe fix: backend serves GET /health at the root (not under /api)",
+      "name": "test_tscheck_health_probe_and_no_regression.py::test_root_health_probe",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET http://localhost:8001/health -> 200 {\"status\":\"ok\"}"
+    },
+    {
+      "criterion": "API health alias",
+      "name": "test_tscheck_health_probe_and_no_regression.py::test_api_health_alias",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET http://localhost:8001/api/health -> 200 {\"status\":\"ok\"}; also curl-verified GET https://digital-shiksha-2.preview.emergentagent.com/api/health -> 200 {\"status\":\"ok\"}"
+    },
+    {
+      "criterion": "No regression to existing API routes after editing backend/server.py",
+      "name": "test_tscheck_health_probe_and_no_regression.py (4 tests: root message, colleges list, admin login+stats, admin login wrong password, sitemap)",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/ -> 200 {\"message\":\"Digital Shiksha API\"}; GET /api/colleges?limit=2 -> 200, 2 items (iit-delhi, ...); POST /api/auth/login admin/DigitalShiksha@2026 -> 200 + ds_admin cookie, then GET /api/admin/stats with that cookie -> 200; POST /api/auth/login with wrong password -> 401 (rejection case); GET /api/sitemap.xml -> 200 containing <urlset>."
+    },
+    {
+      "criterion": "Frontend still loads (home page)",
+      "name": "home-page-loads",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Navigated to public preview URL https://digital-shiksha-2.preview.emergentagent.com/ -> data-testid=home-page visible, screenshot captured."
+    },
+    {
+      "criterion": "Frontend still loads (/admin/login renders login form)",
+      "name": "admin-login-page-renders",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Navigated to /admin/login -> username and password fields visible, screenshot captured."
+    },
+    {
+      "criterion": ".env files no longer git-ignored",
+      "name": "git-check-ignore-env-files",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "`git -C /app check-ignore -v backend/.env frontend/.env` printed nothing and exited 1 (non-zero), confirming neither file is git-ignored."
+    },
+    {
+      "criterion": "No regression - admin counsellor assignment UI (lead assign)",
+      "name": "admin-counsellor-assigns-lead",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: created fixture counsellor + fixture lead, assigned via UI, success toast appeared. (Pre-existing check, re-verified this iteration for no-regression.)"
+    },
+    {
+      "criterion": "No regression - admin counsellor reminders UI",
+      "name": "admin-counsellors-send-reminders",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: 'Send reminders now' renders recipient list. (Pre-existing check, re-verified this iteration for no-regression.)"
+    },
+    {
+      "criterion": "No regression - admin SEO Fix List UI",
+      "name": "admin-seo-fix-list",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: summary cards + fix dialog open/close + keywords-already-filled toast. (Pre-existing check, re-verified this iteration for no-regression.)"
+    }
+  ],
+  "notes": [
+    "This iteration focused on the backend/server.py health-probe fix and confirming no regression; all 15 backend tests (7 new + 8 pre-existing) and all 5 browser checks (2 new + 3 re-run) passed.",
+    "Matrix had 5 criteria; 9 artifacts produced: the 'no regression to existing API routes' criterion was split into focused backend assertions, and 3 pre-existing browser checks were re-run as part of the no-regression verification for 'frontend still loads' / overall app health."
+  ]
+}

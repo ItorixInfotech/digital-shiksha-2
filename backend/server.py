@@ -58,5 +58,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Liveness/readiness probes hit the container root (not /api), so this one route lives on `app`.
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
+@api_router.get("/health")
+async def api_health():
+    return {"status": "ok"}
+
+
 # Include the router in the main app — keep this the last statement
 app.include_router(api_router)
