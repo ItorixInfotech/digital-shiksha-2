@@ -109,3 +109,6 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 - New predictor exam "MHT CET Pharmacy" (cap.EXAM_PROGRAM); branch groups for pharmacy = B.Pharmacy / Pharm.D. GET /api/predictor/cap-meta?program=engineering|pharmacy (400 otherwise).
 - MAH MBA CET Maharashtra-seat cut-offs NOT added: the MBA portal (mba2026.mahacet.org.in) serves them only via a logged-in app; only an All-India Round I PDF was found. MBA predictions remain estimates.
 - Predictor page heading no longer shows "2026" ("College Predictor"); badge/disclaimer/hint/PDF/SEO title no longer mention 2026.
+
+## v16: Predictor lead gate
+- First prediction on a device opens PredictorGate (components/PredictorGate.tsx): Full Name, Mobile, City, Are You (Student/Parent), Which college → POST /api/enquiries (source 'predictor-gate', prediction context, role). localStorage ds_predictor_details_v1=1 unlocks; results query disabled until then (shared links too). LeadIn.role Optional[Literal['Student','Parent']]; shown as badge in admin Leads + in lead alert email.

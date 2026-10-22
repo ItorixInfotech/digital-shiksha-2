@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { BadgeCheck, Building2, Download, Info, Link2, Loader2, MapPin, MessageCircle, Sparkles, Target, TrendingUp } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import PredictorGate, { GATE_KEY } from "@/components/PredictorGate";
 import { PageHeader, EmptyState } from "@/components/Common";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,10 +66,14 @@ export default function Predictor() {
   const body: PredictorIn | null = urlExam && urlScore && !Number.isNaN(Number(urlScore))
     ? { exam: urlExam, score: Number(urlScore), category: urlCategory, cities: CITY_LIST[urlCity],
         ...(CAP_PROGRAM[urlExam] ? { ladies: urlLadies, home_university: urlHu, branch_group: urlBranch } : {}) } : null;
+  // Lead gate: the first prediction on a device needs name/mobile/city/role/college (saved as an enquiry).
+  const [unlocked, setUnlocked] = useState(() => localStorage.getItem(GATE_KEY) === "1");
+  const [gateDismissed, setGateDismissed] = useState(false);
+  const gateOpen = !!body && !unlocked && !gateDismissed;
   const predict = useQuery({
     queryKey: ["predictor", "run", body],
     queryFn: () => apiPost<PredictorOut>("/predictor", body),
-    enabled: !!body,
+    enabled: !!body && unlocked,
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     retry: false,
@@ -82,6 +87,7 @@ export default function Predictor() {
     if (!score.trim() || Number.isNaN(n)) return toast.error(`Please enter your ${spec?.label ?? "score"}`);
     if (spec && (n < spec.min || n > spec.max)) return toast.error(`${spec.label} must be between ${spec.min} and ${spec.max}`);
     setChanceFilter("all");
+    setGateDismissed(false);
     const qs: Record<string, string> = { exam, score: String(n), category, city };
     if (CAP_PROGRAM[exam]) {
       if (ladies) qs.ladies = "1";
@@ -176,7 +182,15 @@ export default function Predictor() {
 
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         {errMsg && <p className="mb-6 rounded-xl bg-red-50 p-4 text-sm text-red-700" data-testid="predictor-error">{errMsg}</p>}
-        {!data && !predict.isFetching && (
+        {body && !unlocked && (
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-green-200 bg-green-50 p-5" data-testid="predictor-locked-card">
+            <p className="text-sm text-slate-700"><span className="font-semibold text-brand-leaf">Your predicted college list is ready.</span> Share your details once to view it.</p>
+            <Button onClick={() => setGateDismissed(false)} className="bg-brand-red text-white hover:bg-red-700" data-testid="predictor-unlock-button">View my colleges</Button>
+          </div>
+        )}
+        <PredictorGate open={gateOpen} onOpenChange={(o) => { if (!o) setGateDismissed(true); }} onUnlocked={() => setUnlocked(true)}
+          prediction={body} examLabel={body ? `${body.exam}${body.branch_group ? ` – ${body.branch_group}` : ""}` : ""} />
+        {!data && !predict.isFetching && !(body && !unlocked) && (
           <div className="grid gap-4 md:grid-cols-3" data-testid="predictor-intro">
             {[[Target, "Official CAP cut-offs", "MHT CET (Engineering & Pharmacy) uses the State CET Cell Round I–IV closing percentiles for every category, Home-University and Ladies seat."], [MapPin, "900+ Maharashtra colleges", "Every engineering and pharmacy college in the CAP — Pune, Mumbai, Nagpur, Nashik and more."], [TrendingUp, "Fees & packages", "Compare fees and average placements right in the results."]].map(([I, t, d]) => {
               const Icon = I as typeof Target;

@@ -156,7 +156,7 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
               <TableRow key={l.id} data-testid={`admin-lead-row-${l.id}`}>
                 <TableCell className="whitespace-nowrap text-xs text-slate-500">{new Date(l.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</TableCell>
                 <TableCell>
-                  <p className="font-medium text-slate-900" data-testid={`admin-lead-name-${l.id}`}>{l.name}</p>
+                  <p className="font-medium text-slate-900" data-testid={`admin-lead-name-${l.id}`}>{l.name}{l.role && <span className="ml-1.5 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-slate-600" data-testid={`admin-lead-role-${l.id}`}>{l.role}</span>}</p>
                   <a href={`tel:+91${l.phone}`} className="text-xs text-brand-blue hover:underline">+91 {l.phone}</a>
                   {l.email && <p className="text-xs text-slate-500">{l.email}</p>}
                   {l.city && <p className="text-xs text-slate-500">{l.city}</p>}

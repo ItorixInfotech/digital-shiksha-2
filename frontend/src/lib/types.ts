@@ -212,7 +212,9 @@ export interface LeadIn {
   source: string;
   prediction: PredictionContext | null;
   whatsapp_opt_in: boolean;
+  role?: LeadRole | null; // server default null
 }
+export type LeadRole = "Student" | "Parent";
 export interface Lead extends LeadIn {
   id: string;
   status: LeadStatus;

@@ -158,6 +158,7 @@ class LeadIn(BaseModel):
     source: str = "website"
     prediction: Optional[PredictionContext] = None
     whatsapp_opt_in: bool = False
+    role: Optional[Literal["Student", "Parent"]] = None  # "Are you" on the predictor form
 
 
 class Lead(LeadIn):

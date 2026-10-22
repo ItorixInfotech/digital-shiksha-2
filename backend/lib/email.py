@@ -124,6 +124,8 @@ def _row(label: str, value: str) -> str:
 def lead_alert_html(lead: dict) -> str:
     phone = escape(lead["phone"])
     rows = [_row("Name", escape(lead["name"])), _row("Mobile", f'<a href="tel:+91{phone}" style="color:#1e3a8a">+91 {phone}</a>')]
+    if lead.get("role"):
+        rows.append(_row("Are you", escape(lead["role"])))
     if lead.get("email"):
         em = escape(lead["email"])
         rows.append(_row("Email", f'<a href="mailto:{em}" style="color:#1e3a8a">{em}</a>'))
