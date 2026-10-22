@@ -10,8 +10,6 @@ export const SITE = {
   phoneHref: "tel:+918149689468",
   whatsappHref: "https://wa.me/918149689468?text=Hi%20Digital%20Shiksha%2C%20I%20need%20admission%20guidance",
   email: "enquiry@digitalshiksha.in",
-  address: "Saudamini Commercial Complex, C1-203, Paud Road, Bhusari Colony, Kothrud, Pune, Maharashtra 411038",
-  mapHref: "https://maps.app.goo.gl/ab3QrL9qLAmJy4hYA",
   facebook: "https://www.facebook.com/DigitalShikshaOfficial",
   instagram: "https://www.instagram.com/digitalshikshaoffical/",
   logo: "/logo.png",

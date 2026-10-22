@@ -168,7 +168,6 @@ COUNSELLOR = {
     "phone": "+91 8149 68 9468",
     "tel": "+918149689468",
     "email": "enquiry@digitalshiksha.in",
-    "address": "Saudamini Commercial Complex, C1-203, Paud Road, Bhusari Colony, Kothrud, Pune, Maharashtra 411038",
     "hours": "Monday – Saturday, 10:00 AM – 7:00 PM",
 }
 
@@ -199,7 +198,6 @@ def student_confirmation_html(lead: dict) -> str:
         '<strong style="font-size:13px;color:#dc2626;letter-spacing:1px">YOUR COUNSELLING DESK</strong><br>'
         f'Call / WhatsApp: <a href="tel:{c["tel"]}" style="color:#1e3a8a;font-weight:bold">{escape(c["phone"])}</a><br>'
         f'Email: <a href="mailto:{c["email"]}" style="color:#1e3a8a">{escape(c["email"])}</a><br>'
-        f'Office: {escape(c["address"])}<br>'
         f'Hours: {escape(c["hours"])}</td></tr></table></td></tr>'
         '<tr><td style="padding:8px 24px 24px;font-size:14px;color:#334155;line-height:1.6">Need help sooner? Call us directly — counselling is free.</td></tr>'
         '<tr><td style="padding:16px 24px;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8;line-height:1.5">'

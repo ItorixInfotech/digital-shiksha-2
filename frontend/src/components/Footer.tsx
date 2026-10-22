@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
+import { Facebook, Instagram, Mail, Phone } from "lucide-react";
 import { SITE } from "@/lib/site";
 
 const COLS = [
@@ -23,7 +23,6 @@ export default function Footer() {
             <ul className="mt-6 space-y-3 text-sm">
               <li><a href={SITE.phoneHref} data-testid="footer-phone-link" className="flex items-center gap-2.5 hover:text-white transition-colors"><Phone className="size-4 text-brand-leaf" /> {SITE.phone}</a></li>
               <li><a href={`mailto:${SITE.email}`} data-testid="footer-email-link" className="flex items-center gap-2.5 hover:text-white transition-colors"><Mail className="size-4 text-brand-leaf" /> {SITE.email}</a></li>
-              <li><a href={SITE.mapHref} target="_blank" rel="noreferrer" data-testid="footer-address-link" className="flex items-start gap-2.5 hover:text-white transition-colors"><MapPin className="mt-0.5 size-4 shrink-0 text-brand-leaf" /> {SITE.address}</a></li>
             </ul>
             <div className="mt-6 flex gap-3">
               <a href={SITE.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" data-testid="footer-facebook-link" className="grid size-9 place-items-center rounded-full bg-white/10 hover:bg-brand-red transition-colors"><Facebook className="size-4" /></a>

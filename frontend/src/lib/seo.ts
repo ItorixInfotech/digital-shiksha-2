@@ -67,7 +67,7 @@ export function organizationLd() {
   return {
     "@context": "https://schema.org", "@type": "EducationalOrganization", name: SITE.name, url: origin(), logo: absUrl(SITE.logo),
     telephone: "+918149689468", email: SITE.email, sameAs: [SITE.facebook, SITE.instagram],
-    address: { "@type": "PostalAddress", streetAddress: "Saudamini Commercial Complex, C1-203, Paud Road, Bhusari Colony, Kothrud", addressLocality: "Pune", addressRegion: "Maharashtra", postalCode: "411038", addressCountry: "IN" },
+    address: { "@type": "PostalAddress", addressLocality: "Pune", addressRegion: "Maharashtra", addressCountry: "IN" },
   };
 }
 

@@ -18,7 +18,6 @@ NAVY, RED, GREEN, AMBER, SLATE = colors.HexColor("#0A2540"), colors.HexColor("#D
 CONTACT = {
     "phone": "+91 8149 68 9468",
     "email": "enquiry@digitalshiksha.in",
-    "address": "Saudamini Commercial Complex, C1-203, Paud Road, Bhusari Colony, Kothrud, Pune 411038",
 }
 CHANCE_LABEL = {"High": "High chance", "Medium": "Good chance", "Reach": "Reach"}
 CHANCE_COLOR = {"High": GREEN, "Medium": AMBER, "Reach": RED}
@@ -70,7 +69,7 @@ def build_prediction_pdf(out: PredictorOut, cities: List[str]) -> bytes:
         canvas.restoreState()
 
     logo = Image(str(LOGO), width=48 * mm, height=21.6 * mm) if LOGO.exists() else Paragraph("<b>Digital Shiksha</b>", S["title"])
-    header = Table([[logo, Paragraph(f"<b>Free counselling:</b> {CONTACT['phone']}<br/>Call / WhatsApp<br/>{CONTACT['email']}<br/>{_ascii(CONTACT['address'])}", S["contact"])]],
+    header = Table([[logo, Paragraph(f"<b>Free counselling:</b> {CONTACT['phone']}<br/>Call / WhatsApp<br/>{CONTACT['email']}", S["contact"])]],
                    colWidths=[width * 0.45, width * 0.55])
     header.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0), ("RIGHTPADDING", (0, 0), (-1, -1), 0)]))
 

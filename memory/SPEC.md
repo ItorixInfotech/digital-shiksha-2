@@ -93,3 +93,6 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 
 ## v12: Database export
 - GET /api/admin/export (admin cookie required, 401 otherwise) → attachment `digital-shiksha-db-YYYY-MM-DD-HHMM.json`: {exported_at, database, counts, collections{name: [docs]}} for every non-system collection, MongoDB Extended JSON (relaxed) via bson.json_util. Admin sidebar "Download database" link.
+
+## v13: Office address removed
+- Street address + Google map removed from footer, Consultation page, PDF report header, student confirmation email; SITE.address/mapHref deleted. JSON-LD keeps only Pune, Maharashtra, IN. Brand accent text = logo green (--color-brand-leaf #03541C, -soft #6FD08C on dark).

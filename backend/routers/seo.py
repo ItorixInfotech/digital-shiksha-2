@@ -30,7 +30,7 @@ STATIC_PAGES = [
     ("compare", "Compare Colleges", "/compare", "Compare Colleges Side by Side: Fees, Placements, Ranking | Digital Shiksha",
      "Compare up to 3 colleges side by side on fees, NIRF rank, placements, courses and exams accepted to choose the right college."),
     ("consultation", "Free Counselling", "/consultation", "Free Admission Counselling in Pune & Mumbai | Digital Shiksha",
-     "Book free one-to-one admission counselling with Digital Shiksha experts in Kothrud, Pune. Call or WhatsApp +91 8149 68 9468."),
+     "Book free one-to-one admission counselling with Digital Shiksha experts in Pune. Call or WhatsApp +91 8149 68 9468."),
 ]
 
 

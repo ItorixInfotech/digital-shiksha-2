@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Clock, Mail, MessageCircle, Phone } from "lucide-react";
 import EnquiryForm from "@/components/EnquiryForm";
 import { PageHeader } from "@/components/Common";
 import { SITE } from "@/lib/site";
@@ -32,7 +32,6 @@ export function Consultation() {
             <a href={SITE.phoneHref} className="flex items-center gap-3 text-slate-800 hover:text-brand-leaf transition-colors" data-testid="consultation-phone-link"><Phone className="size-5 text-brand-leaf" /> {SITE.phone}</a>
             <a href={SITE.whatsappHref} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-slate-800 hover:text-brand-leaf transition-colors" data-testid="consultation-whatsapp-link"><MessageCircle className="size-5 text-[#25D366]" /> Chat on WhatsApp</a>
             <a href={`mailto:${SITE.email}`} className="flex items-center gap-3 text-slate-800 hover:text-brand-leaf transition-colors" data-testid="consultation-email-link"><Mail className="size-5 text-brand-leaf" /> {SITE.email}</a>
-            <a href={SITE.mapHref} target="_blank" rel="noreferrer" className="flex items-start gap-3 text-slate-800 hover:text-brand-leaf transition-colors" data-testid="consultation-address-link"><MapPin className="mt-0.5 size-5 shrink-0 text-brand-leaf" /> {SITE.address}</a>
             <p className="flex items-center gap-3 text-slate-600"><Clock className="size-5 text-slate-400" /> Mon – Sat, 10:00 AM – 7:00 PM</p>
           </div>
         </div>
@@ -41,9 +40,6 @@ export function Consultation() {
             <h2 className="text-xl font-semibold">Tell us about yourself</h2>
             <p className="mt-1 text-sm text-slate-500">All fields except name & mobile are optional.</p>
             <div className="mt-6"><EnquiryForm testid="consultation" prefill={{ source: "consultation-page" }} showMessage showBudget /></div>
-          </div>
-          <div className="mt-6 overflow-hidden rounded-2xl border">
-            <iframe title="Digital Shiksha office location" src="https://www.google.com/maps?q=Saudamini+Commercial+Complex+Paud+Road+Kothrud+Pune&output=embed" className="h-72 w-full" loading="lazy" data-testid="consultation-map" />
           </div>
         </div>
       </div>
