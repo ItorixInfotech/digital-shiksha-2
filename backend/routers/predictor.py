@@ -14,7 +14,8 @@ from routers.admin import require_admin
 router = APIRouter()
 
 EXAMS = {
-    "MHT CET": PredictorExam(name="MHT CET", metric="percentile", min=0, max=100, label="MHT CET percentile", hint="e.g. 97.5 — official 2026 CAP Round I–IV cut-offs, 380+ Maharashtra colleges"),
+    "MHT CET": PredictorExam(name="MHT CET", metric="percentile", min=0, max=100, label="MHT CET percentile", hint="e.g. 97.5 — official CAP Round I–IV cut-offs, 380+ Maharashtra engineering colleges"),
+    "MHT CET Pharmacy": PredictorExam(name="MHT CET Pharmacy", metric="percentile", min=0, max=100, label="MHT CET percentile (PCB / PCM)", hint="e.g. 92 — official B.Pharm & Pharm.D CAP Round I–IV cut-offs, 520+ Maharashtra colleges"),
     "JEE Main": PredictorExam(name="JEE Main", metric="percentile", min=0, max=100, label="JEE Main percentile", hint="e.g. 98.2 — All India quota seats in Maharashtra"),
     "NEET UG": PredictorExam(name="NEET UG", metric="score", min=0, max=720, label="NEET UG score (out of 720)", hint="e.g. 610 — MBBS state quota / deemed seats"),
     "MAH MBA CET": PredictorExam(name="MAH MBA CET", metric="percentile", min=0, max=100, label="MAH MBA CET percentile", hint="e.g. 96 — MBA/MMS state CAP"),
@@ -72,23 +73,32 @@ async def predictor_exams():
     return list(EXAMS.values())
 
 
+def _program_filter(program: str) -> dict:
+    return {"program": {"$in": [program, None]}} if program == "engineering" else {"program": program}
+
+
 @router.get("/predictor/cap-meta", response_model=CapMeta)
-async def cap_meta():
-    hus = sorted(h for h in await db.cap_cutoffs.distinct("home_university") if h and h not in ("Autonomous Institute", "Deemed to be University"))
-    n = await db.cap_cutoffs.estimated_document_count()
-    return CapMeta(available=n > 0, year=2026, source=cap.SOURCE_URL, colleges=len(await db.cap_cutoffs.distinct("college_code")) if n else 0,
-                   courses=n, home_universities=hus, branch_groups=list(cap.BRANCH_GROUPS), categories=cap.CATEGORIES)
+async def cap_meta(program: str = "engineering"):
+    if program not in cap.DATA_FILES:
+        raise HTTPException(status_code=400, detail="Unknown program")
+    f = _program_filter(program)
+    hus = sorted(h for h in await db.cap_cutoffs.distinct("home_university", f) if h and h not in ("Autonomous Institute", "Deemed to be University"))
+    n = await db.cap_cutoffs.count_documents(f)
+    return CapMeta(available=n > 0, year=2026, source=cap.SOURCE_URL, colleges=len(await db.cap_cutoffs.distinct("college_code", f)) if n else 0,
+                   courses=n, home_universities=hus, branch_groups=list(cap.groups_for(program)), categories=cap.CATEGORIES)
 
 
 async def run_cap_prediction(exam: PredictorExam, body: PredictorIn) -> PredictorOut | None:
-    """MHT CET on the official 2026 CAP cut-offs. Chance uses the Round I closing of the most lenient seat the student is eligible for."""
-    f: dict = {}
+    """MHT CET (engineering / pharmacy) on the official CAP cut-offs. Chance uses the Round I closing of the most lenient eligible seat."""
+    program = cap.EXAM_PROGRAM[exam.name]
+    groups = cap.groups_for(program)
+    f: dict = _program_filter(program)
     if body.cities:
         f["city"] = {"$in": body.cities}  # exact city (Karad is not "Pune" even though it's in the Pune CAP region)
-    if body.branch_group in cap.BRANCH_GROUPS:
-        f["branch_lc"] = {"$regex": cap.BRANCH_GROUPS[body.branch_group]}
+    if body.branch_group in groups:
+        f["branch_lc"] = {"$regex": groups[body.branch_group]}
     rows = await db.cap_cutoffs.find(f, {"_id": 0}).to_list(5000)
-    if not rows and not await db.cap_cutoffs.estimated_document_count():
+    if not rows and not await db.cap_cutoffs.count_documents(_program_filter(program), limit=1):
         return None
     slugs = {r["college_slug"] for r in rows if r.get("college_slug")}
     site = {c["slug"]: c for c in await db.colleges.find({"slug": {"$in": list(slugs)}}, {"_id": 0}).to_list(100)}
@@ -121,7 +131,7 @@ async def run_cap_prediction(exam: PredictorExam, body: PredictorIn) -> Predicto
     # Most competitive first (Reach → Medium → best High options); the cap drops only the lowest-cutoff "High" seats.
     results.sort(key=lambda x: -x.cutoff_value)
     return PredictorOut(exam=exam.name, metric=exam.metric, score=body.score, category=body.category, results=results[:MAX_RESULTS],
-                        total=len(results), source=f"Official CET Cell 2026 CAP cut-offs (Rounds I–IV) — {cap.SOURCE_URL}")
+                        total=len(results), source=f"Official CET Cell CAP cut-offs, {cap.PROGRAM_LABEL[program]} (Rounds I–IV) — {cap.SOURCE_URL}")
 
 
 async def run_prediction(body: PredictorIn) -> PredictorOut:
@@ -130,7 +140,7 @@ async def run_prediction(body: PredictorIn) -> PredictorOut:
         raise HTTPException(status_code=400, detail="Unsupported exam")
     if not (exam.min <= body.score <= exam.max):
         raise HTTPException(status_code=422, detail=f"{exam.label} must be between {exam.min:g} and {exam.max:g}")
-    if exam.name == "MHT CET":
+    if exam.name in cap.EXAM_PROGRAM:
         out = await run_cap_prediction(exam, body)
         if out is not None:
             return out

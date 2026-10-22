@@ -7,6 +7,7 @@ Source: https://fe2026.mahacet.org/ → CAP Round I–IV "MH Cut Off" PDFs
 Usage (needs PyMuPDF, NOT a runtime dependency):
   pip install --target /tmp/pylib pymupdf
   PYTHONPATH=/tmp/pylib python scripts/parse_cap_pdfs.py cap1.pdf cap2.pdf cap3.pdf cap4.pdf
+  PYTHONPATH=/tmp/pylib python scripts/parse_cap_pdfs.py --program pharmacy ph1.pdf ph2.pdf ph3.pdf ph4.pdf  (ph2026.mahacet.org)
 """
 import gzip
 import json
@@ -23,6 +24,7 @@ ROMAN = {"I", "II", "III", "IV", "V", "VI", "VII"}
 RANK_RE = re.compile(r"^\d{1,7}$")
 PCT_RE = re.compile(r"^\(([\d.]+)\)$")
 SKIP_CODES = {"Stage", "State", "Status"}
+SOURCES = {"engineering": "https://fe2026.mahacet.org/", "pharmacy": "https://ph2026.mahacet.org/"}
 
 
 def lines_of(page):
@@ -89,7 +91,7 @@ def parse(path: str, rnd: int, courses: dict) -> None:
                     course["rounds"][str(rnd)][code] = [stage_ranks[col], round(pct, 4)]
 
 
-def main(files: list[str]) -> None:
+def main(files: list[str], program: str = "engineering") -> None:
     courses: dict = {}
     for i, f in enumerate(files, 1):
         parse(f, i, courses)
@@ -97,13 +99,21 @@ def main(files: list[str]) -> None:
     for c in courses.values():
         c["rounds"] = {r: v for r, v in c["rounds"].items() if v}
     rows = [c for c in courses.values() if c["rounds"]]
-    out = Path(__file__).resolve().parent.parent / "data" / "cap_cutoffs_2026.json.gz"
+    for c in rows:
+        c["program"] = program
+    name = "cap_cutoffs_2026.json.gz" if program == "engineering" else f"cap_{program}_2026.json.gz"
+    out = Path(__file__).resolve().parent.parent / "data" / name
     out.parent.mkdir(exist_ok=True)
     with gzip.open(out, "wt", encoding="utf-8") as fh:
-        json.dump({"version": "2026-engg-mh-cap1-4", "year": 2026,
-                   "source": "https://fe2026.mahacet.org/", "courses": rows}, fh, separators=(",", ":"))
+        json.dump({"version": f"2026-{program}-mh-cap1-4-v4", "year": 2026, "program": program,
+                   "source": SOURCES[program], "courses": rows}, fh, separators=(",", ":"))
     print(f"wrote {len(rows)} courses from {len({c['college_code'] for c in rows})} colleges -> {out}", file=sys.stderr)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    # python scripts/parse_cap_pdfs.py [--program pharmacy] r1.pdf r2.pdf r3.pdf r4.pdf
+    args = sys.argv[1:]
+    prog = "engineering"
+    if args[:1] == ["--program"]:
+        prog, args = args[1], args[2:]
+    main(args, prog)

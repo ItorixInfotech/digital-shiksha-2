@@ -1,0 +1,85 @@
+{
+  "iteration": 4,
+  "passed": 10,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Official Pharmacy CAP cut-offs in predictor - cap-meta pharmacy dataset",
+      "name": "test_tscheck_pharmacy_cap_predictor.py::test_cap_meta_pharmacy_dataset",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/predictor/cap-meta?program=pharmacy -> 200 {available:true, colleges:528, courses:559, branch_groups:['B.Pharmacy','Pharm.D (Doctor of Pharmacy)'], 10 full (non-truncated) home_universities}."
+    },
+    {
+      "criterion": "Official Pharmacy CAP cut-offs in predictor - POST /api/predictor Amravati Pharm D",
+      "name": "test_tscheck_pharmacy_cap_predictor.py::test_predictor_pharmacy_amravati_pharm_d_official_cutoff",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/predictor {exam:'MHT CET Pharmacy', score:95.4, category:General, cities:[Amravati], hu:Sant Gadge Baba Amravati University, branch:Pharm.D} -> 200; Government College of Pharmacy, Amravati row: official=true, seat=GOPENH, Round I percentile=95.3576, type field contains no 'Status:' prefix."
+    },
+    {
+      "criterion": "Engineering CAP still works (cap-meta counts + POST)",
+      "name": "test_tscheck_pharmacy_cap_predictor.py::test_cap_meta_engineering_unaffected / test_predictor_engineering_still_works",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/predictor/cap-meta -> colleges:387, courses:2332; POST {exam:'MHT CET', score:97, cities:[Pune]} -> 200, total>0 with at least one official=true row."
+    },
+    {
+      "criterion": "Validation - unknown program and out-of-range pharmacy score",
+      "name": "test_tscheck_pharmacy_cap_predictor.py::test_cap_meta_invalid_program_rejected / test_predictor_pharmacy_score_out_of_range_rejected",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/predictor/cap-meta?program=xyz -> 400; POST /api/predictor {exam:'MHT CET Pharmacy', score:120, ...} -> 422."
+    },
+    {
+      "criterion": "Predictor UI for Pharmacy (cap options, course/HU/ladies controls, official badge, no 2026, tab title)",
+      "name": "predictor-pharmacy-cap-flow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "On /predictor, selecting 'MHT CET Pharmacy' revealed cap-options row with Course select (B.Pharm + Pharm.D), Home university select, Girl candidate checkbox; heading read 'College Predictor' (no 2026); tab title matched 'College Predictor: MHT CET, JEE Main, NEET & Pharmacy | Digital Shiksha'; submitted score 93 -> results rendered with official badge visible; no disclaimer text containing '2026'."
+    },
+    {
+      "criterion": "Engineering CAP predictor UI full flow (regression)",
+      "name": "predictor-mht-cet-cap-flow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: cap-options, HU/branch/ladies, summary, official badge, R1-R4 chips, chance filters, URL params all verified for MHT CET (engineering) with no console errors."
+    },
+    {
+      "criterion": "Other exams unaffected (NEET UG / JEE Main hide cap-options)",
+      "name": "predictor-other-exams-hide-cap-options",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: switching to NEET UG / JEE Main hides predictor-cap-options and returns estimated (non-official) results."
+    },
+    {
+      "criterion": "PDF download + enquiry dialog (regression)",
+      "name": "predictor-pdf-download-and-enquiry",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check: Download PDF triggers a real file download; 'Get guidance' opens the enquiry dialog."
+    },
+    {
+      "criterion": "Predictor UI on public preview ingress URL (regression)",
+      "name": "predictor-mht-cet-cap-flow-preview",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran persisted check against https://digital-shiksha-2.preview.emergentagent.com/predictor: cap-options, submission, results and official badge all verified."
+    },
+    {
+      "criterion": "Full backend regression suite (engineering predictor tests updated for new source URL text)",
+      "name": "test_tscheck_mhtcet_predictor.py (6 tests)",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "Updated stale source-text assertions from 'fe2026.mahacet.org' to the current 'cetcell.mahacet.org' (legitimate source-label change shipped with the pharmacy feature, not a functional regression); all 6 tests pass with counts/cutoffs unchanged (colleges:387, courses:2332, COEP CSE 99.98 official)."
+    }
+  ],
+  "notes": [
+    "Matrix had 6 acceptance criteria; produced 10 artifacts (5 backend test functions across the 4 API-bearing criteria including both validation sub-cases, plus 5 browser checks covering the 2 UI-facing criteria -- 1 new pharmacy flow check and 4 re-run regression checks for engineering/other-exams/PDF/preview).",
+    "Full backend suite (27 tests) run twice: one pre-existing, unrelated test (test_tscheck_duplicate_enquiry_round_robin.py, counsellor round-robin assignment -- no relation to the predictor/pharmacy matrix) failed under parallel xdist execution due to shared-state interference from other tests' counsellor creations, then passed cleanly when run in isolation -- classified as flaky, not a bug, and out of scope for this iteration's acceptance matrix.",
+    "Observed cap-meta/predictor 'source' field text changed from the previous iteration's 'fe2026.mahacet.org...' to 'https://cetcell.mahacet.org/' with program-specific labels (e.g. 'Official CET Cell CAP cut-offs, Engineering (B.E./B.Tech)...' vs '...B.Pharmacy & Pharm.D...') as part of this pharmacy feature; updated the pre-existing regression test's stale string assertions accordingly since the matrix does not require a specific source URL string and the underlying counts/cutoffs are unchanged."
+  ]
+}

@@ -22,7 +22,7 @@ def test_cap_meta_matches_official_dataset(client):
     assert len(data["home_universities"]) == 12
     assert len(data["branch_groups"]) == 7
     assert len(data["categories"]) == 11
-    assert "fe2026.mahacet.org" in data["source"]
+    assert "cetcell.mahacet.org" in data["source"]
 
 
 def test_predictor_coep_cse_official_cutoff(client):
@@ -37,7 +37,7 @@ def test_predictor_coep_cse_official_cutoff(client):
     resp = client.post("/predictor", json=payload)
     assert resp.status_code == 200, resp.text
     data = resp.json()
-    assert "fe2026.mahacet.org" in data["source"]
+    assert "cetcell.mahacet.org" in data["source"]
 
     coep_cse = [
         r for r in data["results"]

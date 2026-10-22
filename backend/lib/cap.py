@@ -15,9 +15,14 @@ from pathlib import Path
 from lib.db import db
 
 logger = logging.getLogger(__name__)
-DATA = Path(__file__).resolve().parent.parent / "data" / "cap_cutoffs_2026.json.gz"
+_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+# program → bundled data file (official CET Cell CAP cut-offs, Maharashtra & minority seats, Rounds I–IV)
+DATA_FILES = {"engineering": _DATA_DIR / "cap_cutoffs_2026.json.gz", "pharmacy": _DATA_DIR / "cap_pharmacy_2026.json.gz"}
 VERSION_KEY = "cap_cutoffs_version"
-SOURCE_URL = "https://fe2026.mahacet.org/"
+SOURCE_URL = "https://cetcell.mahacet.org/"
+# predictor exam name → CAP program
+EXAM_PROGRAM = {"MHT CET": "engineering", "MHT CET Pharmacy": "pharmacy"}
+PROGRAM_LABEL = {"engineering": "Engineering (B.E./B.Tech)", "pharmacy": "B.Pharmacy & Pharm.D"}
 
 # CAP institute code → existing college page on this site.
 SLUG_BY_CODE = {
@@ -45,6 +50,7 @@ ALIASES = {"Andheri": "Mumbai", "Bandra": "Mumbai", "Matunga": "Mumbai", "Chembu
 REGION = {"01": "Amravati", "02": "Aurangabad", "03": "Mumbai", "04": "Nagpur", "05": "Nashik", "06": "Pune", "14": "Nagpur", "16": "Pune"}
 CATEGORIES = ["General", "OBC", "EWS", "SC", "ST", "VJ", "NT1", "NT2", "NT3", "SEBC", "TFWS"]
 CAT_PART = {"General": "OPEN", "OBC": "OBC", "SC": "SC", "ST": "ST", "VJ": "VJ", "NT1": "NT1", "NT2": "NT2", "NT3": "NT3", "SEBC": "SEBC"}
+PHARMA_GROUPS = {"B.Pharmacy": r"^pharmacy$", "Pharm.D (Doctor of Pharmacy)": r"pharm ?d"}
 BRANCH_GROUPS = {
     "Computer / IT / AI": r"comput|information tech|artificial|data sci|cyber|machine learn|software|internet of things|\biot\b|block ?chain",
     "Electronics & Telecom": r"electronics|telecom|vlsi|communication",
@@ -76,25 +82,55 @@ def city_of(name: str) -> str:
     return ALIASES.get(best, best) or "Maharashtra"
 
 
+HOME_UNIVERSITIES = [
+    "Dr. Babasaheb Ambedkar Marathwada University", "Dr. Babasaheb Ambedkar Technological University,Lonere", "Gondwana University",
+    "Kavayitri Bahinabai Chaudhari North Maharashtra University, Jalgaon", "Mumbai University", "Punyashlok Ahilyadevi Holkar Solapur University",
+    "Rashtrasant Tukadoji Maharaj Nagpur University", "SNDT Women's University", "Sant Gadge Baba Amravati University",
+    "Savitribai Phule Pune University", "Shivaji University", "Swami Ramanand Teerth Marathwada University, Nanded",
+]
+
+
+def canonical_hu(hu: str) -> str:
+    """Some PDFs wrap long university names; map a truncated name back to the full one."""
+    hu = (hu or "").strip()
+    if len(hu) >= 12:
+        for full in HOME_UNIVERSITIES:
+            if full.startswith(hu):
+                return full
+    return hu
+
+
+def groups_for(program: str) -> dict:
+    return PHARMA_GROUPS if program == "pharmacy" else BRANCH_GROUPS
+
+
 async def load_cap_data() -> None:
-    """Startup task: (re)load the bundled cut-off file when its version changes. Never raises."""
+    """Startup task: (re)load each bundled cut-off file when its version changes. Never raises."""
+    for program, path in DATA_FILES.items():
+        await _load_program(program, path)
+
+
+async def _load_program(program: str, path: Path) -> None:
     try:
-        if not DATA.exists():
+        if not path.exists():
             return
-        with gzip.open(DATA, "rt", encoding="utf-8") as fh:
+        with gzip.open(path, "rt", encoding="utf-8") as fh:
             payload = json.load(fh)
-        cur = await db.settings.find_one({"key": VERSION_KEY})
-        if cur and cur.get("version") == payload["version"] and await db.cap_cutoffs.estimated_document_count():
+        key = f"{VERSION_KEY}:{program}"
+        match = {"program": {"$in": [program, None]}} if program == "engineering" else {"program": program}
+        cur = await db.settings.find_one({"key": key})
+        if cur and cur.get("version") == payload["version"] and await db.cap_cutoffs.count_documents(match, limit=1):
             return
         docs = []
         for c in payload["courses"]:
             city, region = place_of(c["college_code"], c["college_name"])
-            docs.append({**c, "city": city, "region": region, "college_slug": SLUG_BY_CODE.get(c["college_code"], ""),
+            docs.append({**c, "status": re.sub(r"^Status:\s*", "", c.get("status", "")).strip(),
+                         "home_university": canonical_hu(c.get("home_university", "")), "program": program, "city": city, "region": region, "college_slug": SLUG_BY_CODE.get(c["college_code"], ""),
                          "branch_lc": c["branch"].lower()})
-        await db.cap_cutoffs.delete_many({})
+        await db.cap_cutoffs.delete_many(match)
         for i in range(0, len(docs), 500):
             await db.cap_cutoffs.insert_many(docs[i:i + 500])
-        await db.settings.update_one({"key": VERSION_KEY}, {"$set": {"key": VERSION_KEY, "version": payload["version"], "count": len(docs)}}, upsert=True)
+        await db.settings.update_one({"key": key}, {"$set": {"key": key, "version": payload["version"], "count": len(docs)}}, upsert=True)
         logger.info("Loaded %d CAP cut-off rows (%s)", len(docs), payload["version"])
     except Exception as exc:  # noqa: BLE001
         logger.error("CAP cut-off load failed: %s", exc)

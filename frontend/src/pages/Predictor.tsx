@@ -27,6 +27,8 @@ const CATEGORIES: { value: PredictorCategory; label: string }[] = [
   { value: "VJ", label: "VJ / DT (A)" }, { value: "NT1", label: "NT 1 (B)" }, { value: "NT2", label: "NT 2 (C)" }, { value: "NT3", label: "NT 3 (D)" }, { value: "SEBC", label: "SEBC" }, { value: "TFWS", label: "TFWS (fee waiver)" },
 ];
 const ANY_HU = "any";
+// Exams backed by official CET Cell CAP cut-offs → program key for /predictor/cap-meta
+const CAP_PROGRAM: Record<string, string> = { "MHT CET": "engineering", "MHT CET Pharmacy": "pharmacy" };
 const ALL_BRANCHES = "all";
 const CHANCE: Record<PredictorChance, { label: string; cls: string; desc: string }> = {
   High: { label: "High chance", cls: "bg-green-50 text-green-800 ring-green-200", desc: "Your score is at or above last year's closing cutoff." },
@@ -52,8 +54,9 @@ export default function Predictor() {
   const [ladies, setLadies] = useState(urlLadies);
   const [hu, setHu] = useState(urlHu || ANY_HU);
   const [branch, setBranch] = useState(urlBranch || ALL_BRANCHES);
-  const capMeta = useQuery({ queryKey: ["predictor", "cap-meta"], queryFn: () => apiGet<CapMeta>("/predictor/cap-meta"), staleTime: 10 * 60_000 });
-  const isCap = exam === "MHT CET" && !!capMeta.data?.available;
+  const program = CAP_PROGRAM[exam];
+  const capMeta = useQuery({ queryKey: ["predictor", "cap-meta", program], queryFn: () => apiGet<CapMeta>(`/predictor/cap-meta?program=${program}`), staleTime: 10 * 60_000, enabled: !!program });
+  const isCap = !!program && !!capMeta.data?.available;
 
   const exams = useQuery({ queryKey: ["predictor", "exams"], queryFn: () => apiGet<PredictorExam[]>("/predictor/exams") });
   const spec = exams.data?.find((e) => e.name === exam);
@@ -61,7 +64,7 @@ export default function Predictor() {
   // The URL is the source of truth for a prediction, so result links are shareable.
   const body: PredictorIn | null = urlExam && urlScore && !Number.isNaN(Number(urlScore))
     ? { exam: urlExam, score: Number(urlScore), category: urlCategory, cities: CITY_LIST[urlCity],
-        ...(urlExam === "MHT CET" ? { ladies: urlLadies, home_university: urlHu, branch_group: urlBranch } : {}) } : null;
+        ...(CAP_PROGRAM[urlExam] ? { ladies: urlLadies, home_university: urlHu, branch_group: urlBranch } : {}) } : null;
   const predict = useQuery({
     queryKey: ["predictor", "run", body],
     queryFn: () => apiPost<PredictorOut>("/predictor", body),
@@ -80,7 +83,7 @@ export default function Predictor() {
     if (spec && (n < spec.min || n > spec.max)) return toast.error(`${spec.label} must be between ${spec.min} and ${spec.max}`);
     setChanceFilter("all");
     const qs: Record<string, string> = { exam, score: String(n), category, city };
-    if (exam === "MHT CET") {
+    if (CAP_PROGRAM[exam]) {
       if (ladies) qs.ladies = "1";
       if (hu !== ANY_HU) qs.hu = hu;
       if (branch !== ALL_BRANCHES) qs.branch = branch;
@@ -106,8 +109,8 @@ export default function Predictor() {
   return (
     <div data-testid="predictor-page">
       <PageSeo page="predictor" />
-      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "College Predictor" }]} title={<>College Predictor <span className="text-brand-leaf-soft">2026</span></>}
-        subtitle="Enter your MHT CET, JEE Main, NEET or MBA CET score and see which colleges you can likely get. MHT CET uses the official 2026 CAP cut-offs for 380+ Maharashtra engineering colleges." testid="predictor-header">
+      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "College Predictor" }]} title={<>College <span className="text-brand-leaf-soft">Predictor</span></>}
+        subtitle="Enter your MHT CET, JEE Main, NEET or MBA CET score and see which colleges you can likely get. MHT CET uses the official CAP cut-offs for 380+ engineering and 520+ pharmacy colleges in Maharashtra." testid="predictor-header">
         <form onSubmit={submit} className="mt-8 grid max-w-4xl gap-4 rounded-2xl bg-white p-5 text-slate-900 shadow-2xl sm:grid-cols-12 sm:items-end" data-testid="predictor-form">
           <div className="grid gap-1.5 sm:col-span-3">
             <Label>Entrance exam</Label>
@@ -133,7 +136,7 @@ export default function Predictor() {
             <Label>Location</Label>
             <Select value={city} onValueChange={(v: string) => setCity(v)}>
               <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-city-select"><SelectValue>{(v) => CITIES[v as string]}</SelectValue></SelectTrigger>
-              <SelectContent>{Object.entries(CITIES).filter(([k]) => exam === "MHT CET" || !MH_REGIONS.includes(k)).map(([k, l]) => <SelectItem key={k} value={k} data-testid={`predictor-city-option-${k.toLowerCase()}`}>{l}</SelectItem>)}</SelectContent>
+              <SelectContent>{Object.entries(CITIES).filter(([k]) => !!CAP_PROGRAM[exam] || !MH_REGIONS.includes(k)).map(([k, l]) => <SelectItem key={k} value={k} data-testid={`predictor-city-option-${k.toLowerCase()}`}>{l}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <Button type="submit" disabled={predict.isFetching} data-testid="predictor-submit-button" className="h-11 bg-brand-red text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform] sm:col-span-2">
@@ -152,11 +155,11 @@ export default function Predictor() {
                 </Select>
               </div>
               <div className="grid gap-1.5 sm:col-span-4">
-                <Label>Branch</Label>
+                <Label>{program === "pharmacy" ? "Course" : "Branch"}</Label>
                 <Select value={branch} onValueChange={(v: string) => setBranch(v)}>
-                  <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-branch-select"><SelectValue>{(v) => (v === ALL_BRANCHES ? "All branches" : (v as string))}</SelectValue></SelectTrigger>
+                  <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-branch-select"><SelectValue>{(v) => (v === ALL_BRANCHES ? (program === "pharmacy" ? "B.Pharm + Pharm.D" : "All branches") : (v as string))}</SelectValue></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={ALL_BRANCHES}>All branches</SelectItem>
+                    <SelectItem value={ALL_BRANCHES}>{program === "pharmacy" ? "B.Pharm + Pharm.D" : "All branches"}</SelectItem>
                     {capMeta.data!.branch_groups.map((b) => <SelectItem key={b} value={b} data-testid={`predictor-branch-option-${slugify(b)}`}>{b}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -175,7 +178,7 @@ export default function Predictor() {
         {errMsg && <p className="mb-6 rounded-xl bg-red-50 p-4 text-sm text-red-700" data-testid="predictor-error">{errMsg}</p>}
         {!data && !predict.isFetching && (
           <div className="grid gap-4 md:grid-cols-3" data-testid="predictor-intro">
-            {[[Target, "Official 2026 CAP cut-offs", "MHT CET uses the State CET Cell 2026 Round I–IV closing percentiles for every category, Home-University and Ladies seat."], [MapPin, "380+ Maharashtra colleges", "Every engineering college and branch in the CAP — Pune, Mumbai, Nagpur, Nashik and more."], [TrendingUp, "Fees & packages", "Compare fees and average placements right in the results."]].map(([I, t, d]) => {
+            {[[Target, "Official CAP cut-offs", "MHT CET (Engineering & Pharmacy) uses the State CET Cell Round I–IV closing percentiles for every category, Home-University and Ladies seat."], [MapPin, "900+ Maharashtra colleges", "Every engineering and pharmacy college in the CAP — Pune, Mumbai, Nagpur, Nashik and more."], [TrendingUp, "Fees & packages", "Compare fees and average placements right in the results."]].map(([I, t, d]) => {
               const Icon = I as typeof Target;
               return (
                 <div key={t as string} className="rounded-2xl border bg-white p-6">
@@ -196,7 +199,7 @@ export default function Predictor() {
                   {data.results.length ? <>{colleges} colleges, {data.total > data.results.length ? `top ${data.results.length} of ${data.total}` : data.results.length} course options for {data.exam} {data.metric === "rank" ? `rank ${data.score}` : data.metric === "score" ? `score ${data.score}` : `${data.score} percentile`}</> : "No matching colleges"}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">{CITIES[urlCity]} • {CATEGORIES.find((c) => c.value === data.category)?.label}{body?.ladies ? " • Ladies seats" : ""}{body?.home_university ? ` • HU: ${body.home_university}` : ""}{body?.branch_group ? ` • ${body.branch_group}` : ""} • most competitive first</p>
-                {official && <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-brand-leaf ring-1 ring-green-200" data-testid="predictor-official-badge"><BadgeCheck className="size-3.5" /> Official CET Cell 2026 CAP cut-offs · Rounds I–IV</p>}
+                {official && <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-brand-leaf ring-1 ring-green-200" data-testid="predictor-official-badge"><BadgeCheck className="size-3.5" /> Official CET Cell CAP cut-offs · Rounds I–IV</p>}
               </div>
               <div className="flex flex-wrap gap-2" data-testid="predictor-share-actions">
                 <a href={pdfHref} download data-testid="predictor-download-pdf-button" className={cn(buttonVariants({ size: "sm" }), "bg-brand-navy text-white hover:bg-brand-blue")}><Download className="size-4" /> Download PDF</a>
@@ -256,7 +259,7 @@ export default function Predictor() {
               </div>
             )}
             <p className="mt-6 flex items-start gap-2 rounded-xl bg-slate-100 p-4 text-xs leading-relaxed text-slate-600" data-testid="predictor-disclaimer">
-              <Info className="mt-0.5 size-4 shrink-0" /> {official ? <>Based on the official State CET Cell 2026 CAP cut-offs (Rounds I–IV, Maharashtra & minority seats) from fe2026.mahacet.org. Chance is judged on the Round I closing percentile of the most lenient seat type you qualify for (Open + your category, Home-University / Other-than-HU / State level{body?.ladies ? ", Ladies" : ""}). Later rounds are shown for reference. Defence, PWD, orphan and minority-specific seats are not included. Call {"+91 8149 68 9468"} for a personalised option-form plan.</> : <>Predictions use approximate previous-year closing cutoffs for the General Open category (Maharashtra state quota / All-India quota where noted). For OBC, EWS, SC and ST we estimate the category cutoff from typical historical gaps — actual category, home-university, ladies and minority quota cutoffs vary by college and change every year. Call {"+91 8149 68 9468"} for a personalised option-form plan.</>}
+              <Info className="mt-0.5 size-4 shrink-0" /> {official ? <>Based on the official State CET Cell CAP cut-offs (Rounds I–IV, Maharashtra & minority seats) from cetcell.mahacet.org. Chance is judged on the Round I closing percentile of the most lenient seat type you qualify for (Open + your category, Home-University / Other-than-HU / State level{body?.ladies ? ", Ladies" : ""}). Later rounds are shown for reference. Defence, PWD, orphan and minority-specific seats are not included. Call {"+91 8149 68 9468"} for a personalised option-form plan.</> : <>Predictions use approximate previous-year closing cutoffs for the General Open category (Maharashtra state quota / All-India quota where noted). For OBC, EWS, SC and ST we estimate the category cutoff from typical historical gaps — actual category, home-university, ladies and minority quota cutoffs vary by college and change every year. Call {"+91 8149 68 9468"} for a personalised option-form plan.</>}
             </p>
           </div>
         )}

@@ -25,7 +25,7 @@ STATIC_PAGES = [
      "All major Indian entrance exams — JEE Main, NEET UG, MHT CET, CAT, CLAT and more. Exam dates, application deadlines, eligibility and syllabus."),
     ("news", "News & Articles", "/news", "Admission News & Exam Updates {y} | Digital Shiksha",
      "Latest admission news, CAP round guides, exam updates and career articles from Digital Shiksha's counselling experts."),
-    ("predictor", "College Predictor", "/predictor", "College Predictor {y}: MHT CET, JEE Main, NEET Rank & Percentile | Digital Shiksha",
+    ("predictor", "College Predictor", "/predictor", "College Predictor: MHT CET, JEE Main, NEET & Pharmacy | Digital Shiksha",
      "Enter your MHT CET, JEE or NEET score and category to see colleges in Pune, Mumbai and across India you can get. Download your free PDF report."),
     ("compare", "Compare Colleges", "/compare", "Compare Colleges Side by Side: Fees, Placements, Ranking | Digital Shiksha",
      "Compare up to 3 colleges side by side on fees, NIRF rank, placements, courses and exams accepted to choose the right college."),
