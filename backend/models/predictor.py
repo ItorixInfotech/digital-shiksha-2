@@ -1,13 +1,13 @@
 """College predictor models. Mirrored in frontend/src/lib/types.ts."""
 import uuid
 from datetime import datetime, timezone
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
 Metric = Literal["percentile", "score", "rank"]
 Chance = Literal["High", "Medium", "Reach"]
-Category = Literal["General", "OBC", "EWS", "SC", "ST"]
+Category = Literal["General", "OBC", "EWS", "SC", "ST", "VJ", "NT1", "NT2", "NT3", "SEBC", "TFWS"]
 
 
 class PredictorExam(BaseModel):
@@ -25,6 +25,28 @@ class PredictorIn(BaseModel):
     score: float = Field(ge=0)
     category: Category = "General"
     cities: List[str] = []  # e.g. ["Pune", "Mumbai"]; empty = all India
+    # MHT CET (official CAP data) only:
+    ladies: bool = False
+    home_university: str = ""
+    branch_group: str = ""
+
+
+class RoundCutoff(BaseModel):
+    round: int
+    percentile: Optional[float] = None
+    merit_no: Optional[int] = None
+    seat: str = ""
+
+
+class CapMeta(BaseModel):
+    available: bool
+    year: int
+    source: str
+    colleges: int
+    courses: int
+    home_universities: List[str]
+    branch_groups: List[str]
+    categories: List[str]
 
 
 class PredictorResult(BaseModel):
@@ -43,6 +65,10 @@ class PredictorResult(BaseModel):
     fees_min: int
     fees_max: int
     avg_package: float
+    rounds: List[RoundCutoff] = []
+    seat: str = ""
+    official: bool = False
+    course_code: str = ""  # official CAP choice code (unique per college × branch × shift)
 
 
 class PredictorOut(BaseModel):
@@ -51,6 +77,8 @@ class PredictorOut(BaseModel):
     score: float
     category: Category
     results: List[PredictorResult]
+    total: int = 0
+    source: str = ""
 
 
 class PredictionLog(BaseModel):

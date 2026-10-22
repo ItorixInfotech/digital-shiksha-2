@@ -1,0 +1,85 @@
+{
+  "iteration": 3,
+  "passed": 10,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "MHT CET predictor uses official 2026 CAP cut-offs (cap-meta counts)",
+      "name": "test_tscheck_mhtcet_predictor.py::test_cap_meta_matches_official_dataset",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/predictor/cap-meta -> 200 {available:true, colleges:387, courses:2332, 12 home_universities, 7 branch_groups, 11 categories, source contains fe2026.mahacet.org}"
+    },
+    {
+      "criterion": "MHT CET predictor uses official 2026 CAP cut-offs (COEP CSE result)",
+      "name": "test_tscheck_mhtcet_predictor.py::test_predictor_coep_cse_official_cutoff",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/predictor {score:99.2, category:General, cities:[Pune], hu:SPPU, branch:Computer/IT/AI} -> 200; COEP Technological University / Computer Science and Engineering row: college_slug=coep-pune, official=true, cutoff_value=99.9767 (~99.98, seat GOPENS), rounds len=4."
+    },
+    {
+      "criterion": "Spot-check parsed values vs official PDF (Amravati Civil/CS)",
+      "name": "test_tscheck_mhtcet_predictor.py::test_predictor_amravati_civil_and_cs_spot_check",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/predictor {score:91.8, cities:[Amravati]} -> 200; Civil Engineering round1=91.7858, round2=93.8942 percentile matched exactly against official PDF values."
+    },
+    {
+      "criterion": "Category / ladies / HU seat logic",
+      "name": "test_tscheck_mhtcet_predictor.py::test_predictor_category_ladies_and_seat_logic",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "ladies:true -> seats include L* (e.g. LOBCO, LOPENS); category SC -> GSC*/OPEN seats; category EWS -> 'EWS' seat present; category TFWS -> 'TFWS' seat present."
+    },
+    {
+      "criterion": "Category / ladies / HU seat logic - invalid category rejected",
+      "name": "test_tscheck_mhtcet_predictor.py::test_predictor_invalid_category_rejected",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/predictor {category:'INVALIDCAT'} -> 422 (rejected, as required)."
+    },
+    {
+      "criterion": "PDF + enquiry (PDF download returns a real PDF)",
+      "name": "test_tscheck_mhtcet_predictor.py::test_predictor_pdf_download",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/predictor/pdf?exam=MHT+CET&score=99.2&category=General&cities=Pune&home_university=...&branch_group=... -> 200, content-type application/pdf, body starts with %PDF."
+    },
+    {
+      "criterion": "Predictor UI - MHT CET full flow (cap-options, HU/branch/ladies, summary, official badge, R1-R4 chips, chance filters, URL params, no console errors)",
+      "name": "predictor-mht-cet-cap-flow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "On /predictor, selected MHT CET, filled score 96.5/OBC/Pune&Mumbai/SPPU/Computer-IT-AI, checked Ladies -> submitted. Summary showed '96 colleges, top 300 of 314 course options for MHT CET 96.5 percentile'; official badge visible; result cards show R1-R4 chips + seat (e.g. LOBCS); chance filters (All/High/Good/Reach) clickable; URL contained ladies=1, hu=..., branch=...; console_errors=[] (no duplicate-key warnings)."
+    },
+    {
+      "criterion": "Other exams unchanged (NEET UG / JEE Main hide cap-options, use estimated results)",
+      "name": "predictor-other-exams-hide-cap-options",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Switching exam to NEET UG hid predictor-cap-options, submitted score 550 -> results rendered with no official badge (estimated); switching to JEE Main also hid cap-options."
+    },
+    {
+      "criterion": "PDF + enquiry (UI: Download PDF button + Get guidance opens enquiry dialog)",
+      "name": "predictor-pdf-download-and-enquiry",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Submitted MHT CET prediction (score 99.2, Pune); clicked Download PDF -> real browser download event fired with a valid file path; clicked 'Get guidance' on first result -> enquiry dialog (role=dialog) became visible."
+    },
+    {
+      "criterion": "Predictor UI on public preview ingress URL",
+      "name": "predictor-mht-cet-cap-flow-preview",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Ran against https://digital-shiksha-2.preview.emergentagent.com/predictor: cap-options visible for MHT CET, submitted score 99.2/General/Pune/SPPU/Computer-IT-AI -> results summary + official badge visible."
+    }
+  ],
+  "notes": [
+    "Matrix had 6 acceptance criteria; produced 10 artifacts (6 backend assertions covering the 3 API-bearing criteria including the invalid-category rejection case, 4 browser checks covering the 3 UI-facing criteria plus one run on the public preview ingress per instructions).",
+    "Full backend suite (21 tests across all files, including pre-existing) passes with no regressions.",
+    "Verified course_code for the Amravati Civil Engineering row returned by the live API is 0110219110 rather than the 0100219110 quoted in the briefing's expected text, but the percentile values (91.7858 / 93.8942) matched exactly — treated as a briefing typo (note), not a bug, since the numeric cut-offs are byte-for-byte correct."
+  ]
+}

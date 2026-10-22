@@ -48,6 +48,11 @@ INDEXES: dict[str, list[IndexModel]] = {
         IndexModel([("source", ASCENDING)], name="source"),
         IndexModel([("status", ASCENDING), ("counsellor_id", ASCENDING)], name="status_counsellor"),
     ],
+    "cap_cutoffs": [
+        IndexModel([("course_code", ASCENDING)], name="course_code", unique=True),
+        IndexModel([("city", ASCENDING)], name="city"),
+        IndexModel([("region", ASCENDING)], name="region"),
+    ],
     "counsellors": [
         IndexModel([("id", ASCENDING)], name="id", unique=True),
         IndexModel([("phone", ASCENDING)], name="phone", unique=True),

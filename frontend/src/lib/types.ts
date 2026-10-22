@@ -327,7 +327,7 @@ export interface CutoffImportResult {
 // Mirrors backend/models/predictor.py
 export type PredictorMetric = "percentile" | "score" | "rank";
 export type PredictorChance = "High" | "Medium" | "Reach";
-export type PredictorCategory = "General" | "OBC" | "EWS" | "SC" | "ST";
+export type PredictorCategory = "General" | "OBC" | "EWS" | "SC" | "ST" | "VJ" | "NT1" | "NT2" | "NT3" | "SEBC" | "TFWS";
 
 export interface PredictorExam {
   name: string;
@@ -344,6 +344,28 @@ export interface PredictorIn {
   score: number;
   category: PredictorCategory;
   cities: string[];
+  // MHT CET (official CAP data) only — server defaults: false / "" / ""
+  ladies?: boolean;
+  home_university?: string;
+  branch_group?: string;
+}
+
+export interface RoundCutoff {
+  round: number;
+  percentile: number | null;
+  merit_no: number | null;
+  seat: string;
+}
+
+export interface CapMeta {
+  available: boolean;
+  year: number;
+  source: string;
+  colleges: number;
+  courses: number;
+  home_universities: string[];
+  branch_groups: string[];
+  categories: string[];
 }
 
 export interface PredictorResult {
@@ -362,6 +384,10 @@ export interface PredictorResult {
   fees_min: number;
   fees_max: number;
   avg_package: number;
+  rounds: RoundCutoff[];
+  seat: string;
+  official: boolean;
+  course_code: string;
 }
 
 export interface PredictorOut {
@@ -370,6 +396,8 @@ export interface PredictorOut {
   score: number;
   category: PredictorCategory;
   results: PredictorResult[];
+  total: number;
+  source: string;
 }
 
 export interface PredictionLog {
