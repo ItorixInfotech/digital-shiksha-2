@@ -18,6 +18,9 @@ class PredictorExam(BaseModel):
     label: str
     hint: str
     rank_note: str = ""
+    fee: int = 0  # ₹; >0 = results unlock only after a verified Razorpay payment
+    payment_link: str = ""
+    payment_auto_check: bool = False  # True once Razorpay API keys are set (payment checked with Razorpay)
 
 
 class PredictorIn(BaseModel):
@@ -29,6 +32,32 @@ class PredictorIn(BaseModel):
     ladies: bool = False
     home_university: str = ""
     branch_group: str = ""
+    unlock_token: str = ""  # paid exams: token from POST /predictor/unlock for this exam + score
+
+
+class UnlockIn(BaseModel):
+    prediction: PredictorIn
+    name: str = Field(default="", max_length=80)
+    phone: str = Field(pattern=r"^[6-9]\d{9}$")  # mobile used to pay; also gets the WhatsApp list
+    payment_id: str = Field(default="", pattern=r"^(pay_[A-Za-z0-9]{6,30})?$")
+
+
+class UnlockOut(BaseModel):
+    token: str
+    payment_id: str
+    exam: str
+    score: float
+
+
+class PaymentRecord(BaseModel):
+    payment_id: str
+    exam: str
+    score: float
+    name: str = ""
+    phone: str
+    amount: int = 0
+    verified: bool = False  # False = payment ID not yet checked with Razorpay (no API keys) — cross-check in dashboard
+    created_at: datetime
 
 
 class RoundCutoff(BaseModel):

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { BadgeCheck, Building2, Download, Info, Link2, Loader2, MapPin, MessageCircle, Sparkles, Target, TrendingUp } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import PredictorGate, { GATE_KEY } from "@/components/PredictorGate";
+import PredictorPayment, { getUnlockToken, PENDING_KEY, setUnlockToken } from "@/components/PredictorPayment";
 import { PageHeader, EmptyState } from "@/components/Common";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,10 @@ const CHANCE: Record<PredictorChance, { label: string; cls: string; desc: string
 export default function Predictor() {
   const { openEnquiry } = useSite();
   const [sp, setSp] = useSearchParams();
+  // Razorpay may redirect back to /predictor?razorpay_payment_id=… — restore the prediction the student paid for.
+  const rzpId = sp.get("razorpay_payment_id");
+  const pending = rzpId && !sp.get("exam") ? localStorage.getItem(PENDING_KEY) : null;
+  if (pending) { const next = new URLSearchParams(pending); next.set("razorpay_payment_id", rzpId!); localStorage.removeItem(PENDING_KEY); setTimeout(() => setSp(next, { replace: true })); }
   const urlExam = sp.get("exam") ?? "";
   const urlScore = sp.get("score") ?? "";
   const urlCategory = (sp.get("category") ?? "General") as PredictorCategory;
@@ -70,16 +75,27 @@ export default function Predictor() {
   const [unlocked, setUnlocked] = useState(() => localStorage.getItem(GATE_KEY) === "1");
   const [gateDismissed, setGateDismissed] = useState(false);
   const gateOpen = !!body && !unlocked && !gateDismissed;
+  // Paid exams (MHT CET engineering): one verified Razorpay payment unlocks one exam + score.
+  const urlSpec = exams.data?.find((e) => e.name === urlExam);
+  const fee = urlSpec?.fee ?? 0;
+  const [token, setToken] = useState("");
+  const [tokenFor, setTokenFor] = useState("");
+  const bodyKey = body ? `${body.exam}|${body.score}` : "";
+  if (bodyKey !== tokenFor) { setTokenFor(bodyKey); setToken(body ? getUnlockToken(body.exam, body.score) : ""); }
+  const [payDismissed, setPayDismissed] = useState(false);
+  const needsPay = !!body && fee > 0 && !token;
+  const payOpen = !!body && unlocked && needsPay && !payDismissed;
   const predict = useQuery({
-    queryKey: ["predictor", "run", body],
-    queryFn: () => apiPost<PredictorOut>("/predictor", body),
-    enabled: !!body && unlocked,
+    queryKey: ["predictor", "run", body, token],
+    queryFn: () => apiPost<PredictorOut>("/predictor", fee > 0 ? { ...body, unlock_token: token } : body),
+    enabled: !!body && unlocked && !!urlSpec && !needsPay,
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     retry: false,
   });
   const err = predict.error;
-  const errMsg = err ? (err instanceof ApiError && err.status === 422 ? `Enter a valid ${spec?.label ?? "score"}` : "Prediction failed. Please try again.") : "";
+  if (err instanceof ApiError && err.status === 402 && body && token) { setUnlockToken(body.exam, body.score, ""); setToken(""); }
+  const errMsg = err && !(err instanceof ApiError && err.status === 402) ? (err instanceof ApiError && err.status === 422 ? `Enter a valid ${spec?.label ?? "score"}` : "Prediction failed. Please try again.") : "";
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,6 +104,7 @@ export default function Predictor() {
     if (spec && (n < spec.min || n > spec.max)) return toast.error(`${spec.label} must be between ${spec.min} and ${spec.max}`);
     setChanceFilter("all");
     setGateDismissed(false);
+    setPayDismissed(false);
     const qs: Record<string, string> = { exam, score: String(n), category, city };
     if (CAP_PROGRAM[exam]) {
       if (ladies) qs.ladies = "1";
@@ -100,7 +117,7 @@ export default function Predictor() {
   const shareQs = body ? sp.toString() : "";
   const shareUrl = `${window.location.origin}/predictor?${shareQs}`;
   const pdfHref = body ? `/api/predictor/pdf?${new URLSearchParams({ exam: body.exam, score: String(body.score), category: body.category, cities: body.cities.join(","),
-    ...(body.ladies ? { ladies: "true" } : {}), ...(body.home_university ? { home_university: body.home_university } : {}), ...(body.branch_group ? { branch_group: body.branch_group } : {}) }).toString()}` : "";
+    ...(body.ladies ? { ladies: "true" } : {}), ...(body.home_university ? { home_university: body.home_university } : {}), ...(body.branch_group ? { branch_group: body.branch_group } : {}), ...(token ? { token } : {}) }).toString()}` : "";
   const waText = body ? `My ${body.exam} college prediction (${body.score}, ${body.category}) from Digital Shiksha: ${shareUrl}` : "";
   const copyLink = async () => {
     try { await navigator.clipboard.writeText(shareUrl); toast.success("Link copied"); } catch { toast.error("Couldn't copy — please copy from the address bar"); }
@@ -176,7 +193,7 @@ export default function Predictor() {
               </label>
             </div>
           )}
-          {spec && <p className="text-xs text-slate-500 sm:col-span-12">{spec.hint}{category !== "General" && spec.rank_note ? ` • ${spec.rank_note}` : ""}</p>}
+          {spec && <p className="text-xs text-slate-500 sm:col-span-12">{spec.hint}{category !== "General" && spec.rank_note ? ` • ${spec.rank_note}` : ""}{spec.fee > 0 && <span className="ml-1 font-semibold text-brand-leaf" data-testid="predictor-fee-note">• Full college list: ₹{spec.fee.toLocaleString("en-IN")} per percentile</span>}</p>}
         </form>
       </PageHeader>
 
@@ -190,7 +207,17 @@ export default function Predictor() {
         )}
         <PredictorGate open={gateOpen} onOpenChange={(o) => { if (!o) setGateDismissed(true); }} onUnlocked={() => setUnlocked(true)}
           prediction={body} examLabel={body ? `${body.exam}${body.branch_group ? ` – ${body.branch_group}` : ""}` : ""} />
-        {!data && !predict.isFetching && !(body && !unlocked) && (
+        {body && unlocked && needsPay && (
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-green-200 bg-green-50 p-5" data-testid="predictor-paywall-card">
+            <p className="text-sm text-slate-700"><span className="font-semibold text-brand-leaf">Your MHT CET college list for {body.score} percentile is ready.</span> Pay ₹{fee.toLocaleString("en-IN")} to view it and get it on WhatsApp.</p>
+            <Button onClick={() => setPayDismissed(false)} className="bg-brand-red text-white hover:bg-red-700" data-testid="predictor-pay-button">Pay ₹{fee.toLocaleString("en-IN")} &amp; view</Button>
+          </div>
+        )}
+        {body && urlSpec && fee > 0 && unlocked && (
+          <PredictorPayment key={bodyKey} open={payOpen} onOpenChange={(o) => { if (!o) setPayDismissed(true); }} onPaid={(t) => setToken(t)}
+            prediction={body} fee={fee} paymentLink={urlSpec.payment_link} autoCheck={urlSpec.payment_auto_check} />
+        )}
+        {!data && !predict.isFetching && !(body && !unlocked) && !(body && needsPay) && (
           <div className="grid gap-4 md:grid-cols-3" data-testid="predictor-intro">
             {[[Target, "Official CAP cut-offs", "MHT CET (Engineering & Pharmacy) uses the State CET Cell Round I–IV closing percentiles for every category, Home-University and Ladies seat."], [MapPin, "900+ Maharashtra colleges", "Every engineering and pharmacy college in the CAP — Pune, Mumbai, Nagpur, Nashik and more."], [TrendingUp, "Fees & packages", "Compare fees and average placements right in the results."]].map(([I, t, d]) => {
               const Icon = I as typeof Target;

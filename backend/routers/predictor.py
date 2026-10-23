@@ -1,20 +1,26 @@
 from datetime import datetime, timedelta, timezone
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+import secrets
 
-from lib import cap
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response
+from pymongo.errors import DuplicateKeyError
+
+from lib import cap, razorpay
+from lib.whatsapp import send_student_prediction
 from lib.db import db
 from lib.pdf import build_prediction_pdf
 from models.predictor import (
     Bucket, CapMeta, Category, ExamReport, RoundCutoff, PredictionLog, PredictorExam, PredictorIn, PredictorOut, PredictorReport, PredictorResult,
+    PaymentRecord, UnlockIn, UnlockOut,
 )
 from routers.admin import require_admin
 
 router = APIRouter()
 
 EXAMS = {
-    "MHT CET": PredictorExam(name="MHT CET", metric="percentile", min=0, max=100, label="MHT CET percentile", hint="e.g. 97.5 — official CAP Round I–IV cut-offs, 380+ Maharashtra engineering colleges"),
+    "MHT CET": PredictorExam(name="MHT CET", metric="percentile", min=0, max=100, label="MHT CET percentile", hint="e.g. 97.5 — official CAP Round I–IV cut-offs, 380+ Maharashtra engineering colleges",
+                            fee=razorpay.PREDICTOR_FEE_PAISE // 100, payment_link=razorpay.PREDICTOR_PAYMENT_LINK),
     "MHT CET Pharmacy": PredictorExam(name="MHT CET Pharmacy", metric="percentile", min=0, max=100, label="MHT CET percentile (PCB / PCM)", hint="e.g. 92 — official B.Pharm & Pharm.D CAP Round I–IV cut-offs, 520+ Maharashtra colleges"),
     "JEE Main": PredictorExam(name="JEE Main", metric="percentile", min=0, max=100, label="JEE Main percentile", hint="e.g. 98.2 — All India quota seats in Maharashtra"),
     "NEET UG": PredictorExam(name="NEET UG", metric="score", min=0, max=720, label="NEET UG score (out of 720)", hint="e.g. 610 — MBBS state quota / deemed seats"),
@@ -70,7 +76,8 @@ def chance_for(metric: str, score: float, closing: float) -> str | None:
 
 @router.get("/predictor/exams", response_model=List[PredictorExam])
 async def predictor_exams():
-    return list(EXAMS.values())
+    auto = razorpay.configured()
+    return [e.model_copy(update={"payment_auto_check": auto}) if e.fee else e for e in EXAMS.values()]
 
 
 def _program_filter(program: str) -> dict:
@@ -180,8 +187,54 @@ async def run_prediction(body: PredictorIn) -> PredictorOut:
     return PredictorOut(exam=exam.name, metric=exam.metric, score=body.score, category=body.category, results=results[:MAX_RESULTS], total=len(results))
 
 
+async def require_unlock(body: PredictorIn) -> None:
+    """Paid exams: one verified payment unlocks one exam + score (a new score needs a new payment)."""
+    if body.exam not in razorpay.PAID_EXAMS:
+        return
+    if not body.unlock_token or not await db.predictor_unlocks.find_one(
+            {"token": body.unlock_token, "exam": body.exam, "score": body.score}, {"_id": 1}):
+        raise HTTPException(status_code=402, detail="Payment required to view this prediction")
+
+
+@router.post("/predictor/unlock", response_model=UnlockOut)
+async def unlock(body: UnlockIn, background: BackgroundTasks):
+    pred = body.prediction
+    if pred.exam not in razorpay.PAID_EXAMS:
+        raise HTTPException(status_code=400, detail="This exam's predictor is free")
+    out = await run_prediction(pred.model_copy(update={"unlock_token": ""}))  # validates exam + score range first
+    used_msg = "This payment has already been used for a prediction. Changing your percentile needs a new payment"
+    verified = razorpay.configured()
+    try:
+        if body.payment_id and await db.predictor_unlocks.find_one({"payment_id": body.payment_id}, {"_id": 1}):
+            raise razorpay.PaymentError(409, used_msg)
+        if not verified:
+            # No Razorpay API keys yet: accept the receipt's payment ID once; admin cross-checks it in the Razorpay dashboard.
+            if not body.payment_id:
+                raise razorpay.PaymentError(422, "Enter the payment ID (pay_…) from your Razorpay receipt")
+            payment = {"id": body.payment_id, "amount": razorpay.PREDICTOR_FEE_PAISE}
+        elif body.payment_id:
+            payment = await razorpay.fetch_payment(body.payment_id)
+        else:
+            used = {d["payment_id"] async for d in db.predictor_unlocks.find({"phone": body.phone}, {"payment_id": 1})}
+            payment = await razorpay.find_by_phone(body.phone, used)
+    except razorpay.PaymentError as exc:
+        raise HTTPException(status_code=exc.status, detail=exc.detail)
+    doc = {"payment_id": payment["id"], "token": secrets.token_urlsafe(24), "exam": pred.exam, "score": pred.score,
+           "phone": body.phone, "name": body.name.strip(), "amount": payment["amount"] // 100,
+           "payer_contact": payment.get("contact", ""), "payer_email": payment.get("email", ""),
+           "prediction": pred.model_dump(exclude={"unlock_token"}), "verified": verified, "created_at": datetime.now(timezone.utc)}
+    try:
+        await db.predictor_unlocks.insert_one(doc)
+    except DuplicateKeyError:
+        raise HTTPException(status_code=409, detail=used_msg)
+    lead = {"id": doc["payment_id"], "name": doc["name"] or "Student", "phone": body.phone}
+    background.add_task(send_student_prediction, lead, out, doc["prediction"])
+    return UnlockOut(token=doc["token"], payment_id=doc["payment_id"], exam=pred.exam, score=pred.score)
+
+
 @router.post("/predictor", response_model=PredictorOut)
 async def predict(body: PredictorIn):
+    await require_unlock(body)
     out = await run_prediction(body)
     await db.predictions.insert_one(PredictionLog(
         exam=out.exam, metric=out.metric, score=out.score, category=out.category, cities=body.cities,
@@ -192,9 +245,10 @@ async def predict(body: PredictorIn):
 
 @router.get("/predictor/pdf")
 async def predictor_pdf(exam: str, score: float, category: Category = "General", cities: str = "", ladies: bool = False,
-                        home_university: str = "", branch_group: str = ""):
+                        home_university: str = "", branch_group: str = "", token: str = ""):
     body = PredictorIn(exam=exam, score=score, category=category, cities=[c for c in cities.split(",") if c],
-                       ladies=ladies, home_university=home_university, branch_group=branch_group)
+                       ladies=ladies, home_university=home_university, branch_group=branch_group, unlock_token=token)
+    await require_unlock(body)
     out = await run_prediction(body)
     pdf = build_prediction_pdf(out, body.cities)
     name = f"digital-shiksha-{out.exam.lower().replace(' ', '-')}-{out.score:g}-prediction.pdf"
@@ -238,3 +292,9 @@ async def predictor_report(_: str = Depends(require_admin)):
         exams=exams,
         recent=[PredictionLog(**d) for d in logs[:50]],
     )
+
+
+@router.get("/admin/predictor-payments", response_model=List[PaymentRecord])
+async def predictor_payments(_: str = Depends(require_admin)):
+    rows = await db.predictor_unlocks.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
+    return [PaymentRecord(**{**d, "created_at": _aware(d.get("created_at") or datetime.now(timezone.utc)), "verified": d.get("verified", False)}) for d in rows]

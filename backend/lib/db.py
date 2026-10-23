@@ -57,6 +57,10 @@ INDEXES: dict[str, list[IndexModel]] = {
         IndexModel([("id", ASCENDING)], name="id", unique=True),
         IndexModel([("phone", ASCENDING)], name="phone", unique=True),
     ],
+    "predictor_unlocks": [
+        IndexModel([("payment_id", ASCENDING)], name="payment_id", unique=True),
+        IndexModel([("token", ASCENDING)], name="token", unique=True),
+    ],
     "predictions": [
         IndexModel([("id", ASCENDING)], name="id", unique=True),
         IndexModel([("created_at", DESCENDING)], name="created_desc"),

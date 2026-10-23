@@ -4,7 +4,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { Activity, CalendarClock, PhoneCall, Search } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { apiGet } from "@/lib/api";
-import type { Lead, PredictorReport } from "@/lib/types";
+import type { Lead, PaymentRecord, PredictorReport } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const fmtScore = (metric: string, v: number) => (metric === "rank" ? `Rank ${Math.round(v)}` : metric === "score" ? `${Math.round(v)}/720` : `${v}%ile`);
@@ -13,6 +13,7 @@ const when = (d: string) => new Date(d).toLocaleString("en-IN", { dateStyle: "me
 export default function PredictorReportPanel() {
   const report = useQuery({ queryKey: ["admin", "predictor-report"], queryFn: () => apiGet<PredictorReport>("/admin/predictor-report") });
   const leads = useQuery({ queryKey: ["admin", "leads"], queryFn: () => apiGet<Lead[]>("/admin/leads") });
+  const payments = useQuery({ queryKey: ["admin", "predictor-payments"], queryFn: () => apiGet<PaymentRecord[]>("/admin/predictor-payments") });
   const [sel, setSel] = useState<string | null>(null);
 
   const r = report.data;
@@ -79,6 +80,27 @@ export default function PredictorReportPanel() {
               </div>
             </>
           )}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="font-semibold">MHT CET payments <span className="text-sm font-normal text-slate-500">— ₹1500 unlocks; "Check in Razorpay" ones were not auto-verified</span></h3>
+        <div className="mt-3 rounded-2xl border bg-white">
+          <Table data-testid="admin-predictor-payments-table">
+            <TableHeader><TableRow><TableHead>When</TableHead><TableHead>Student</TableHead><TableHead>Percentile</TableHead><TableHead>Payment ID</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+            <TableBody>
+              {(payments.data ?? []).map((p) => (
+                <TableRow key={p.payment_id} data-testid={`admin-predictor-payment-${p.payment_id}`}>
+                  <TableCell className="whitespace-nowrap text-xs text-slate-500">{when(p.created_at)}</TableCell>
+                  <TableCell><p className="font-medium">{p.name || "—"}</p><a href={`tel:+91${p.phone}`} className="text-xs text-brand-blue">+91 {p.phone}</a></TableCell>
+                  <TableCell>{p.score}%ile</TableCell>
+                  <TableCell><a href={`https://dashboard.razorpay.com/app/payments/${p.payment_id}`} target="_blank" rel="noreferrer" className="font-mono text-xs text-brand-blue hover:underline">{p.payment_id}</a></TableCell>
+                  <TableCell><span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1", p.verified ? "bg-green-50 text-green-800 ring-green-200" : "bg-amber-50 text-amber-800 ring-amber-200")}>{p.verified ? "Verified ₹" + p.amount : "Check in Razorpay"}</span></TableCell>
+                </TableRow>
+              ))}
+              {!payments.data?.length && <TableRow><TableCell colSpan={5} className="py-6 text-center text-slate-500">No payments yet.</TableCell></TableRow>}
+            </TableBody>
+          </Table>
         </div>
       </div>
 

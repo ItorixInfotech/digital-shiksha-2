@@ -339,6 +339,9 @@ export interface PredictorExam {
   label: string;
   hint: string;
   rank_note: string;
+  fee: number; // ₹; >0 = results unlock only after a verified Razorpay payment
+  payment_link: string;
+  payment_auto_check: boolean; // true once Razorpay API keys are set
 }
 
 export interface PredictorIn {
@@ -350,6 +353,32 @@ export interface PredictorIn {
   ladies?: boolean;
   home_university?: string;
   branch_group?: string;
+  unlock_token?: string; // paid exams: token from POST /predictor/unlock for this exam + score
+}
+
+export interface UnlockIn {
+  prediction: PredictorIn;
+  name: string;
+  phone: string;
+  payment_id: string; // "" = find the payment by mobile number
+}
+
+export interface PaymentRecord {
+  payment_id: string;
+  exam: string;
+  score: number;
+  name: string;
+  phone: string;
+  amount: number;
+  verified: boolean; // false = not yet checked with Razorpay — cross-check in the dashboard
+  created_at: string;
+}
+
+export interface UnlockOut {
+  token: string;
+  payment_id: string;
+  exam: string;
+  score: number;
 }
 
 export interface RoundCutoff {
