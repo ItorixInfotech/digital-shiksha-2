@@ -221,7 +221,7 @@ async def send_student_confirmation(lead: dict) -> None:
         logger.error("Student confirmation failed for %s: %s", lead.get("id"), exc)
 
 
-# ---- Paid MHT CET predictor receipt (fixed server-side template; only escaped server data is interpolated)
+# ---- Paid MHT CET / Pharmacy predictor receipt (fixed server-side template; only escaped server data is interpolated)
 def predictor_receipt_html(rec: dict, out, pdf_url: str) -> str:
     c = COUNSELLOR
     first = escape(_first_name(rec.get("name", "")))
@@ -246,12 +246,12 @@ def predictor_receipt_html(rec: dict, out, pdf_url: str) -> str:
         '<span style="color:#ffffff;font-size:20px;font-weight:bold"><span style="color:#4ade80">Digital</span> Shiksha</span><br>'
         '<span style="color:#cbd5e1;font-size:12px;letter-spacing:1px">PAYMENT RECEIPT &bull; COLLEGE PREDICTOR</span></td></tr>'
         f'<tr><td style="padding:24px 24px 8px"><p style="margin:0 0 10px;font-size:18px;color:#0f172a;font-weight:bold">Hi {first}, thank you for your payment!</p>'
-        f'<p style="margin:0;font-size:15px;line-height:1.6;color:#334155">Here is your MHT CET college prediction for <strong>{rec["score"]:g} percentile</strong> '
+        f'<p style="margin:0;font-size:15px;line-height:1.6;color:#334155">Here is your {escape(out.exam)} college prediction for <strong>{rec["score"]:g} percentile</strong> '
         f'({escape(out.category)}). The full list with all CAP round cut-offs is in the PDF below.</p></td></tr>'
         '<tr><td style="padding:12px 24px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px">'
         '<tr><td style="padding:14px 16px;font-size:14px;color:#0f172a;line-height:1.8">'
         f'Amount paid: <strong>&#8377;{int(rec["amount"]):,}</strong><br>Payment ID: <strong>{escape(rec["payment_id"])}</strong><br>'
-        f'Date: {escape(paid)}<br>For: MHT CET College Predictor &ndash; {rec["score"]:g} percentile</td></tr></table></td></tr>'
+        f'Date: {escape(paid)}<br>For: {escape(out.exam)} College Predictor &ndash; {rec["score"]:g} percentile</td></tr></table></td></tr>'
         + btn +
         '<tr><td style="padding:12px 24px"><p style="margin:0 0 8px;font-size:13px;font-weight:bold;color:#dc2626;letter-spacing:1px">YOUR TOP COLLEGES</p>'
         f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:8px">{"".join(rows) or empty}</table></td></tr>'
@@ -267,7 +267,7 @@ def predictor_receipt_html(rec: dict, out, pdf_url: str) -> str:
 async def send_predictor_receipt(rec: dict, out, pdf_url: str) -> bool:
     """Background-safe: returns False instead of raising."""
     try:
-        email_id = await send_email(to=rec["email"], subject=f"Your Digital Shiksha receipt & MHT CET college list ({rec['score']:g} percentile)",
+        email_id = await send_email(to=rec["email"], subject=f"Your Digital Shiksha receipt & {out.exam} college list ({rec['score']:g} percentile)",
                                     html=predictor_receipt_html(rec, out, pdf_url))
         logger.info("Predictor receipt %s sent: %s", rec["payment_id"], email_id)
         return bool(email_id)

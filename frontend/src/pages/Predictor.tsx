@@ -209,7 +209,7 @@ export default function Predictor() {
           prediction={body} examLabel={body ? `${body.exam}${body.branch_group ? ` – ${body.branch_group}` : ""}` : ""} />
         {body && unlocked && needsPay && (
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-green-200 bg-green-50 p-5" data-testid="predictor-paywall-card">
-            <p className="text-sm text-slate-700"><span className="font-semibold text-brand-leaf">Your MHT CET college list for {body.score} percentile is ready.</span> Pay ₹{fee.toLocaleString("en-IN")} to view it and get it on WhatsApp.</p>
+            <p className="text-sm text-slate-700"><span className="font-semibold text-brand-leaf">Your {body.exam} college list for {body.score} percentile is ready.</span> Pay ₹{fee.toLocaleString("en-IN")} to view it and get it on WhatsApp.</p>
             <Button onClick={() => setPayDismissed(false)} className="bg-brand-red text-white hover:bg-red-700" data-testid="predictor-pay-button">Pay ₹{fee.toLocaleString("en-IN")} &amp; view</Button>
           </div>
         )}

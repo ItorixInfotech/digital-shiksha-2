@@ -23,8 +23,9 @@ router = APIRouter()
 
 EXAMS = {
     "MHT CET": PredictorExam(name="MHT CET", metric="percentile", min=0, max=100, label="MHT CET percentile", hint="e.g. 97.5 — official CAP Round I–IV cut-offs, 380+ Maharashtra engineering colleges",
-                            fee=razorpay.PREDICTOR_FEE_PAISE // 100, payment_link=razorpay.PREDICTOR_PAYMENT_LINK),
-    "MHT CET Pharmacy": PredictorExam(name="MHT CET Pharmacy", metric="percentile", min=0, max=100, label="MHT CET percentile (PCB / PCM)", hint="e.g. 92 — official B.Pharm & Pharm.D CAP Round I–IV cut-offs, 520+ Maharashtra colleges"),
+                            fee=razorpay.PAID_EXAMS["MHT CET"][0] // 100, payment_link=razorpay.PAID_EXAMS["MHT CET"][1]),
+    "MHT CET Pharmacy": PredictorExam(name="MHT CET Pharmacy", metric="percentile", min=0, max=100, label="MHT CET percentile (PCB / PCM)", hint="e.g. 92 — official B.Pharm & Pharm.D CAP Round I–IV cut-offs, 520+ Maharashtra colleges",
+                                     fee=razorpay.PAID_EXAMS["MHT CET Pharmacy"][0] // 100, payment_link=razorpay.PAID_EXAMS["MHT CET Pharmacy"][1]),
     "JEE Main": PredictorExam(name="JEE Main", metric="percentile", min=0, max=100, label="JEE Main percentile", hint="e.g. 98.2 — All India quota seats in Maharashtra"),
     "NEET UG": PredictorExam(name="NEET UG", metric="score", min=0, max=720, label="NEET UG score (out of 720)", hint="e.g. 610 — MBBS state quota / deemed seats"),
     "MAH MBA CET": PredictorExam(name="MAH MBA CET", metric="percentile", min=0, max=100, label="MAH MBA CET percentile", hint="e.g. 96 — MBA/MMS state CAP"),
@@ -206,6 +207,7 @@ async def unlock(body: UnlockIn, background: BackgroundTasks):
         raise HTTPException(status_code=400, detail="This exam's predictor is free")
     out = await run_prediction(pred.model_copy(update={"unlock_token": ""}))  # validates exam + score range first
     used_msg = "This payment has already been used for a prediction. Changing your percentile needs a new payment"
+    fee = razorpay.PAID_EXAMS[pred.exam][0]
     verified = razorpay.configured()
     if body.email and await db.predictor_unlocks.count_documents(
             {"email": body.email, "created_at": {"$gte": datetime.now(timezone.utc) - timedelta(hours=24)}}) >= 5:
@@ -217,12 +219,12 @@ async def unlock(body: UnlockIn, background: BackgroundTasks):
             # No Razorpay API keys yet: accept the receipt's payment ID once; admin cross-checks it in the Razorpay dashboard.
             if not body.payment_id:
                 raise razorpay.PaymentError(422, "Enter the payment ID (pay_…) from your Razorpay receipt")
-            payment = {"id": body.payment_id, "amount": razorpay.PREDICTOR_FEE_PAISE}
+            payment = {"id": body.payment_id, "amount": fee}
         elif body.payment_id:
-            payment = await razorpay.fetch_payment(body.payment_id)
+            payment = await razorpay.fetch_payment(body.payment_id, fee)
         else:
             used = {d["payment_id"] async for d in db.predictor_unlocks.find({"phone": body.phone}, {"payment_id": 1})}
-            payment = await razorpay.find_by_phone(body.phone, used)
+            payment = await razorpay.find_by_phone(body.phone, used, fee)
     except razorpay.PaymentError as exc:
         raise HTTPException(status_code=exc.status, detail=exc.detail)
     doc = {"payment_id": payment["id"], "token": secrets.token_urlsafe(24), "exam": pred.exam, "score": pred.score,

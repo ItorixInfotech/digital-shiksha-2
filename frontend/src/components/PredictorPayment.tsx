@@ -71,7 +71,7 @@ export default function PredictorPayment({ open, onOpenChange, onPaid, predictio
       <DialogContent className="sm:max-w-md" data-testid="predictor-payment-dialog">
         <DialogHeader>
           <span className="mb-1 grid size-10 place-items-center rounded-xl bg-green-50 text-brand-leaf"><CreditCard className="size-5" /></span>
-          <DialogTitle>Unlock your MHT CET college list</DialogTitle>
+          <DialogTitle>Unlock your {prediction.exam} college list</DialogTitle>
           <DialogDescription>
             Pay <span className="font-semibold text-slate-900" data-testid="predictor-payment-fee">₹{fee.toLocaleString("en-IN")}</span> once for percentile <span className="font-semibold text-slate-900">{prediction.score}</span>. You'll see every predicted college here and get a receipt with the full list PDF by email.
           </DialogDescription>

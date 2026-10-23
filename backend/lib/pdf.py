@@ -95,7 +95,7 @@ def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | N
     if receipt:
         rc = Table([[Paragraph(f"<b>PAYMENT RECEIPT</b><br/>Paid by: <b>{_ascii(receipt.get('name') or 'Student')}</b> &nbsp;|&nbsp; "
                                f"Amount: <b>Rs. {int(receipt['amount']):,}</b> &nbsp;|&nbsp; Payment ID: <b>{_ascii(receipt['payment_id'])}</b> &nbsp;|&nbsp; "
-                               f"Date: {receipt['paid_at'].strftime('%d %b %Y')}<br/><font color='#64748B'>College Predictor - full MHT CET college list for this percentile</font>", S["sub"])]],
+                               f"Date: {receipt['paid_at'].strftime('%d %b %Y')}<br/><font color='#64748B'>College Predictor - full {_ascii(out.exam)} college list for this percentile</font>", S["sub"])]],
                    colWidths=[width])
         rc.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#15803D")), ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F0FDF4")),
                                 ("LEFTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
