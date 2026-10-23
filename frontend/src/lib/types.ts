@@ -360,6 +360,7 @@ export interface UnlockIn {
   prediction: PredictorIn;
   name: string;
   phone: string;
+  email: string; // receipt + full college list PDF
   payment_id: string; // "" = find the payment by mobile number
 }
 
@@ -370,6 +371,8 @@ export interface PaymentRecord {
   name: string;
   phone: string;
   amount: number;
+  email: string;
+  email_sent: boolean;
   verified: boolean; // false = not yet checked with Razorpay — cross-check in the dashboard
   created_at: string;
 }

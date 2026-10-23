@@ -219,3 +219,58 @@ async def send_student_confirmation(lead: dict) -> None:
         logger.info("Student confirmation for %s sent: %s", lead["id"], email_id)
     except Exception as exc:  # noqa: BLE001
         logger.error("Student confirmation failed for %s: %s", lead.get("id"), exc)
+
+
+# ---- Paid MHT CET predictor receipt (fixed server-side template; only escaped server data is interpolated)
+def predictor_receipt_html(rec: dict, out, pdf_url: str) -> str:
+    c = COUNSELLOR
+    first = escape(_first_name(rec.get("name", "")))
+    seen, rows = set(), []
+    for r in out.results:
+        if r.college_slug in seen or len(rows) == 10:
+            continue
+        seen.add(r.college_slug)
+        chance = {"High": ("High chance", "#15803d"), "Medium": ("Good chance", "#b45309")}.get(r.chance, ("Reach", "#dc2626"))
+        rows.append(f'<tr><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;font-size:13px;color:#0f172a"><strong>{escape(r.college_name)}</strong>'
+                    f'<br><span style="color:#64748b">{escape(r.course)} &middot; {escape(r.city)}</span></td>'
+                    f'<td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;font-size:12px;font-weight:bold;color:{chance[1]};white-space:nowrap">{chance[0]}</td></tr>')
+    empty = '<tr><td style="padding:10px;font-size:13px">No direct matches &ndash; our counsellor will suggest options.</td></tr>'
+    paid = rec["created_at"].strftime("%d %b %Y, %I:%M %p UTC")
+    btn = (f'<tr><td style="padding:4px 24px 8px"><a href="{escape(pdf_url)}" style="display:inline-block;background:#dc2626;color:#ffffff;'
+           'text-decoration:none;font-weight:bold;font-size:15px;padding:12px 22px;border-radius:8px">Download full college list (PDF)</a></td></tr>') if pdf_url else ""
+    return (
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:24px 0">'
+        '<tr><td align="center"><table role="presentation" width="600" cellpadding="0" cellspacing="0" '
+        'style="background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;font-family:Arial,Helvetica,sans-serif">'
+        '<tr><td style="background:#0a2540;padding:22px 24px;border-radius:12px 12px 0 0">'
+        '<span style="color:#ffffff;font-size:20px;font-weight:bold"><span style="color:#4ade80">Digital</span> Shiksha</span><br>'
+        '<span style="color:#cbd5e1;font-size:12px;letter-spacing:1px">PAYMENT RECEIPT &bull; COLLEGE PREDICTOR</span></td></tr>'
+        f'<tr><td style="padding:24px 24px 8px"><p style="margin:0 0 10px;font-size:18px;color:#0f172a;font-weight:bold">Hi {first}, thank you for your payment!</p>'
+        f'<p style="margin:0;font-size:15px;line-height:1.6;color:#334155">Here is your MHT CET college prediction for <strong>{rec["score"]:g} percentile</strong> '
+        f'({escape(out.category)}). The full list with all CAP round cut-offs is in the PDF below.</p></td></tr>'
+        '<tr><td style="padding:12px 24px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px">'
+        '<tr><td style="padding:14px 16px;font-size:14px;color:#0f172a;line-height:1.8">'
+        f'Amount paid: <strong>&#8377;{int(rec["amount"]):,}</strong><br>Payment ID: <strong>{escape(rec["payment_id"])}</strong><br>'
+        f'Date: {escape(paid)}<br>For: MHT CET College Predictor &ndash; {rec["score"]:g} percentile</td></tr></table></td></tr>'
+        + btn +
+        '<tr><td style="padding:12px 24px"><p style="margin:0 0 8px;font-size:13px;font-weight:bold;color:#dc2626;letter-spacing:1px">YOUR TOP COLLEGES</p>'
+        f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:8px">{"".join(rows) or empty}</table></td></tr>'
+        f'<tr><td style="padding:12px 24px 20px;font-size:14px;color:#334155;line-height:1.6">Need help with your option form? Call / WhatsApp '
+        f'<a href="tel:{c["tel"]}" style="color:#1e3a8a;font-weight:bold">{escape(c["phone"])}</a> &ndash; counselling is free.</td></tr>'
+        '<tr><td style="padding:16px 24px;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8;line-height:1.5">'
+        'You received this receipt because you paid for the Digital Shiksha College Predictor. Keep it for your records. '
+        'Digital Shiksha will never ask for passwords or OTPs by email.</td></tr>'
+        '</table></td></tr></table>'
+    )
+
+
+async def send_predictor_receipt(rec: dict, out, pdf_url: str) -> bool:
+    """Background-safe: returns False instead of raising."""
+    try:
+        email_id = await send_email(to=rec["email"], subject=f"Your Digital Shiksha receipt & MHT CET college list ({rec['score']:g} percentile)",
+                                    html=predictor_receipt_html(rec, out, pdf_url))
+        logger.info("Predictor receipt %s sent: %s", rec["payment_id"], email_id)
+        return bool(email_id)
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Predictor receipt %s failed: %s", rec.get("payment_id"), exc)
+        return False

@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 Metric = Literal["percentile", "score", "rank"]
 Chance = Literal["High", "Medium", "Reach"]
@@ -39,6 +39,7 @@ class UnlockIn(BaseModel):
     prediction: PredictorIn
     name: str = Field(default="", max_length=80)
     phone: str = Field(pattern=r"^[6-9]\d{9}$")  # mobile used to pay; also gets the WhatsApp list
+    email: Optional[EmailStr] = None  # receipt + full college list PDF (falls back to the Razorpay payer email)
     payment_id: str = Field(default="", pattern=r"^(pay_[A-Za-z0-9]{6,30})?$")
 
 
@@ -56,6 +57,8 @@ class PaymentRecord(BaseModel):
     name: str = ""
     phone: str
     amount: int = 0
+    email: str = ""
+    email_sent: bool = False
     verified: bool = False  # False = payment ID not yet checked with Razorpay (no API keys) — cross-check in dashboard
     created_at: datetime
 

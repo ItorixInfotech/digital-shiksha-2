@@ -51,7 +51,8 @@ def _score(out: PredictorOut) -> str:
     return f"{out.score:g} percentile"
 
 
-def build_prediction_pdf(out: PredictorOut, cities: List[str]) -> bytes:
+def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | None = None) -> bytes:
+    """receipt (paid MHT CET): {name, payment_id, amount, paid_at} — adds a payment receipt box under the title."""
     buf = BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=14 * mm, rightMargin=14 * mm, topMargin=14 * mm, bottomMargin=18 * mm,
                             title=f"Digital Shiksha - {out.exam} College Prediction", author="Digital Shiksha")
@@ -91,6 +92,14 @@ def build_prediction_pdf(out: PredictorOut, cities: List[str]) -> bytes:
                     colWidths=[width / 4] * 4)
     summary.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F1F5F9")), ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#E2E8F0")),
                                  ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6), ("LEFTPADDING", (0, 0), (-1, -1), 10)]))
+    if receipt:
+        rc = Table([[Paragraph(f"<b>PAYMENT RECEIPT</b><br/>Paid by: <b>{_ascii(receipt.get('name') or 'Student')}</b> &nbsp;|&nbsp; "
+                               f"Amount: <b>Rs. {int(receipt['amount']):,}</b> &nbsp;|&nbsp; Payment ID: <b>{_ascii(receipt['payment_id'])}</b> &nbsp;|&nbsp; "
+                               f"Date: {receipt['paid_at'].strftime('%d %b %Y')}<br/><font color='#64748B'>College Predictor - full MHT CET college list for this percentile</font>", S["sub"])]],
+                   colWidths=[width])
+        rc.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#15803D")), ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F0FDF4")),
+                                ("LEFTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
+        story += [rc, Spacer(1, 4 * mm)]
     story += [summary, Spacer(1, 5 * mm)]
 
     if out.results:

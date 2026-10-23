@@ -7,6 +7,9 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response
 from pymongo.errors import DuplicateKeyError
 
 from lib import cap, razorpay
+import os
+
+from lib.email import send_predictor_receipt
 from lib.whatsapp import send_student_prediction
 from lib.db import db
 from lib.pdf import build_prediction_pdf
@@ -204,6 +207,9 @@ async def unlock(body: UnlockIn, background: BackgroundTasks):
     out = await run_prediction(pred.model_copy(update={"unlock_token": ""}))  # validates exam + score range first
     used_msg = "This payment has already been used for a prediction. Changing your percentile needs a new payment"
     verified = razorpay.configured()
+    if body.email and await db.predictor_unlocks.count_documents(
+            {"email": body.email, "created_at": {"$gte": datetime.now(timezone.utc) - timedelta(hours=24)}}) >= 5:
+        raise HTTPException(status_code=429, detail="Too many unlocks for this email today — please call +91 8149 68 9468")
     try:
         if body.payment_id and await db.predictor_unlocks.find_one({"payment_id": body.payment_id}, {"_id": 1}):
             raise razorpay.PaymentError(409, used_msg)
@@ -222,14 +228,38 @@ async def unlock(body: UnlockIn, background: BackgroundTasks):
     doc = {"payment_id": payment["id"], "token": secrets.token_urlsafe(24), "exam": pred.exam, "score": pred.score,
            "phone": body.phone, "name": body.name.strip(), "amount": payment["amount"] // 100,
            "payer_contact": payment.get("contact", ""), "payer_email": payment.get("email", ""),
-           "prediction": pred.model_dump(exclude={"unlock_token"}), "verified": verified, "created_at": datetime.now(timezone.utc)}
+           "prediction": pred.model_dump(exclude={"unlock_token"}), "verified": verified, "created_at": datetime.now(timezone.utc),
+           "receipt_id": secrets.token_urlsafe(18), "email": str(body.email or payment.get("email") or ""), "email_sent": False}
     try:
         await db.predictor_unlocks.insert_one(doc)
     except DuplicateKeyError:
         raise HTTPException(status_code=409, detail=used_msg)
     lead = {"id": doc["payment_id"], "name": doc["name"] or "Student", "phone": body.phone}
     background.add_task(send_student_prediction, lead, out, doc["prediction"])
+    if doc["email"]:
+        background.add_task(_email_receipt, doc, out)
     return UnlockOut(token=doc["token"], payment_id=doc["payment_id"], exam=pred.exam, score=pred.score)
+
+
+async def _email_receipt(doc: dict, out: PredictorOut) -> None:
+    base = os.environ.get("PUBLIC_SITE_URL", "").rstrip("/")
+    url = f"{base}/api/predictor/receipt/{doc['receipt_id']}.pdf" if base.startswith("https://") else ""
+    if await send_predictor_receipt(doc, out, url):
+        await db.predictor_unlocks.update_one({"payment_id": doc["payment_id"]}, {"$set": {"email_sent": True}})
+
+
+@router.get("/predictor/receipt/{receipt_id}.pdf")
+async def predictor_receipt_pdf(receipt_id: str):
+    """Emailed download link: receipt + full college list for the paid percentile."""
+    doc = await db.predictor_unlocks.find_one({"receipt_id": receipt_id}, {"_id": 0}) if receipt_id else None
+    if not doc:
+        raise HTTPException(status_code=404, detail="Receipt not found")
+    body = PredictorIn(**doc["prediction"])
+    out = await run_prediction(body)
+    pdf = build_prediction_pdf(out, body.cities, receipt={"name": doc.get("name"), "payment_id": doc["payment_id"],
+                                                          "amount": doc.get("amount", 0), "paid_at": _aware(doc["created_at"])})
+    name = f"digital-shiksha-mht-cet-{out.score:g}-receipt.pdf"
+    return Response(content=pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="{name}"'})
 
 
 @router.post("/predictor", response_model=PredictorOut)

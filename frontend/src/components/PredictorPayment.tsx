@@ -37,6 +37,9 @@ export const PENDING_KEY = "ds_predictor_pending_v1"; // prediction query to res
 export default function PredictorPayment({ open, onOpenChange, onPaid, prediction, fee, paymentLink, autoCheck }: Props) {
   const contact = savedContact();
   const [phone, setPhone] = useState(contact.phone ?? "");
+  const [email, setEmail] = useState("");
+  const mail = email.trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail);
   const [paymentId, setPaymentId] = useState(() => new URLSearchParams(window.location.search).get("razorpay_payment_id") ?? "");
   const mobile = phone.replace(/\D/g, "").slice(-10);
   const pid = paymentId.trim();
@@ -44,10 +47,10 @@ export default function PredictorPayment({ open, onOpenChange, onPaid, predictio
   const pidOk = (!autoCheck && !pid) ? false : !pid || /^pay_[A-Za-z0-9]{6,30}$/.test(pid);
 
   const verify = useMutation({
-    mutationFn: () => apiPost<UnlockOut>("/predictor/unlock", { prediction, name: contact.name ?? "", phone: mobile, payment_id: pid } satisfies UnlockIn),
+    mutationFn: () => apiPost<UnlockOut>("/predictor/unlock", { prediction, name: contact.name ?? "", phone: mobile, email: mail, payment_id: pid } satisfies UnlockIn),
     onSuccess: (r) => {
       setUnlockToken(r.exam, r.score, r.token);
-      toast.success("Payment confirmed! Your college list is also being sent to your WhatsApp.");
+      toast.success(`Payment confirmed! Your receipt and full college list PDF are on their way to ${mail}.`);
       onPaid(r.token);
     },
     onError: (e) => {
@@ -58,6 +61,7 @@ export default function PredictorPayment({ open, onOpenChange, onPaid, predictio
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!phoneOk) return toast.error("Enter the 10-digit mobile number you paid with");
+    if (!emailOk) return toast.error("Enter a valid email — we'll send your receipt and college list PDF there");
     if (!pidOk) return toast.error(pid ? "Payment ID looks like pay_XXXXXXXXXXXX" : "Enter the payment ID (pay_…) from your Razorpay receipt");
     verify.mutate();
   };
@@ -69,7 +73,7 @@ export default function PredictorPayment({ open, onOpenChange, onPaid, predictio
           <span className="mb-1 grid size-10 place-items-center rounded-xl bg-green-50 text-brand-leaf"><CreditCard className="size-5" /></span>
           <DialogTitle>Unlock your MHT CET college list</DialogTitle>
           <DialogDescription>
-            Pay <span className="font-semibold text-slate-900" data-testid="predictor-payment-fee">₹{fee.toLocaleString("en-IN")}</span> once for percentile <span className="font-semibold text-slate-900">{prediction.score}</span>. You'll see every predicted college here and get the list on WhatsApp.
+            Pay <span className="font-semibold text-slate-900" data-testid="predictor-payment-fee">₹{fee.toLocaleString("en-IN")}</span> once for percentile <span className="font-semibold text-slate-900">{prediction.score}</span>. You'll see every predicted college here and get a receipt with the full list PDF by email.
           </DialogDescription>
         </DialogHeader>
         <ol className="grid gap-4 text-sm">
@@ -90,6 +94,10 @@ export default function PredictorPayment({ open, onOpenChange, onPaid, predictio
                   <span className="grid place-items-center rounded-l-md border border-r-0 bg-slate-50 px-3 text-sm text-slate-500">+91</span>
                   <Input id="pp-phone" inputMode="numeric" maxLength={14} className="rounded-l-none" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="10-digit mobile" data-testid="predictor-payment-phone-input" />
                 </div>
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="pp-email">Email for receipt &amp; PDF</Label>
+                <Input id="pp-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" data-testid="predictor-payment-email-input" />
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor="pp-id">Razorpay payment ID {autoCheck && <span className="font-normal text-slate-400">(optional)</span>}</Label>
