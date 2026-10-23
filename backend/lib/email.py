@@ -274,3 +274,46 @@ async def send_predictor_receipt(rec: dict, out, pdf_url: str) -> bool:
     except Exception as exc:  # noqa: BLE001
         logger.error("Predictor receipt %s failed: %s", rec.get("payment_id"), exc)
         return False
+
+
+# ---- Owner alert for each paid prediction (internal; fixed template, escaped server data only)
+def payment_alert_html(rec: dict, out, pdf_url: str) -> str:
+    phone, pid = escape(rec["phone"]), escape(rec["payment_id"])
+    exam = escape({"MHT CET": "MHT CET (Engineering)", "MHT CET Pharmacy": "MHT CET (Pharmacy)"}.get(out.exam, out.exam))
+    rows = [_row("Name", escape(rec.get("name") or "—")), _row("Mobile", f'<a href="tel:+91{phone}" style="color:#1e3a8a">+91 {phone}</a>'),
+            _row("Exam", exam), _row("Percentile", f'{rec["score"]:g} ({escape(out.category)})'),
+            _row("Amount", f'&#8377;{int(rec["amount"]):,}'),
+            _row("Payment ID", f'<a href="https://dashboard.razorpay.com/app/payments/{pid}" style="color:#1e3a8a">{pid}</a>'),
+            _row("Status", "Verified with Razorpay" if rec.get("verified") else '<strong style="color:#b45309">Not auto-verified &ndash; check this ID in Razorpay</strong>'),
+            _row("Student email", escape(rec.get("email") or "—")),
+            _row("Paid at", escape(rec["created_at"].strftime("%d %b %Y, %I:%M %p UTC")))]
+    btn = (f'<p style="margin:20px 0 0"><a href="{escape(pdf_url)}" style="display:inline-block;background:#dc2626;color:#ffffff;text-decoration:none;'
+           'font-weight:bold;font-size:14px;padding:11px 20px;border-radius:8px">Download prediction PDF</a></p>') if pdf_url else ""
+    return (
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:24px 0">'
+        '<tr><td align="center"><table role="presentation" width="600" cellpadding="0" cellspacing="0" '
+        'style="background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;font-family:Arial,Helvetica,sans-serif">'
+        '<tr><td style="background:#0a2540;padding:20px 24px;border-radius:12px 12px 0 0">'
+        '<span style="color:#ffffff;font-size:18px;font-weight:bold"><span style="color:#4ade80">Digital</span> Shiksha</span>'
+        '<span style="color:#cbd5e1;font-size:13px;margin-left:8px">New predictor payment</span></td></tr>'
+        f'<tr><td style="padding:24px"><p style="margin:0 0 16px;font-size:16px;color:#0f172a"><strong>{escape(rec.get("name") or "A student")}</strong> '
+        f'paid for the {exam} college prediction ({len({r.college_name for r in out.results})} colleges, {out.total} course options).</p>'
+        f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:8px">{"".join(rows)}</table>'
+        + btn +
+        '<p style="margin:20px 0 0;font-size:13px;color:#64748b">All payments are listed in the admin panel (Predictor tab &rarr; MHT CET payments).</p>'
+        '</td></tr><tr><td style="padding:16px 24px;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8">'
+        'Automated payment alert sent by Digital Shiksha.</td></tr></table></td></tr></table>'
+    )
+
+
+async def notify_payment(rec: dict, out, pdf_url: str) -> None:
+    """Owner inbox (LEAD_ALERT_EMAIL). Background task: never raises."""
+    to = os.environ.get("LEAD_ALERT_EMAIL")
+    if not to:
+        return
+    try:
+        subject = f"Payment ₹{int(rec['amount']):,}: {rec.get('name') or 'Student'} – {out.exam} {rec['score']:g} percentile"
+        email_id = await send_email(to=to, subject=subject[:150], html=payment_alert_html(rec, out, pdf_url), internal=True)
+        logger.info("Payment alert %s sent: %s", rec["payment_id"], email_id)
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Payment alert %s failed: %s", rec.get("payment_id"), exc)

@@ -30,7 +30,7 @@ const CATEGORIES: { value: PredictorCategory; label: string }[] = [
 ];
 const ANY_HU = "any";
 // Display names in the exam drop-down (the exam key stays "MHT CET" for links, payments and stored data).
-const EXAM_LABEL: Record<string, string> = { "MHT CET": "MHT CET (Engineering)" };
+const EXAM_LABEL: Record<string, string> = { "MHT CET": "MHT CET (Engineering)", "MHT CET Pharmacy": "MHT CET (Pharmacy)" };
 const examLabel = (name: string) => EXAM_LABEL[name] ?? name;
 // Exams backed by official CET Cell CAP cut-offs → program key for /predictor/cap-meta
 const CAP_PROGRAM: Record<string, string> = { "MHT CET": "engineering", "MHT CET Pharmacy": "pharmacy" };

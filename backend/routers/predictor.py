@@ -9,7 +9,7 @@ from pymongo.errors import DuplicateKeyError
 from lib import cap, razorpay
 import os
 
-from lib.email import send_predictor_receipt
+from lib.email import notify_payment, send_predictor_receipt
 from lib.whatsapp import send_student_prediction
 from lib.db import db
 from lib.pdf import build_prediction_pdf
@@ -238,15 +238,16 @@ async def unlock(body: UnlockIn, background: BackgroundTasks):
         raise HTTPException(status_code=409, detail=used_msg)
     lead = {"id": doc["payment_id"], "name": doc["name"] or "Student", "phone": body.phone}
     background.add_task(send_student_prediction, lead, out, doc["prediction"])
-    if doc["email"]:
-        background.add_task(_email_receipt, doc, out)
+    background.add_task(_payment_emails, doc, out)
     return UnlockOut(token=doc["token"], payment_id=doc["payment_id"], exam=pred.exam, score=pred.score)
 
 
-async def _email_receipt(doc: dict, out: PredictorOut) -> None:
+async def _payment_emails(doc: dict, out: PredictorOut) -> None:
+    """Owner payment alert + student receipt, both linking the prediction PDF (the email service has no attachments)."""
     base = os.environ.get("PUBLIC_SITE_URL", "").rstrip("/")
     url = f"{base}/api/predictor/receipt/{doc['receipt_id']}.pdf" if base.startswith("https://") else ""
-    if await send_predictor_receipt(doc, out, url):
+    await notify_payment(doc, out, url)
+    if doc["email"] and await send_predictor_receipt(doc, out, url):
         await db.predictor_unlocks.update_one({"payment_id": doc["payment_id"]}, {"$set": {"email_sent": True}})
 
 
