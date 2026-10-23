@@ -239,3 +239,34 @@ async def message_status(message_sid: str) -> dict:
         return {"status": "unknown", "error": f"{r.status_code}"}
     d = r.json()
     return {"status": d.get("status", "unknown"), "error": (f"{d.get('error_code')}: {d.get('error_message') or ''}" if d.get("error_code") else "")}
+
+
+async def notify_payment_whatsapp(rec: dict, out, pdf_url: str) -> None:
+    """Owner WhatsApp (WHATSAPP_ALERT_TO) for each paid prediction; reuses the approved lead-alert template. Never raises."""
+    if not whatsapp_configured():
+        return
+    exam = {"MHT CET": "MHT CET (Engineering)", "MHT CET Pharmacy": "MHT CET (Pharmacy)"}.get(out.exam, out.exam)
+    top, seen = [], set()
+    for r in out.results:
+        if r.college_name not in seen and len(top) < 5:
+            seen.add(r.college_name)
+            top.append(f"{r.short_name or r.college_name} ({r.chance})")
+    name = rec.get("name") or "Student"
+    paid = f"PAID Rs.{int(rec['amount'])} - {exam} {rec['score']:g} percentile ({out.category})"
+    details = " | ".join(x for x in (
+        rec.get("role"), f"Payment ID {rec['payment_id']}" + ("" if rec.get("verified") else " (check in Razorpay)"),
+        "Top: " + ", ".join(top) if top else "", f"PDF: {pdf_url}" if pdf_url else "") if x)
+    body = "\n".join(x for x in (
+        "*New predictor payment - Digital Shiksha*", f"Name: {name}" + (f" ({rec['role']})" if rec.get("role") else ""),
+        f"Mobile: +91 {rec['phone']}", f"Exam: {exam}", f"Percentile: {rec['score']:g} ({out.category})", f"Amount: Rs.{int(rec['amount'])}",
+        f"Payment ID: {rec['payment_id']}" + ("" if rec.get("verified") else " (not auto-verified, check in Razorpay)"),
+        "Top colleges:\n" + "\n".join(f"- {t}" for t in top) if top else "", f"Prediction PDF: {pdf_url}" if pdf_url else "") if x)
+    try:
+        tpl = await effective_template("lead")
+        for to in alert_numbers():
+            ok, info = await _send(to, body, tpl, {"1": name, "2": f"+91 {rec['phone']}", "3": paid, "4": details})
+            await _record("payment", ok, info)
+            (logger.info if ok else logger.error)("WhatsApp payment alert %s -> %s: %s", rec["payment_id"], to, info)
+    except Exception as exc:  # noqa: BLE001
+        await _record("payment", False, str(exc))
+        logger.error("WhatsApp payment alert failed for %s: %s", rec.get("payment_id"), exc)

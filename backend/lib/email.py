@@ -280,7 +280,7 @@ async def send_predictor_receipt(rec: dict, out, pdf_url: str) -> bool:
 def payment_alert_html(rec: dict, out, pdf_url: str) -> str:
     phone, pid = escape(rec["phone"]), escape(rec["payment_id"])
     exam = escape({"MHT CET": "MHT CET (Engineering)", "MHT CET Pharmacy": "MHT CET (Pharmacy)"}.get(out.exam, out.exam))
-    rows = [_row("Name", escape(rec.get("name") or "—")), _row("Mobile", f'<a href="tel:+91{phone}" style="color:#1e3a8a">+91 {phone}</a>'),
+    rows = [_row("Name", escape(rec.get("name") or "—")), _row("Are you", escape(rec.get("role") or "—")), _row("Mobile", f'<a href="tel:+91{phone}" style="color:#1e3a8a">+91 {phone}</a>'),
             _row("Exam", exam), _row("Percentile", f'{rec["score"]:g} ({escape(out.category)})'),
             _row("Amount", f'&#8377;{int(rec["amount"]):,}'),
             _row("Payment ID", f'<a href="https://dashboard.razorpay.com/app/payments/{pid}" style="color:#1e3a8a">{pid}</a>'),

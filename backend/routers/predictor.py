@@ -10,7 +10,7 @@ from lib import cap, razorpay
 import os
 
 from lib.email import notify_payment, send_predictor_receipt
-from lib.whatsapp import send_student_prediction
+from lib.whatsapp import notify_payment_whatsapp, send_student_prediction
 from lib.db import db
 from lib.pdf import build_prediction_pdf
 from models.predictor import (
@@ -232,6 +232,8 @@ async def unlock(body: UnlockIn, background: BackgroundTasks):
            "payer_contact": payment.get("contact", ""), "payer_email": payment.get("email", ""),
            "prediction": pred.model_dump(exclude={"unlock_token"}), "verified": verified, "created_at": datetime.now(timezone.utc),
            "receipt_id": secrets.token_urlsafe(18), "email": str(body.email or payment.get("email") or ""), "email_sent": False}
+    gate = await db.leads.find_one({"phone": body.phone, "role": {"$nin": [None, ""]}}, {"role": 1}, sort=[("created_at", -1)])
+    doc["role"] = (gate or {}).get("role", "")  # Parent / Student from the predictor details pop-up
     try:
         await db.predictor_unlocks.insert_one(doc)
     except DuplicateKeyError:
@@ -247,6 +249,7 @@ async def _payment_emails(doc: dict, out: PredictorOut) -> None:
     base = os.environ.get("PUBLIC_SITE_URL", "").rstrip("/")
     url = f"{base}/api/predictor/receipt/{doc['receipt_id']}.pdf" if base.startswith("https://") else ""
     await notify_payment(doc, out, url)
+    await notify_payment_whatsapp(doc, out, url)
     if doc["email"] and await send_predictor_receipt(doc, out, url):
         await db.predictor_unlocks.update_one({"payment_id": doc["payment_id"]}, {"$set": {"email_sent": True}})
 
