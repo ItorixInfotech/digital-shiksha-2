@@ -64,6 +64,9 @@ def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | N
         canvas.setFont("Helvetica", 7.5)
         canvas.drawString(14 * mm, 10 * mm, f"Digital Shiksha  |  {CONTACT['phone']}  |  {CONTACT['email']}")
         canvas.drawRightString(A4[0] - 14 * mm, 10 * mm, f"Page {d.page}")
+        canvas.setFont("Helvetica-Oblique", 7)
+        canvas.drawCentredString(A4[0] / 2, 6 * mm, "This is only a prediction based on previous years' cut-offs, not a guarantee of admission. "
+                                                    "For more details, contact your counsellor.")
         canvas.setStrokeColor(RED)
         canvas.setLineWidth(2)
         canvas.line(14 * mm, A4[1] - 8 * mm, A4[0] - 14 * mm, A4[1] - 8 * mm)
@@ -100,7 +103,14 @@ def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | N
         rc.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#15803D")), ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#F0FDF4")),
                                 ("LEFTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
         story += [rc, Spacer(1, 4 * mm)]
-    story += [summary, Spacer(1, 5 * mm)]
+    notice = Table([[Paragraph(
+        "<b>IMPORTANT - PLEASE READ:</b> This report is only a prediction based on previous years' cut-offs. It is not a guarantee of admission "
+        "or of a seat allotment, and actual cut-offs can change every year. Digital Shiksha is not responsible for admission decisions made on the "
+        f"basis of this report. <b>For more details, contact your counsellor</b> - call / WhatsApp {CONTACT['phone']} or email {CONTACT['email']}.",
+        ParagraphStyle("legal", parent=S["sub"], fontSize=8.5, leading=12, textColor=colors.HexColor("#78350F")))]], colWidths=[width])
+    notice.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#D97706")), ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#FFFBEB")),
+                                ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
+    story += [summary, Spacer(1, 4 * mm), notice, Spacer(1, 5 * mm)]
 
     if out.results:
         rows = [[Paragraph(h, S["head"]) for h in ("#", "College", "Course / Branch", ("Round I cutoff (official CAP)" if official else "Cutoff" + (" (est.)" if out.category != "General" else "")), "Chance", "Fees / yr")]]
@@ -129,7 +139,8 @@ def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | N
     story += [Spacer(1, 6 * mm), cta, Spacer(1, 4 * mm), Paragraph(
         ("Source: official State CET Cell CAP cut-offs (Rounds I-IV, Maharashtra seats), cetcell.mahacet.org. Chance is judged on the Round I "
          "closing percentile of the most lenient seat type you are eligible for. " if official else "") +
-        "Disclaimer: predictions use approximate previous-year closing cutoffs. Where an official category cutoff is not available, the category cutoff is "
+        "Disclaimer: this is just a predictor based on previous years' cut-offs - not a guarantee of admission. For more details, contact your counsellor. "
+        "Predictions use approximate previous-year closing cutoffs. Where an official category cutoff is not available, the category cutoff is "
         "estimated from the Open cutoff. Cutoffs change every year and differ for home-university, ladies, minority and other quotas. Please verify with the "
         "State CET Cell / MCC / JoSAA and the respective institute.", S["small"])]
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
