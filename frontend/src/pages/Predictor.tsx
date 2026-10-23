@@ -29,6 +29,9 @@ const CATEGORIES: { value: PredictorCategory; label: string }[] = [
   { value: "VJ", label: "VJ / DT (A)" }, { value: "NT1", label: "NT 1 (B)" }, { value: "NT2", label: "NT 2 (C)" }, { value: "NT3", label: "NT 3 (D)" }, { value: "SEBC", label: "SEBC" }, { value: "TFWS", label: "TFWS (fee waiver)" },
 ];
 const ANY_HU = "any";
+// Display names in the exam drop-down (the exam key stays "MHT CET" for links, payments and stored data).
+const EXAM_LABEL: Record<string, string> = { "MHT CET": "MHT CET (Engineering)" };
+const examLabel = (name: string) => EXAM_LABEL[name] ?? name;
 // Exams backed by official CET Cell CAP cut-offs → program key for /predictor/cap-meta
 const CAP_PROGRAM: Record<string, string> = { "MHT CET": "engineering", "MHT CET Pharmacy": "pharmacy" };
 const ALL_BRANCHES = "all";
@@ -138,9 +141,9 @@ export default function Predictor() {
           <div className="grid gap-1.5 sm:col-span-3">
             <Label>Entrance exam</Label>
             <Select value={exam} onValueChange={(v: string) => { setExam(v); setScore(""); }}>
-              <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-exam-select"><SelectValue>{(v) => v as string}</SelectValue></SelectTrigger>
+              <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-exam-select"><SelectValue>{(v) => examLabel(v as string)}</SelectValue></SelectTrigger>
               <SelectContent>
-                {(exams.data ?? []).map((e) => <SelectItem key={e.name} value={e.name} data-testid={`predictor-exam-option-${slugify(e.name)}`}>{e.name}</SelectItem>)}
+                {(exams.data ?? []).map((e) => <SelectItem key={e.name} value={e.name} data-testid={`predictor-exam-option-${slugify(e.name)}`}>{examLabel(e.name)}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
