@@ -1,3 +1,4 @@
+import ExamPredictorBox from "@/components/ExamPredictorBox";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { BookMarked, Building, CalendarDays, Clock, Globe, Monitor } from "lucide-react";
@@ -29,6 +30,7 @@ export default function ExamDetail() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {facts.map(([Icon, l, v]) => <div key={l} className="rounded-xl border bg-white p-4"><p className="flex items-center gap-1.5 text-xs text-slate-500"><Icon className="size-3.5" /> {l}</p><p className="mt-1 text-sm font-semibold text-slate-900">{v}</p></div>)}
           </div>
+          <ExamPredictorBox examName={e.name} />
           <div className="rounded-2xl border bg-white p-6">
             <h2 className="text-xl font-semibold">About {e.name}</h2>
             <p className="mt-3 leading-relaxed text-slate-600" data-testid="exam-overview">{e.overview}</p>

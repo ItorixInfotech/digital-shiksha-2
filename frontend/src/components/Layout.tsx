@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ExitIntent from "@/components/ExitIntent";
 import { CompareBar, EnquiryDialog, FloatingActions, MobileBottomBar } from "@/components/Overlays";
 import { SiteProvider } from "@/lib/site-context";
 
@@ -25,6 +26,7 @@ export default function Layout() {
       </div>
       <FloatingActions />
       <MobileBottomBar />
+      <ExitIntent />
       <CompareBar />
       <EnquiryDialog />
       <Toaster richColors />
