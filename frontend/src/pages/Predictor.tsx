@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { BadgeCheck, Building2, Download, Info, Link2, Loader2, MapPin, MessageCircle, Sparkles, Target, TrendingUp } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import PredictorGate, { GATE_KEY } from "@/components/PredictorGate";
-import PredictorPayment, { getUnlockToken, PENDING_KEY, setUnlockToken } from "@/components/PredictorPayment";
+import PredictorGate from "@/components/PredictorGate";
+import PredictorPayment from "@/components/PredictorPayment";
+import { dropLegacyStorage, GATE_KEY, PENDING_KEY } from "@/lib/predictor-storage";
 import { PageHeader, EmptyState } from "@/components/Common";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiGet, apiPost, ApiError } from "@/lib/api";
 import { buttonVariants } from "@/components/ui/button";
-import type { CapMeta, PredictorCategory, PredictorChance, PredictorExam, PredictorIn, PredictorOut } from "@/lib/types";
+import type { CapMeta, PredictorCategory, PredictorChance, PredictorExam, PredictorAccess, PredictorIn, PredictorOut } from "@/lib/types";
 import { feeRange, slugify } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
@@ -46,8 +47,15 @@ export default function Predictor() {
   const [sp, setSp] = useSearchParams();
   // Razorpay may redirect back to /predictor?razorpay_payment_id=… — restore the prediction the student paid for.
   const rzpId = sp.get("razorpay_payment_id");
-  const pending = rzpId && !sp.get("exam") ? localStorage.getItem(PENDING_KEY) : null;
-  if (pending) { const next = new URLSearchParams(pending); next.set("razorpay_payment_id", rzpId!); localStorage.removeItem(PENDING_KEY); setTimeout(() => setSp(next, { replace: true })); }
+  const needsRestore = !!rzpId && !sp.get("exam");
+  useEffect(() => {
+    const pending = needsRestore ? localStorage.getItem(PENDING_KEY) : null;
+    if (!pending || !rzpId) return;
+    localStorage.removeItem(PENDING_KEY);
+    const next = new URLSearchParams(pending);
+    next.set("razorpay_payment_id", rzpId);
+    setSp(next, { replace: true });
+  }, [needsRestore, rzpId, setSp]);
   const urlExam = sp.get("exam") ?? "";
   const urlScore = sp.get("score") ?? "";
   const urlCategory = (sp.get("category") ?? "General") as PredictorCategory;
@@ -81,23 +89,29 @@ export default function Predictor() {
   // Paid exams (MHT CET engineering): one verified Razorpay payment unlocks one exam + score.
   const urlSpec = exams.data?.find((e) => e.name === urlExam);
   const fee = urlSpec?.fee ?? 0;
-  const [token, setToken] = useState("");
-  const [tokenFor, setTokenFor] = useState("");
   const bodyKey = body ? `${body.exam}|${body.score}` : "";
-  if (bodyKey !== tokenFor) { setTokenFor(bodyKey); setToken(body ? getUnlockToken(body.exam, body.score) : ""); }
+  const qc = useQueryClient();
+  const accessKey = ["predictor", "access", body?.exam, body?.score];
+  const access = useQuery({
+    queryKey: accessKey,
+    queryFn: () => apiGet<PredictorAccess>(`/predictor/access?${new URLSearchParams({ exam: body!.exam, score: String(body!.score) })}`),
+    enabled: !!body && fee > 0,
+  });
   const [payDismissed, setPayDismissed] = useState(false);
-  const needsPay = !!body && fee > 0 && !token;
+  const needsPay = !!body && fee > 0 && access.data?.paid !== true;
   const payOpen = !!body && unlocked && needsPay && !payDismissed;
   const predict = useQuery({
-    queryKey: ["predictor", "run", body, token],
-    queryFn: () => apiPost<PredictorOut>("/predictor", fee > 0 ? { ...body, unlock_token: token } : body),
+    queryKey: ["predictor", "run", body],
+    queryFn: () => apiPost<PredictorOut>("/predictor", body),
     enabled: !!body && unlocked && !!urlSpec && !needsPay,
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     retry: false,
   });
   const err = predict.error;
-  if (err instanceof ApiError && err.status === 402 && body && token) { setUnlockToken(body.exam, body.score, ""); setToken(""); }
+  const paywalled = err instanceof ApiError && err.status === 402;
+  useEffect(() => { if (paywalled) void qc.invalidateQueries({ queryKey: ["predictor", "access"] }); }, [paywalled, qc]);
+  useEffect(dropLegacyStorage, []);
   const errMsg = err && !(err instanceof ApiError && err.status === 402) ? (err instanceof ApiError && err.status === 422 ? `Enter a valid ${spec?.label ?? "score"}` : "Prediction failed. Please try again.") : "";
 
   const submit = (e: React.FormEvent) => {
@@ -120,15 +134,16 @@ export default function Predictor() {
   const shareQs = body ? sp.toString() : "";
   const shareUrl = `${window.location.origin}/predictor?${shareQs}`;
   const pdfHref = body ? `/api/predictor/pdf?${new URLSearchParams({ exam: body.exam, score: String(body.score), category: body.category, cities: body.cities.join(","),
-    ...(body.ladies ? { ladies: "true" } : {}), ...(body.home_university ? { home_university: body.home_university } : {}), ...(body.branch_group ? { branch_group: body.branch_group } : {}), ...(token ? { token } : {}) }).toString()}` : "";
+    ...(body.ladies ? { ladies: "true" } : {}), ...(body.home_university ? { home_university: body.home_university } : {}), ...(body.branch_group ? { branch_group: body.branch_group } : {}) }).toString()}` : "";
   const waText = body ? `My ${body.exam} college prediction (${body.score}, ${body.category}) from Digital Shiksha: ${shareUrl}` : "";
   const copyLink = async () => {
     try { await navigator.clipboard.writeText(shareUrl); toast.success("Link copied"); } catch { toast.error("Couldn't copy — please copy from the address bar"); }
   };
 
   const data = predict.data;
-  const shown = (data?.results ?? []).filter((r) => chanceFilter === "all" || r.chance === chanceFilter);
-  const counts = (["High", "Medium", "Reach"] as const).map((c) => [c, data?.results.filter((r) => r.chance === c).length ?? 0] as const);
+  const shown = useMemo(() => (data?.results ?? []).filter((r) => chanceFilter === "all" || r.chance === chanceFilter), [data, chanceFilter]);
+  const counts = useMemo(() => (["High", "Medium", "Reach"] as const).map((c) => [c, data?.results.filter((r) => r.chance === c).length ?? 0] as const), [data]);
+  const cityOptions = useMemo(() => Object.entries(CITIES).filter(([k]) => !!CAP_PROGRAM[exam] || !MH_REGIONS.includes(k)), [exam]);
   const colleges = new Set(data?.results.map((r) => r.college_name)).size;
   const official = !!data?.results[0]?.official || !!data?.source;
 
@@ -162,7 +177,7 @@ export default function Predictor() {
             <Label>Location</Label>
             <Select value={city} onValueChange={(v: string) => setCity(v)}>
               <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-city-select"><SelectValue>{(v) => CITIES[v as string]}</SelectValue></SelectTrigger>
-              <SelectContent>{Object.entries(CITIES).filter(([k]) => !!CAP_PROGRAM[exam] || !MH_REGIONS.includes(k)).map(([k, l]) => <SelectItem key={k} value={k} data-testid={`predictor-city-option-${k.toLowerCase()}`}>{l}</SelectItem>)}</SelectContent>
+              <SelectContent>{cityOptions.map(([k, l]) => <SelectItem key={k} value={k} data-testid={`predictor-city-option-${k.toLowerCase()}`}>{l}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <Button type="submit" disabled={predict.isFetching} data-testid="predictor-submit-button" className="h-11 bg-brand-red text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform] sm:col-span-2">
@@ -217,7 +232,7 @@ export default function Predictor() {
           </div>
         )}
         {body && urlSpec && fee > 0 && unlocked && (
-          <PredictorPayment key={bodyKey} open={payOpen} onOpenChange={(o) => { if (!o) setPayDismissed(true); }} onPaid={(t) => setToken(t)}
+          <PredictorPayment key={bodyKey} open={payOpen} onOpenChange={(o) => { if (!o) setPayDismissed(true); }} onPaid={() => void qc.invalidateQueries({ queryKey: accessKey })}
             prediction={body} fee={fee} paymentLink={urlSpec.payment_link} autoCheck={urlSpec.payment_auto_check} />
         )}
         {!data && !predict.isFetching && !(body && !unlocked) && !(body && needsPay) && (

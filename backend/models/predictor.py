@@ -32,7 +32,6 @@ class PredictorIn(BaseModel):
     ladies: bool = False
     home_university: str = ""
     branch_group: str = ""
-    unlock_token: str = ""  # paid exams: token from POST /predictor/unlock for this exam + score
 
 
 class UnlockIn(BaseModel):
@@ -43,11 +42,14 @@ class UnlockIn(BaseModel):
     payment_id: str = Field(default="", pattern=r"^(pay_[A-Za-z0-9]{6,30})?$")
 
 
-class UnlockOut(BaseModel):
-    token: str
+class UnlockOut(BaseModel):  # the unlock token itself only travels in the httpOnly ds_unlocks cookie
     payment_id: str
     exam: str
     score: float
+
+
+class PredictorAccess(BaseModel):
+    paid: bool  # this browser (ds_unlocks cookie) has unlocked this exam + score
 
 
 class PaymentRecord(BaseModel):

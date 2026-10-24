@@ -55,7 +55,7 @@ export function CardSkeleton({ count = 6 }: { count?: number }) {
   return (
     <>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="h-72 animate-pulse rounded-2xl border bg-white">
+        <div key={`skeleton-${i}`} className="h-72 animate-pulse rounded-2xl border bg-white">
           <div className="h-36 rounded-t-2xl bg-slate-100" />
           <div className="space-y-2 p-4"><div className="h-4 w-3/4 rounded bg-slate-100" /><div className="h-3 w-1/2 rounded bg-slate-100" /></div>
         </div>

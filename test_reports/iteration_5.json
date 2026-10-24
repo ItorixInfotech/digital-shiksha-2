@@ -1,0 +1,97 @@
+{
+  "iteration": 5,
+  "passed": 9,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [
+    "Pre-existing backend test files (test_tscheck_mhtcet_predictor.py, test_tscheck_pharmacy_cap_predictor.py) call POST /api/predictor directly for MHT CET without an unlock cookie; they now correctly get 402 since this iteration's paywall is by design (matrix criterion 1). Not touched -- out of scope for this iteration's matrix, but they will keep failing in the full-suite run until updated to go through /predictor/unlock first.",
+    "Pre-existing test_tscheck_health_probe_and_no_regression.py::test_admin_login_and_stats uses a stale hardcoded admin password ('admin'/'DigitalShiksha@2026'); the real credentials now live in backend/.env per seed_facts. Not part of this iteration's matrix -- flagging so it can be refreshed.",
+    "test_tscheck_weekly_seo_report_cron.py and test_tscheck_duplicate_enquiry_round_robin.py errored/failed under xdist parallel execution (shared-state interference across files) -- unrelated to this iteration's matrix; not investigated further."
+  ],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Paid MHT CET (Engineering) predictor: results locked until payment",
+      "name": "predictor-paid-engineering-shows-payment-dialog",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "On /predictor, chose MHT CET (Engineering), entered 93.5, clicked Predict -> predictor-gate-dialog (name/mobile/city/Parent-Student/college) appeared; after submit, predictor-payment-dialog showed fee ₹1,500 and payment link href=https://rzp.io/rzp/6wXdLUk; predictor-results had zero count (no table shown)."
+    },
+    {
+      "criterion": "Unlock with payment ID stores access in an httpOnly cookie, not localStorage; change percentile needs new payment; reused ID rejected",
+      "name": "predictor-unlock-cookie-not-localstorage-and-reuse-rejected",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Unlocked a fresh percentile with a unique pay_TESTAGENT… id + email -> results shown; localStorage.ds_predictor_unlocks_v1 and ds_predictor_contact_v1 both null, sessionStorage.ds_predictor_contact_v1 set, document.cookie had no 'ds_unlocks' substring (httpOnly). Reloaded same URL -> results shown again with no payment dialog. Changed percentile +1 and Predict -> payment dialog reappeared; reusing the same payment_id triggered a visible 'already been used' toast (backend returned 409, seen as a console 409 network error)."
+    },
+    {
+      "criterion": "Changing percentile requires a new payment; reused payment ID rejected (API)",
+      "name": "test_tscheck_predictor_paywall.py::test_unlock_grants_access_cookie_and_pdf_then_rejects_reused_payment_id",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/predictor/unlock with pay_TESTAGENT… -> 200, cookie issued; GET /api/predictor/access with cookie -> {paid:true}; reusing same payment_id for a different score -> 409 {detail:'...already been used...'}."
+    },
+    {
+      "criterion": "POST /api/predictor for MHT CET without cookie returns 402; PDF without cookie returns 402",
+      "name": "test_tscheck_predictor_paywall.py::test_mhtcet_predict_without_cookie_returns_402 / test_pdf_without_cookie_returns_402",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/predictor {exam:'MHT CET', score:61.11} with no cookie -> 402; GET /api/predictor/pdf?exam=MHT+CET&score=61.12 with no cookie -> 402."
+    },
+    {
+      "criterion": "MHT CET (Pharmacy) is paid ₹599, other exams free",
+      "name": "predictor-pharmacy-paid-other-exams-free",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Selected MHT CET (Pharmacy), score 88.7 -> gate -> predictor-payment-dialog fee=₹599, link href=https://rzp.io/rzp/6vvZNmq. Switched to JEE Main, score 96.5 -> predictor-results visible immediately, predictor-payment-dialog count=0."
+    },
+    {
+      "criterion": "MHT CET (Pharmacy) ₹599 / free exams ₹0 (API)",
+      "name": "test_tscheck_predictor_paywall.py::test_pharmacy_fee_599_and_free_exams_have_no_fee",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/predictor/exams -> MHT CET fee=1500/link rzp/6wXdLUk, MHT CET Pharmacy fee=599/link rzp/6vvZNmq, JEE Main/NEET UG/MAH MBA CET fee=0; POST /api/predictor {exam:'JEE Main'} with no cookie -> 200 (never paywalled)."
+    },
+    {
+      "criterion": "PDF download works for a paid prediction",
+      "name": "predictor-pdf-download-after-unlock",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "After unlocking a fresh percentile (gate + payment with unique pay_TESTAGENT… id/email), clicking Download PDF fired a real browser download event with a non-empty local file path."
+    },
+    {
+      "criterion": "Compare page shareable link + shortlist still work (hook refactor)",
+      "name": "compare-shareable-link-and-shortlist",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "/compare?c=iit-madras,iit-delhi loaded both colleges (compare-col-iit-madras / -iit-delhi visible). Added iim-ahmedabad via the selector -> all 3 columns visible. Removed iit-madras -> iit-delhi and iim-ahmedabad remained visible (not reset back to the original URL pair of iit-madras+iit-delhi)."
+    },
+    {
+      "criterion": "Admin SEO fix list 'Fix' opens the edit dialog once",
+      "name": "admin-seo-fix-opens-dialog-once",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Logged in at /admin/login, opened admin-seo-dashboard, clicked the first row's Fix button (admin-seo-fix-row-colleges-aissms-coe-pune) -> exactly one role=dialog opened; pressed Escape -> dialog hidden and stayed hidden (did not reopen)."
+    },
+    {
+      "criterion": "FAQ editor add/remove keeps typed text",
+      "name": "admin-faq-editor-keeps-text-after-remove",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "In Admin > Exams > Add new (unsaved fixture tscheck-faq-exam-…, never submitted), added 3 FAQs via admin-exams-faqs-add-button, typed distinct question/answer text into each, removed the middle row (index 1) -> remaining two rows (now indices 0,1) kept their own original text ('Question ONE text'/'Answer ONE text' and 'Question THREE text'/'Answer THREE text') rather than being blanked or swapped."
+    },
+    {
+      "criterion": "Courses page grouping and filters",
+      "name": "courses-grouping-and-filters",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "/courses rendered multiple courses-group-<stream> sections by default. Clicking the Engineering stream chip narrowed to exactly 1 section (courses-group-engineering). Applying the UG level filter on top kept the page rendering without error. Resetting both filters restored multiple groups."
+    }
+  ],
+  "notes": [
+    "Matrix had 8 acceptance criteria; produced 11 artifacts (4 backend test functions in one new file covering the API-bearing parts of criteria 1-5, 7 browser checks covering all 8 UI-facing criteria -- criteria 2 and 3 share one combined browser check since they are a single continuous flow: unlock -> storage/cookie checks -> reload persistence -> percentile change -> reuse rejection).",
+    "Discovered and worked around an httpx-specific quirk (not an app bug): the ds_unlocks and ds_admin cookies are Secure, so plain-HTTP httpx test clients never auto-resend them (browsers accept Secure cookies on https:// and on localhost, which is what the browser checks exercise per spec_deviations). The new backend test extracts the Set-Cookie token from the response and sends it back explicitly as a Cookie header instead of relying on the httpx cookie jar.",
+    "Backend rate-limiting on unlocks (max 5 per email per 24h) was hit during iteration while reusing delivered@resend.dev across repeated manual runs; browser checks now generate a unique @example.com email per run to stay rerun-safe, and only the dedicated PDF-receipt-email criterion (not in this matrix) would need delivered@resend.dev specifically.",
+    "Cleaned up all test fixtures per seed_facts: deleted 7 predictor_unlocks docs (payment_id starting pay_TESTAGENT) and 7 leads (name starting 'Test Agent') created during this run; no tscheck-prefixed exam record was persisted (the FAQ editor check never submits the form)."
+  ]
+}

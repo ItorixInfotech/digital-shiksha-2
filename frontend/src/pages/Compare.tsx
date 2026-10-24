@@ -1,6 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { PageHeader } from "@/components/Common";
 import { Button } from "@/components/ui/button";
@@ -33,11 +33,11 @@ export default function Compare() {
   const { data, isLoading } = useQuery({ queryKey: ["colleges", "all"], queryFn: () => apiGet<College[]>("/colleges") });
 
   // URL ?c= wins on first load (shareable links), then the URL mirrors the shortlist.
+  const [initialUrl] = useState(() => sp.get("c") ?? "");
   useEffect(() => {
-    const fromUrl = (sp.get("c") ?? "").split(",").filter(Boolean);
+    const fromUrl = initialUrl.split(",").filter(Boolean);
     if (fromUrl.length) setCompareList(fromUrl.slice(0, MAX_COMPARE));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialUrl, setCompareList]);
   useEffect(() => { setSp(compare.length ? { c: compare.join(",") } : {}, { replace: true }); }, [compare, setSp]);
 
   const selected = compare.map((s) => data?.find((c) => c.slug === s)).filter((c): c is College => !!c);

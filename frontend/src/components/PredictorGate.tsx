@@ -8,10 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiPost, ApiError } from "@/lib/api";
 import type { Lead, LeadIn, LeadRole, PredictionContext } from "@/lib/types";
+import { GATE_KEY, saveContact } from "@/lib/predictor-storage";
 import { cn } from "@/lib/utils";
 
-export const GATE_KEY = "ds_predictor_details_v1";
-export const CONTACT_KEY = "ds_predictor_contact_v1"; // {name, phone} — prefills the payment step
 
 interface Props {
   open: boolean;
@@ -44,7 +43,7 @@ export default function PredictorGate({ open, onOpenChange, onUnlocked, predicti
     } satisfies LeadIn),
     onSuccess: () => {
       localStorage.setItem(GATE_KEY, "1");
-      localStorage.setItem(CONTACT_KEY, JSON.stringify({ name: f.name.trim(), phone }));
+      saveContact({ name: f.name.trim(), phone });
       toast.success("Thanks! Your details are saved.");
       onUnlocked();
     },

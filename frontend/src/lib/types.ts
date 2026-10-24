@@ -353,7 +353,6 @@ export interface PredictorIn {
   ladies?: boolean;
   home_university?: string;
   branch_group?: string;
-  unlock_token?: string; // paid exams: token from POST /predictor/unlock for this exam + score
 }
 
 export interface UnlockIn {
@@ -362,6 +361,10 @@ export interface UnlockIn {
   phone: string;
   email: string; // receipt + full college list PDF
   payment_id: string; // "" = find the payment by mobile number
+}
+
+export interface PredictorAccess {
+  paid: boolean; // this browser has unlocked this exam + score
 }
 
 export interface PaymentRecord {
@@ -377,8 +380,8 @@ export interface PaymentRecord {
   created_at: string;
 }
 
+// The unlock token itself is only in the httpOnly ds_unlocks cookie.
 export interface UnlockOut {
-  token: string;
   payment_id: string;
   exam: string;
   score: number;

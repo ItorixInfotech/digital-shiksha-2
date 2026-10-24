@@ -54,18 +54,14 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const value = useMemo<SiteCtx>(
-    () => ({
-      compare,
-      toggleCompare,
-      clearCompare: () => setCompare([]),
-      setCompareList: (slugs) => setCompare([...new Set(slugs)].slice(0, MAX_COMPARE)),
-      enquiry,
-      openEnquiry: (p) => setEnquiry(p ?? {}),
-      closeEnquiry: () => setEnquiry(null),
-    }),
-    [compare, toggleCompare, enquiry],
-  );
+  // Stable setters (state setters never change) so consumers can safely list them as effect dependencies.
+  const setters = useMemo(() => ({
+    clearCompare: () => setCompare([]),
+    setCompareList: (slugs: string[]) => setCompare([...new Set(slugs)].slice(0, MAX_COMPARE)),
+    openEnquiry: (p?: EnquiryPrefill) => setEnquiry(p ?? {}),
+    closeEnquiry: () => setEnquiry(null),
+  }), []);
+  const value = useMemo<SiteCtx>(() => ({ compare, toggleCompare, enquiry, ...setters }), [compare, toggleCompare, enquiry, setters]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

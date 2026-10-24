@@ -6,37 +6,25 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CONTACT_KEY } from "@/components/PredictorGate";
 import { apiPost, ApiError } from "@/lib/api";
+import { PENDING_KEY, readContact } from "@/lib/predictor-storage";
 import type { PredictorIn, UnlockIn, UnlockOut } from "@/lib/types";
 import { cn } from "@/lib/utils";
-
-const TOKENS_KEY = "ds_predictor_unlocks_v1";
-const tokenKey = (exam: string, score: number) => `${exam}|${score}`;
-const readTokens = (): Record<string, string> => { try { return JSON.parse(localStorage.getItem(TOKENS_KEY) ?? "{}"); } catch { return {}; } };
-export const getUnlockToken = (exam: string, score: number) => readTokens()[tokenKey(exam, score)] ?? "";
-export const setUnlockToken = (exam: string, score: number, token: string) => {
-  const t = readTokens();
-  if (token) t[tokenKey(exam, score)] = token; else delete t[tokenKey(exam, score)];
-  localStorage.setItem(TOKENS_KEY, JSON.stringify(t));
-};
-const savedContact = (): { name: string; phone: string } => { try { return JSON.parse(localStorage.getItem(CONTACT_KEY) ?? "{}"); } catch { return { name: "", phone: "" }; } };
 
 interface Props {
   open: boolean;
   onOpenChange: (o: boolean) => void;
-  onPaid: (token: string) => void;
+  onPaid: () => void; // the unlock is stored server-side in an httpOnly cookie
   prediction: PredictorIn;
   fee: number;
   paymentLink: string;
   autoCheck: boolean; // false = payment ID from the receipt is required
 }
-export const PENDING_KEY = "ds_predictor_pending_v1"; // prediction query to restore when Razorpay redirects back
 
 /** Paid MHT CET step: pay on the Razorpay page, then we confirm the payment with Razorpay and unlock this exam + score. */
 export default function PredictorPayment({ open, onOpenChange, onPaid, prediction, fee, paymentLink, autoCheck }: Props) {
-  const contact = savedContact();
-  const [phone, setPhone] = useState(contact.phone ?? "");
+  const [contact] = useState(readContact);
+  const [phone, setPhone] = useState(contact.phone);
   const [email, setEmail] = useState("");
   const mail = email.trim();
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail);
@@ -47,11 +35,10 @@ export default function PredictorPayment({ open, onOpenChange, onPaid, predictio
   const pidOk = (!autoCheck && !pid) ? false : !pid || /^pay_[A-Za-z0-9]{6,30}$/.test(pid);
 
   const verify = useMutation({
-    mutationFn: () => apiPost<UnlockOut>("/predictor/unlock", { prediction, name: contact.name ?? "", phone: mobile, email: mail, payment_id: pid } satisfies UnlockIn),
-    onSuccess: (r) => {
-      setUnlockToken(r.exam, r.score, r.token);
+    mutationFn: () => apiPost<UnlockOut>("/predictor/unlock", { prediction, name: contact.name, phone: mobile, email: mail, payment_id: pid } satisfies UnlockIn),
+    onSuccess: () => {
       toast.success(`Payment confirmed! Your receipt and full college list PDF are on their way to ${mail}.`);
-      onPaid(r.token);
+      onPaid();
     },
     onError: (e) => {
       const detail = e instanceof ApiError ? (e.body as { detail?: unknown } | null)?.detail : undefined;

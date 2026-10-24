@@ -18,7 +18,9 @@ import { cn } from "@/lib/utils";
 type Kind = SeoKind | "landing";
 type Level = SeoScore["level"];
 type Row = { id: string; slug: string; name?: string; title?: string } & Record<string, unknown>;
-interface Item { kind: Kind; slug: string; name: string; url: string; score: SeoScore; effort: number }
+interface Item { kind: Kind; slug: string; name: string; url: string; score: SeoScore; effort: number; failing: SeoScore["checks"] }
+/** Failing checks, quickest fix first (computed once per item, not on every render). */
+const failingChecks = (s: SeoScore) => s.checks.filter((c) => !c.ok).sort((a, b) => FIX_EFFORT[a.id] - FIX_EFFORT[b.id]);
 
 const KINDS: { key: Kind; label: string }[] = [
   { key: "colleges", label: "Colleges" }, { key: "courses", label: "Courses" }, { key: "exams", label: "Exams" },
@@ -60,10 +62,10 @@ export default function SeoDashboard() {
     const out: Item[] = [];
     const add = (k: SeoKind, rows?: Row[]) => rows?.forEach((r) => {
       const score = entityScore(k, r, year);
-      out.push({ kind: k, slug: r.slug, name: String(r.name ?? r.title ?? r.slug), url: `${RESOURCES[k].publicPath}/${r.slug}`, score, effort: fixEffort(score) });
+      out.push({ kind: k, slug: r.slug, name: String(r.name ?? r.title ?? r.slug), url: `${RESOURCES[k].publicPath}/${r.slug}`, score, effort: fixEffort(score), failing: failingChecks(score) });
     });
     add("colleges", colleges.data); add("courses", courses.data); add("exams", exams.data); add("articles", articles.data);
-    landing.data?.forEach((l) => { const score = landingScore(l); out.push({ kind: "landing", slug: l.slug, name: l.label, url: `/${l.slug}`, score, effort: fixEffort(score) }); });
+    landing.data?.forEach((l) => { const score = landingScore(l); out.push({ kind: "landing", slug: l.slug, name: l.label, url: `/${l.slug}`, score, effort: fixEffort(score), failing: failingChecks(score) }); });
     return out;
   }, [colleges.data, courses.data, exams.data, articles.data, landing.data, year]);
 
@@ -72,9 +74,9 @@ export default function SeoDashboard() {
     const of = items.filter((i) => i.kind === k.key);
     return { ...k, total: of.length, green: of.filter((i) => i.score.level === "green").length, amber: of.filter((i) => i.score.level === "amber").length, red: of.filter((i) => i.score.level === "red").length };
   });
-  const rows = items
+  const rows = useMemo(() => items
     .filter((i) => (kind === "all" || i.kind === kind) && (level === "todo" ? i.score.level !== "green" : i.score.level === level))
-    .sort((a, b) => a.effort - b.effort || b.score.score - a.score.score || a.name.localeCompare(b.name));
+    .sort((a, b) => a.effort - b.effort || b.score.score - a.score.score || a.name.localeCompare(b.name)), [items, kind, level]);
   const todo = items.filter((i) => i.score.level !== "green").length;
 
   return (
@@ -144,7 +146,7 @@ export default function SeoDashboard() {
                   <TableCell><SeoBadge score={i.score} testid={`${tid}-score`} /></TableCell>
                   <TableCell className="whitespace-normal">
                     <div className="flex flex-wrap gap-1.5">
-                      {i.score.checks.filter((c) => !c.ok).sort((a, b) => FIX_EFFORT[a.id] - FIX_EFFORT[b.id]).map((c) => (
+                      {i.failing.map((c) => (
                         <span key={c.id} title={c.fix} className={cn("rounded-md px-2 py-0.5 text-[11px] font-semibold", FIX_EFFORT[c.id] <= 1 ? "bg-teal-50 text-teal-800" : FIX_EFFORT[c.id] <= 2 ? "bg-sky-50 text-sky-800" : "bg-slate-100 text-slate-700")} data-testid={`${tid}-chip-${c.id}`}>
                           {SHORT_FIX[c.id]}{FIX_EFFORT[c.id] <= 1 && " · quick"}
                         </span>

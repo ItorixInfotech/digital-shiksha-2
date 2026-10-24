@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Clock, IndianRupee } from "lucide-react";
@@ -18,10 +19,14 @@ export default function Courses() {
   const set = (k: string, v: string) => { const n = new URLSearchParams(sp); if (v) n.set(k, v); else n.delete(k); setSp(n, { replace: true }); };
 
   const { data, isLoading, isError } = useQuery({ queryKey: ["courses", "all"], queryFn: () => apiGet<Course[]>("/courses") });
-  const all = data ?? [];
-  const filtered = all.filter((c) => (!stream || c.stream === stream) && (!level || c.level === level));
-  const streams = STREAMS.map((s) => s.name).filter((s) => all.some((c) => c.stream === s));
-  const groups = streams.filter((s) => filtered.some((c) => c.stream === s));
+  const filtered = useMemo(() => (data ?? []).filter((c) => (!stream || c.stream === stream) && (!level || c.level === level)), [data, stream, level]);
+  const streams = useMemo(() => STREAMS.map((s) => s.name).filter((s) => (data ?? []).some((c) => c.stream === s)), [data]);
+  const byStream = useMemo(() => {
+    const m = new Map<string, Course[]>();
+    for (const c of filtered) m.set(c.stream, [...(m.get(c.stream) ?? []), c]);
+    return m;
+  }, [filtered]);
+  const groups = streams.filter((s) => byStream.has(s));
 
   return (
     <div data-testid="courses-page">
@@ -54,7 +59,7 @@ export default function Courses() {
                   <Link to={`/colleges?stream=${encodeURIComponent(g)}`} className="ml-auto text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid={`courses-group-colleges-${slugify(g)}`}>{g} colleges →</Link>
                 </div>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {filtered.filter((c) => c.stream === g).map((c) => (
+                  {(byStream.get(g) ?? []).map((c) => (
                     <Link key={c.id} to={`/courses/${c.slug}`} data-testid={`course-card-${c.slug}`} className="group flex flex-col rounded-2xl border bg-white p-5 hover:-translate-y-0.5 hover:shadow-lg transition-[transform,box-shadow]">
                       <div className="flex items-start justify-between gap-2">
                         <div>

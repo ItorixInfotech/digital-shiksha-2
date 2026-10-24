@@ -132,7 +132,7 @@ export default function CollegeDetail() {
               <h2 className="px-2 pt-2 text-xl font-semibold">{c.short_name} cutoff (previous year)</h2>
               <Table className="mt-3" data-testid="college-cutoff-table">
                 <TableHeader><TableRow><TableHead>Exam</TableHead><TableHead>Course / Branch</TableHead><TableHead>Category</TableHead><TableHead>Closing cutoff</TableHead></TableRow></TableHeader>
-                <TableBody>{c.cutoffs.map((r, i) => <TableRow key={i}><TableCell className="font-medium">{r.exam}</TableCell><TableCell>{r.branch}</TableCell><TableCell>{r.category || "General"}</TableCell><TableCell>{r.cutoff}</TableCell></TableRow>)}</TableBody>
+                <TableBody>{c.cutoffs.map((r, i) => <TableRow key={`${r.exam}|${r.branch}|${r.category}|${i}`}><TableCell className="font-medium">{r.exam}</TableCell><TableCell>{r.branch}</TableCell><TableCell>{r.category || "General"}</TableCell><TableCell>{r.cutoff}</TableCell></TableRow>)}</TableBody>
               </Table>
               <p className="px-2 py-3 text-xs text-slate-500">Cutoffs are indicative. Get a personalised prediction from our counsellors.</p>
             </div>

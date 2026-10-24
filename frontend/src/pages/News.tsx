@@ -83,7 +83,7 @@ export function ArticleDetail() {
           {a.image && <img src={a.image} alt="" className="h-72 w-full rounded-2xl object-cover sm:h-96" />}
           <p className="mt-8 text-lg font-medium leading-relaxed text-slate-800">{a.excerpt}</p>
           <div className="mt-6 space-y-5 text-[17px] leading-[1.75] text-slate-700" data-testid="article-content">
-            {a.content.split(/\n\n+/).map((p, i) => <p key={i}>{p}</p>)}
+            {a.content.split(/\n\n+/).map((p, i) => <p key={`${i}-${p.slice(0, 32)}`}>{p}</p>)}
           </div>
           <div className="mt-8 flex flex-wrap gap-2">{a.tags.map((t) => <span key={t} className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-600">#{t}</span>)}</div>
         </article>

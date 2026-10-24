@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Pencil, Search } from "lucide-react";
@@ -46,7 +46,9 @@ export default function LandingManager({ editSlug, onClose }: { editSlug?: strin
   });
   const close = () => { setEditing(null); onClose?.(); };
   const target = editSlug ? list.data?.find((l) => l.slug === editSlug) : undefined;
-  useEffect(() => { if (target) open(target); }, [target?.slug]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Open the page requested via editSlug once (adjusting state during render instead of an effect with stale deps).
+  const [openedSlug, setOpenedSlug] = useState<string>();
+  if (target && openedSlug !== target.slug) { setOpenedSlug(target.slug); open(target); }
   const rows = useMemo(() => (list.data ?? []).filter((l) => !q || l.label.toLowerCase().includes(q.toLowerCase())), [list.data, q]);
 
   const dialog = (

@@ -3,7 +3,7 @@ from typing import List
 
 import secrets
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response
 from pymongo.errors import DuplicateKeyError
 
 from lib import cap, razorpay
@@ -15,7 +15,7 @@ from lib.db import db
 from lib.pdf import build_prediction_pdf
 from models.predictor import (
     Bucket, CapMeta, Category, ExamReport, RoundCutoff, PredictionLog, PredictorExam, PredictorIn, PredictorOut, PredictorReport, PredictorResult,
-    PaymentRecord, UnlockIn, UnlockOut,
+    PaymentRecord, PredictorAccess, UnlockIn, UnlockOut,
 )
 from routers.admin import require_admin
 
@@ -191,21 +191,37 @@ async def run_prediction(body: PredictorIn) -> PredictorOut:
     return PredictorOut(exam=exam.name, metric=exam.metric, score=body.score, category=body.category, results=results[:MAX_RESULTS], total=len(results))
 
 
-async def require_unlock(body: PredictorIn) -> None:
+UNLOCK_COOKIE = "ds_unlocks"  # httpOnly; "."-separated unlock tokens (newest last, max 20)
+
+
+def _cookie_tokens(request: Request) -> list[str]:
+    return [t for t in request.cookies.get(UNLOCK_COOKIE, "").split(".") if t][-20:]
+
+
+async def _is_unlocked(request: Request, exam: str, score: float) -> bool:
+    tokens = _cookie_tokens(request)
+    return bool(tokens) and bool(await db.predictor_unlocks.find_one({"token": {"$in": tokens}, "exam": exam, "score": score}, {"_id": 1}))
+
+
+@router.get("/predictor/access", response_model=PredictorAccess)
+async def predictor_access(exam: str, score: float, request: Request):
+    return PredictorAccess(paid=exam not in razorpay.PAID_EXAMS or await _is_unlocked(request, exam, score))
+
+
+async def require_unlock(body: PredictorIn, request: Request) -> None:
     """Paid exams: one verified payment unlocks one exam + score (a new score needs a new payment)."""
     if body.exam not in razorpay.PAID_EXAMS:
         return
-    if not body.unlock_token or not await db.predictor_unlocks.find_one(
-            {"token": body.unlock_token, "exam": body.exam, "score": body.score}, {"_id": 1}):
+    if not await _is_unlocked(request, body.exam, body.score):
         raise HTTPException(status_code=402, detail="Payment required to view this prediction")
 
 
 @router.post("/predictor/unlock", response_model=UnlockOut)
-async def unlock(body: UnlockIn, background: BackgroundTasks):
+async def unlock(body: UnlockIn, background: BackgroundTasks, request: Request, response: Response):
     pred = body.prediction
     if pred.exam not in razorpay.PAID_EXAMS:
         raise HTTPException(status_code=400, detail="This exam's predictor is free")
-    out = await run_prediction(pred.model_copy(update={"unlock_token": ""}))  # validates exam + score range first
+    out = await run_prediction(pred)  # validates exam + score range first
     used_msg = "This payment has already been used for a prediction. Changing your percentile needs a new payment"
     fee = razorpay.PAID_EXAMS[pred.exam][0]
     verified = razorpay.configured()
@@ -230,7 +246,7 @@ async def unlock(body: UnlockIn, background: BackgroundTasks):
     doc = {"payment_id": payment["id"], "token": secrets.token_urlsafe(24), "exam": pred.exam, "score": pred.score,
            "phone": body.phone, "name": body.name.strip(), "amount": payment["amount"] // 100,
            "payer_contact": payment.get("contact", ""), "payer_email": payment.get("email", ""),
-           "prediction": pred.model_dump(exclude={"unlock_token"}), "verified": verified, "created_at": datetime.now(timezone.utc),
+           "prediction": pred.model_dump(), "verified": verified, "created_at": datetime.now(timezone.utc),
            "receipt_id": secrets.token_urlsafe(18), "email": str(body.email or payment.get("email") or ""), "email_sent": False}
     gate = await db.leads.find_one({"phone": body.phone, "role": {"$nin": [None, ""]}}, {"role": 1}, sort=[("created_at", -1)])
     doc["role"] = (gate or {}).get("role", "")  # Parent / Student from the predictor details pop-up
@@ -241,7 +257,9 @@ async def unlock(body: UnlockIn, background: BackgroundTasks):
     lead = {"id": doc["payment_id"], "name": doc["name"] or "Student", "phone": body.phone}
     background.add_task(send_student_prediction, lead, out, doc["prediction"])
     background.add_task(_payment_emails, doc, out)
-    return UnlockOut(token=doc["token"], payment_id=doc["payment_id"], exam=pred.exam, score=pred.score)
+    tokens = (_cookie_tokens(request) + [doc["token"]])[-20:]
+    response.set_cookie(UNLOCK_COOKIE, ".".join(tokens), httponly=True, samesite="lax", secure=True, max_age=365 * 86400, path="/api/predictor")
+    return UnlockOut(payment_id=doc["payment_id"], exam=pred.exam, score=pred.score)
 
 
 async def _payment_emails(doc: dict, out: PredictorOut) -> None:
@@ -269,8 +287,8 @@ async def predictor_receipt_pdf(receipt_id: str):
 
 
 @router.post("/predictor", response_model=PredictorOut)
-async def predict(body: PredictorIn):
-    await require_unlock(body)
+async def predict(body: PredictorIn, request: Request):
+    await require_unlock(body, request)
     out = await run_prediction(body)
     await db.predictions.insert_one(PredictionLog(
         exam=out.exam, metric=out.metric, score=out.score, category=out.category, cities=body.cities,
@@ -280,11 +298,11 @@ async def predict(body: PredictorIn):
 
 
 @router.get("/predictor/pdf")
-async def predictor_pdf(exam: str, score: float, category: Category = "General", cities: str = "", ladies: bool = False,
-                        home_university: str = "", branch_group: str = "", token: str = ""):
+async def predictor_pdf(request: Request, exam: str, score: float, category: Category = "General", cities: str = "", ladies: bool = False,
+                        home_university: str = "", branch_group: str = ""):
     body = PredictorIn(exam=exam, score=score, category=category, cities=[c for c in cities.split(",") if c],
-                       ladies=ladies, home_university=home_university, branch_group=branch_group, unlock_token=token)
-    await require_unlock(body)
+                       ladies=ladies, home_university=home_university, branch_group=branch_group)
+    await require_unlock(body, request)
     out = await run_prediction(body)
     pdf = build_prediction_pdf(out, body.cities)
     name = f"digital-shiksha-{out.exam.lower().replace(' ', '-')}-{out.score:g}-prediction.pdf"

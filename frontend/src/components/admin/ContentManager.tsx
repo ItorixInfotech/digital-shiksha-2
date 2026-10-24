@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2, Search } from "lucide-react";
@@ -110,7 +110,9 @@ export default function ContentManager({ resource, title, fields, columns, publi
 
   const close = () => { setEditing(undefined); onClose?.(); };
   const target = editSlug ? list.data?.find((r) => r.slug === editSlug) : undefined;
-  useEffect(() => { if (target) open(target); }, [target?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Open the record requested via editSlug once (adjusting state during render instead of an effect with stale deps).
+  const [openedId, setOpenedId] = useState<string>();
+  if (target && openedId !== target.id) { setOpenedId(target.id); open(target); }
 
   const rows = useMemo(() => (list.data ?? []).filter((r) => !q || JSON.stringify([r.name, r.title, r.slug]).toLowerCase().includes(q.toLowerCase())), [list.data, q]);
 
