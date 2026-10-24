@@ -1,5 +1,6 @@
 """On-page SEO: static-page meta (admin-editable), sitemap.xml, robots.txt."""
 import os
+from datetime import datetime, timezone
 from html import escape
 
 from fastapi import APIRouter, Depends, Request
@@ -67,25 +68,60 @@ def _base(request: Request) -> str:
     return os.environ.get("PUBLIC_SITE_URL", "").rstrip("/") or str(request.base_url).rstrip("/")
 
 
+def _lastmod(d: dict) -> str:
+    v = d.get("updated_at") or d.get("published_at") or d.get("created_at")
+    if isinstance(v, datetime):
+        return v.strftime("%Y-%m-%d")
+    return str(v)[:10] if isinstance(v, str) and len(v) >= 10 else ""
+
+
+# (path prefix or exact) -> priority; detail pages default 0.6
+_PRIORITY = {"/": "1.0", "/colleges": "0.9", "/predictor": "0.9", "/courses": "0.8", "/exams": "0.8", "/news": "0.7", "/compare": "0.5", "/consultation": "0.6"}
+
+
 @router.get("/sitemap.xml")
 async def sitemap(request: Request):
+    """All indexable public pages: static pages, colleges, courses, exams, news, city landing pages (noindex / off-site canonicals skipped)."""
     base = _base(request)
-    urls: list[tuple[str, str]] = [(p.path, "daily" if p.key in ("home", "news") else "weekly") for p in (await _pages()).pages if not p.noindex]
-    for coll, prefix in (("colleges", "/colleges/"), ("courses", "/courses/"), ("exams", "/exams/"), ("articles", "/news/")):
-        async for d in db[coll].find({"seo.noindex": {"$ne": True}}, {"_id": 0, "slug": 1, "seo.canonical_url": 1}):
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    urls: dict[str, tuple[str, str, str]] = {}  # path -> (changefreq, priority, lastmod)
+    for p in (await _pages()).pages:
+        if not p.noindex:
+            urls[p.path] = ("daily" if p.key in ("home", "news") else "weekly", _PRIORITY.get(p.path, "0.6"), today)
+    for coll, prefix, freq, prio in (("colleges", "/colleges/", "weekly", "0.8"), ("courses", "/courses/", "monthly", "0.6"),
+                                     ("exams", "/exams/", "weekly", "0.7"), ("articles", "/news/", "monthly", "0.6")):
+        async for d in db[coll].find({"seo.noindex": {"$ne": True}},
+                                     {"_id": 0, "slug": 1, "seo.canonical_url": 1, "updated_at": 1, "published_at": 1, "created_at": 1}):
             canon = (d.get("seo") or {}).get("canonical_url") or ""
             if canon and not canon.startswith(base):
                 continue  # canonical points elsewhere → don't list this duplicate
-            urls.append((canon[len(base):] if canon else f"{prefix}{d['slug']}", "weekly"))
+            urls.setdefault(canon[len(base):] if canon else f"{prefix}{d['slug']}", (freq, prio, _lastmod(d)))
     for lp in await list_landing():
         if not (lp.override and lp.override.seo.noindex):
-            urls.append((f"/{lp.slug}", "weekly"))
-    body = "".join(f"<url><loc>{escape(base + path)}</loc><changefreq>{freq}</changefreq></url>" for path, freq in dict.fromkeys(urls))
-    xml = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
-    return Response(xml, media_type="application/xml")
+            urls.setdefault(f"/{lp.slug}", ("weekly", "0.7", ""))
+    body = "".join(
+        f"<url><loc>{escape(base + path)}</loc>{f'<lastmod>{lm}</lastmod>' if lm else ''}<changefreq>{freq}</changefreq><priority>{prio}</priority></url>"
+        for path, (freq, prio, lm) in urls.items())
+    xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
+    return Response(xml, media_type="application/xml", headers={"Cache-Control": "public, max-age=3600"})
 
 
 @router.get("/robots.txt", response_class=PlainTextResponse)
 async def robots(request: Request):
     base = _base(request)
-    return f"User-agent: *\nAllow: /\nDisallow: /admin\n\nSitemap: {base}/sitemap.xml\nSitemap: {base}/api/sitemap.xml\n"
+    return "\n".join([
+        "# Digital Shiksha — India higher-education portal",
+        "User-agent: *",
+        "Allow: /",
+        "Allow: /api/sitemap.xml",
+        "Disallow: /admin",          # admin panel, login and password reset
+        "Disallow: /api/",           # JSON API, PDFs and receipts are not pages
+        "Disallow: /*?*razorpay_payment_id=",  # payment return links
+        "Disallow: /compare?",       # shareable comparison links (endless combinations)
+        "Disallow: /predictor?",     # personal predictor results
+        "Disallow: /colleges?",      # filter / search combinations
+        "Disallow: /*?q=",
+        "",
+        f"Sitemap: {base}/sitemap.xml",
+        "",
+    ])
