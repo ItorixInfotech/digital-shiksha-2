@@ -300,7 +300,7 @@ def payment_alert_html(rec: dict, out, pdf_url: str) -> str:
         f'paid for the {exam} college prediction ({len({r.college_name for r in out.results})} colleges, {out.total} course options).</p>'
         f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:8px">{"".join(rows)}</table>'
         + btn +
-        '<p style="margin:20px 0 0;font-size:13px;color:#64748b">All payments are listed in the admin panel (Predictor tab &rarr; MHT CET payments).</p>'
+        '<p style="margin:20px 0 0;font-size:13px;color:#64748b">All payments are listed in the admin panel (Predictor tab &rarr; Predictor payments).</p>'
         '</td></tr><tr><td style="padding:16px 24px;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8">'
         'Automated payment alert sent by Digital Shiksha.</td></tr></table></td></tr></table>'
     )

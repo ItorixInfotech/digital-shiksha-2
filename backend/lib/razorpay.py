@@ -14,6 +14,7 @@ import httpx
 PAID_EXAMS = {
     "MHT CET": (150000, "https://rzp.io/rzp/6wXdLUk"),            # ₹1500 engineering
     "MHT CET Pharmacy": (59900, "https://rzp.io/rzp/6vvZNmq"),    # ₹599 pharmacy
+    "JEE Main": (249900, "https://rzp.io/rzp/UIqrKC9h"),          # ₹2499
 }
 API = "https://api.razorpay.com/v1"
 logger = logging.getLogger(__name__)

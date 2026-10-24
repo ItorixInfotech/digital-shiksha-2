@@ -84,7 +84,7 @@ export default function PredictorReportPanel() {
       </div>
 
       <div>
-        <h3 className="font-semibold">MHT CET payments <span className="text-sm font-normal text-slate-500">— Engineering ₹1500 / Pharmacy ₹599 unlocks; "Check in Razorpay" ones were not auto-verified</span></h3>
+        <h3 className="font-semibold">Predictor payments <span className="text-sm font-normal text-slate-500">— MHT CET Engineering ₹1500 / Pharmacy ₹599 / JEE Main ₹2499 unlocks; "Check in Razorpay" ones were not auto-verified</span></h3>
         <div className="mt-3 rounded-2xl border bg-white">
           <Table data-testid="admin-predictor-payments-table">
             <TableHeader><TableRow><TableHead>When</TableHead><TableHead>Student</TableHead><TableHead>Percentile</TableHead><TableHead>Payment ID</TableHead><TableHead>Receipt email</TableHead><TableHead>Status</TableHead><TableHead>PDF</TableHead></TableRow></TableHeader>
@@ -93,7 +93,7 @@ export default function PredictorReportPanel() {
                 <TableRow key={p.payment_id} data-testid={`admin-predictor-payment-${p.payment_id}`}>
                   <TableCell className="whitespace-nowrap text-xs text-slate-500">{when(p.created_at)}</TableCell>
                   <TableCell><p className="font-medium">{p.name || "—"}</p><a href={`tel:+91${p.phone}`} className="text-xs text-brand-blue">+91 {p.phone}</a></TableCell>
-                  <TableCell>{p.score}%ile<p className="text-[11px] text-slate-500">{p.exam === "MHT CET" ? "Engineering" : "Pharmacy"} · ₹{p.amount}</p></TableCell>
+                  <TableCell>{p.score}%ile<p className="text-[11px] text-slate-500">{({ "MHT CET": "MHT CET Engineering", "MHT CET Pharmacy": "MHT CET Pharmacy" } as Record<string, string>)[p.exam] ?? p.exam} · ₹{p.amount}</p></TableCell>
                   <TableCell><a href={`https://dashboard.razorpay.com/app/payments/${p.payment_id}`} target="_blank" rel="noreferrer" className="font-mono text-xs text-brand-blue hover:underline">{p.payment_id}</a></TableCell>
                   <TableCell className="text-xs">{p.email ? <><p>{p.email}</p><p className={p.email_sent ? "text-green-700" : "text-amber-700"}>{p.email_sent ? "Receipt sent" : "Not sent"}</p></> : "—"}</TableCell>
                   <TableCell><span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1", p.verified ? "bg-green-50 text-green-800 ring-green-200" : "bg-amber-50 text-amber-800 ring-amber-200")}>{p.verified ? "Verified ₹" + p.amount : "Check in Razorpay"}</span></TableCell>

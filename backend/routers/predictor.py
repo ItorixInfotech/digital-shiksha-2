@@ -26,7 +26,8 @@ EXAMS = {
                             fee=razorpay.PAID_EXAMS["MHT CET"][0] // 100, payment_link=razorpay.PAID_EXAMS["MHT CET"][1]),
     "MHT CET Pharmacy": PredictorExam(name="MHT CET Pharmacy", metric="percentile", min=0, max=100, label="MHT CET percentile (PCB / PCM)", hint="e.g. 92 — official B.Pharm & Pharm.D CAP Round I–IV cut-offs, 520+ Maharashtra colleges",
                                      fee=razorpay.PAID_EXAMS["MHT CET Pharmacy"][0] // 100, payment_link=razorpay.PAID_EXAMS["MHT CET Pharmacy"][1]),
-    "JEE Main": PredictorExam(name="JEE Main", metric="percentile", min=0, max=100, label="JEE Main percentile", hint="e.g. 98.2 — All India quota seats in Maharashtra"),
+    "JEE Main": PredictorExam(name="JEE Main", metric="percentile", min=0, max=100, label="JEE Main percentile", hint="e.g. 98.2 — All India quota seats in Maharashtra",
+                              fee=razorpay.PAID_EXAMS["JEE Main"][0] // 100, payment_link=razorpay.PAID_EXAMS["JEE Main"][1]),
     "NEET UG": PredictorExam(name="NEET UG", metric="score", min=0, max=720, label="NEET UG score (out of 720)", hint="e.g. 610 — MBBS state quota / deemed seats"),
     "MAH MBA CET": PredictorExam(name="MAH MBA CET", metric="percentile", min=0, max=100, label="MAH MBA CET percentile", hint="e.g. 96 — MBA/MMS state CAP"),
     "JEE Advanced": PredictorExam(name="JEE Advanced", metric="rank", min=1, max=250000, label="JEE Advanced rank", hint="e.g. 1500 — IIT seats via JoSAA",
@@ -306,7 +307,7 @@ async def _receipt_pdf(doc: dict) -> Response:
     out = await run_prediction(body)
     pdf = build_prediction_pdf(out, body.cities, receipt={"name": doc.get("name"), "payment_id": doc["payment_id"],
                                                           "amount": doc.get("amount", 0), "paid_at": _aware(doc["created_at"])})
-    name = f"digital-shiksha-{'pharmacy' if 'Pharmacy' in out.exam else 'mht-cet'}-{out.score:g}-{doc['payment_id']}.pdf"
+    name = f"digital-shiksha-{out.exam.lower().replace(' ', '-')}-{out.score:g}-{doc['payment_id']}.pdf"
     return Response(content=pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="{name}"'})
 
 
