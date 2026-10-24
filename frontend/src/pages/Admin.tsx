@@ -21,7 +21,7 @@ import { RESOURCES } from "@/components/admin/resources";
 import SeoDashboard from "@/components/admin/SeoDashboard";
 import { apiDelete, apiGet, apiPatch, apiPost, ApiError } from "@/lib/api";
 import { beginSession, endSession } from "@/lib/session";
-import type { AdminMe, AdminStats, CounsellorWithStats, Lead, LeadAssignIn, LeadStatus, WhatsAppStatus } from "@/lib/types";
+import type { AdminMe, ForgotOut, AdminStats, CounsellorWithStats, Lead, LeadAssignIn, LeadStatus, WhatsAppStatus } from "@/lib/types";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +55,11 @@ export function AdminLogin() {
     onSuccess: () => { beginSession(); nav("/admin", { replace: true }); },
     onError: (e) => toast.error(e instanceof ApiError && e.status === 401 ? "Invalid username or password" : "Login failed"),
   });
+  const forgot = useMutation({
+    mutationFn: () => apiPost<ForgotOut>("/auth/forgot", {}),
+    onSuccess: (r) => toast.success(`Reset link sent to ${r.sent_to}. It includes your username and expires in 30 minutes.`, { duration: 8000 }),
+    onError: (e) => toast.error(e instanceof ApiError && typeof (e.body as { detail?: unknown })?.detail === "string" ? (e.body as { detail: string }).detail : "Could not send the reset link"),
+  });
   return (
     <div className="grid min-h-screen place-items-center bg-brand-ink px-4" data-testid="admin-login-page">
       <Seo title="Admin login | Digital Shiksha" description="Digital Shiksha admin" noindex />
@@ -70,7 +75,11 @@ export function AdminLogin() {
             {login.isPending && <Loader2 className="size-4 animate-spin" />} Sign in
           </Button>
         </div>
-        <a href="/" className="mt-6 block text-center text-sm text-slate-500 hover:text-brand-leaf" data-testid="admin-login-back-link">← Back to website</a>
+        <button type="button" onClick={() => forgot.mutate()} disabled={forgot.isPending} data-testid="admin-login-forgot-button"
+          className="mt-4 flex w-full items-center justify-center gap-1.5 text-sm font-medium text-brand-blue hover:text-brand-leaf disabled:opacity-60 transition-colors">
+          {forgot.isPending && <Loader2 className="size-3.5 animate-spin" />} Forgot username or password? Email me a reset link
+        </button>
+        <a href="/" className="mt-4 block text-center text-sm text-slate-500 hover:text-brand-leaf" data-testid="admin-login-back-link">← Back to website</a>
       </form>
     </div>
   );

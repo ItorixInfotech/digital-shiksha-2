@@ -317,3 +317,34 @@ async def notify_payment(rec: dict, out, pdf_url: str) -> None:
         logger.info("Payment alert %s sent: %s", rec["payment_id"], email_id)
     except Exception as exc:  # noqa: BLE001
         logger.error("Payment alert %s failed: %s", rec.get("payment_id"), exc)
+
+
+# ---- Admin password reset (fixed template to the owner inbox; link is first-party https, 30-min single-use)
+def admin_reset_html(username: str, link: str) -> str:
+    return (
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:24px 0">'
+        '<tr><td align="center"><table role="presentation" width="600" cellpadding="0" cellspacing="0" '
+        'style="background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;font-family:Arial,Helvetica,sans-serif">'
+        '<tr><td style="background:#0a2540;padding:20px 24px;border-radius:12px 12px 0 0">'
+        '<span style="color:#ffffff;font-size:18px;font-weight:bold"><span style="color:#4ade80">Digital</span> Shiksha</span>'
+        '<span style="color:#cbd5e1;font-size:13px;margin-left:8px">Admin password reset</span></td></tr>'
+        '<tr><td style="padding:24px;font-size:15px;line-height:1.6;color:#334155">'
+        '<p style="margin:0 0 12px">Someone asked to reset the Digital Shiksha admin password. If that was you, choose a new password below.</p>'
+        f'<p style="margin:0 0 16px">Admin username: <strong style="color:#0f172a">{escape(username)}</strong></p>'
+        f'<p style="margin:0 0 16px"><a href="{escape(link)}" style="display:inline-block;background:#dc2626;color:#ffffff;text-decoration:none;'
+        'font-weight:bold;font-size:15px;padding:12px 22px;border-radius:8px">Set a new admin password</a></p>'
+        '<p style="margin:0;font-size:13px;color:#64748b">The link works once and expires in 30 minutes. '
+        'If you did not ask for this, ignore this email &ndash; your current password keeps working.</p></td></tr>'
+        '<tr><td style="padding:16px 24px;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8">Automated security email sent by Digital Shiksha.</td></tr>'
+        '</table></td></tr></table>'
+    )
+
+
+async def send_admin_reset(to: str, username: str, link: str) -> bool:
+    try:
+        email_id = await send_email(to=to, subject="Reset your Digital Shiksha admin password", html=admin_reset_html(username, link), internal=True)
+        logger.info("Admin reset email sent: %s", email_id)
+        return bool(email_id)
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Admin reset email failed: %s", exc)
+        return False

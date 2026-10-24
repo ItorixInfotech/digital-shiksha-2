@@ -288,6 +288,15 @@ export interface Meta {
   totals: Record<string, number>;
 }
 
+// Mirrors backend/models/content.py ForgotOut / ResetIn
+export interface ForgotOut {
+  sent_to: string; // masked owner inbox
+}
+export interface ResetIn {
+  token: string;
+  password: string; // 10–128 chars
+}
+
 export interface AdminMe {
   username: string;
 }

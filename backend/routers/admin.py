@@ -7,10 +7,12 @@ import jwt
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 
+from lib import admin_auth
 from lib.db import db
+from lib.email import send_admin_reset
 from lib.whatsapp import whatsapp_configured, whatsapp_status
 from models.content import (
-    AdminMe, AdminStats, Article, ArticleIn, College, CollegeIn, Course, CourseIn,
+    AdminMe, AdminStats, Article, ForgotOut, ResetIn, ArticleIn, College, CollegeIn, Course, CourseIn,
     Exam, ExamIn, Lead, LeadStatusUpdate, LoginIn,
 )
 
@@ -30,20 +32,51 @@ async def require_admin(request: Request) -> str:
         data = jwt.decode(token, _secret(), algorithms=["HS256"])
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Session expired")
+    if data.get("pv", 0) != await admin_auth.session_version():  # password was reset since this session started
+        raise HTTPException(status_code=401, detail="Session expired")
     return data["sub"]
 
 
 @router.post("/auth/login", response_model=AdminMe)
 async def login(body: LoginIn, response: Response):
     ok_user = secrets.compare_digest(body.username, os.environ["ADMIN_USERNAME"])
-    ok_pass = secrets.compare_digest(body.password, os.environ["ADMIN_PASSWORD"])
+    ok_pass = await admin_auth.password_ok(body.password)
     if not (ok_user and ok_pass):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     token = jwt.encode(
-        {"sub": body.username, "exp": datetime.now(timezone.utc) + timedelta(days=7)}, _secret(), algorithm="HS256"
+        {"sub": body.username, "pv": await admin_auth.session_version(), "exp": datetime.now(timezone.utc) + timedelta(days=7)},
+        _secret(), algorithm="HS256"
     )
     response.set_cookie(COOKIE, token, httponly=True, samesite="lax", secure=True, max_age=7 * 86400, path="/")
     return AdminMe(username=body.username)
+
+
+def _mask(email: str) -> str:
+    user, _, domain = email.partition("@")
+    return f"{user[:1]}{'*' * max(len(user) - 1, 3)}@{domain}" if domain else ""
+
+
+@router.post("/auth/forgot", response_model=ForgotOut, status_code=202)
+async def forgot_password():
+    """Emails a 30-minute single-use reset link (with the admin username) to the fixed owner inbox LEAD_ALERT_EMAIL only."""
+    to = os.environ.get("LEAD_ALERT_EMAIL", "")
+    if not to:
+        raise HTTPException(status_code=503, detail="No admin inbox is set up for password reset")
+    token = await admin_auth.create_reset_token()
+    if token is None:
+        raise HTTPException(status_code=429, detail="A reset link was just sent — please check the inbox or wait 2 minutes")
+    base = os.environ.get("PUBLIC_SITE_URL", "").rstrip("/")
+    if not base.startswith("https://") or not await send_admin_reset(to, os.environ["ADMIN_USERNAME"], f"{base}/admin/reset?token={token}"):
+        raise HTTPException(status_code=502, detail="Could not send the reset email — please try again")
+    return ForgotOut(sent_to=_mask(to))
+
+
+@router.post("/auth/reset")
+async def reset_password(body: ResetIn, response: Response):
+    if not await admin_auth.reset_password(body.token, body.password):
+        raise HTTPException(status_code=400, detail="This reset link is invalid, already used or expired — request a new one")
+    response.delete_cookie(COOKIE, path="/")
+    return {"ok": True}
 
 
 @router.post("/auth/logout")

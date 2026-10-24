@@ -12,6 +12,7 @@ import Predictor from "@/pages/Predictor";
 import { ArticleDetail, News } from "@/pages/News";
 import { Consultation, NotFound } from "@/pages/Consultation";
 import Admin, { AdminLogin } from "@/pages/Admin";
+import AdminReset from "@/pages/AdminReset";
 import Landing from "@/pages/Landing";
 
 // One <Route> per page in src/pages; BrowserRouter already wraps this in main.tsx.
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin/reset" element={<AdminReset />} />
       <Route path="/admin" element={<Admin />} />
     </Routes>
   );

@@ -197,6 +197,15 @@ class LoginIn(BaseModel):
     password: str
 
 
+class ForgotOut(BaseModel):
+    sent_to: str  # masked owner inbox, e.g. "e*****@digitalshiksha.in" ("" if no inbox configured)
+
+
+class ResetIn(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+    password: str = Field(min_length=10, max_length=128)
+
+
 class AdminMe(BaseModel):
     username: str
 

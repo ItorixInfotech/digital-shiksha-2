@@ -127,3 +127,8 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 - Drop-down labels: "MHT CET (Engineering)" / "MHT CET (Pharmacy)" (display only; exam keys unchanged).
 - MHT CET Pharmacy is also paid: ₹599 via https://rzp.io/rzp/6vvZNmq (razorpay.PAID_EXAMS maps exam -> (fee paise, link)). Same flow; unlock tokens are per exam + score, so an engineering payment never unlocks pharmacy. MBA, JEE, NEET stay free.
 - Unlock storage (code-review fix): unlock tokens are NOT exposed to JS. POST /api/predictor/unlock sets httpOnly Secure SameSite=Lax cookie `ds_unlocks` (path /api/predictor, "."-joined tokens, last 20, 1 year); UnlockOut = {payment_id, exam, score}. GET /api/predictor/access?exam&score -> {paid} drives the paywall; /predictor and /predictor/pdf read the cookie (no token param/body field). Frontend storage helpers in src/lib/predictor-storage.ts: gate flag in localStorage, contact {name, phone} in sessionStorage only.
+
+## Admin forgot-password (email reset)
+- Login page "Forgot username or password? Email me a reset link" -> POST /api/auth/forgot (no body) emails the fixed owner inbox LEAD_ALERT_EMAIL only: admin username + https link /admin/reset?token=… (30 min, single-use, only sha256 stored in db.admin_auth; 2-min cooldown -> 429). Response {sent_to: masked email}.
+- /admin/reset page -> POST /api/auth/reset {token, password 10-128} stores a PBKDF2 hash in db.admin_auth (key "admin"), bumps pv (all old sessions 401; JWT carries pv), clears the ds_admin cookie.
+- Login checks the DB hash when present AND its env_fp matches the current ADMIN_PASSWORD; if the owner later changes ADMIN_PASSWORD in .env, the env value wins again. Deleting the admin_auth doc restores the .env password.
