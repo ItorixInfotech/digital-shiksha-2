@@ -51,7 +51,10 @@ export function defaultSeo(kind: SeoKind, raw: object, year: number): { title: s
   };
 }
 
-export const origin = () => (typeof window === "undefined" ? "" : window.location.origin);
+/** Main public domain for canonical / OG / schema URLs (mirrors CANONICAL_SITE in backend/routers/seo.py). */
+export const CANONICAL_ORIGIN = "https://www.digitalshiksha.in";
+const isPreviewHost = (h: string) => h === "localhost" || h === "127.0.0.1" || h.endsWith(".emergentagent.com") || h.endsWith(".emergent.host");
+export const origin = () => (typeof window === "undefined" ? "" : isPreviewHost(window.location.hostname) ? window.location.origin : CANONICAL_ORIGIN);
 export const absUrl = (u: string) => (!u ? "" : /^https?:\/\//.test(u) ? u : `${origin()}${u.startsWith("/") ? "" : "/"}${u}`);
 
 export function breadcrumbLd(items: [string, string][]) {

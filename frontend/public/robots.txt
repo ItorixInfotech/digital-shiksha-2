@@ -1,0 +1,15 @@
+# Digital Shiksha — https://www.digitalshiksha.in
+User-agent: *
+Allow: /
+Allow: /api/sitemap.xml
+Disallow: /admin
+Disallow: /api/
+Disallow: /*?*razorpay_payment_id=
+Disallow: /compare?
+Disallow: /predictor?
+Disallow: /colleges?
+Disallow: /*?q=
+
+# Live sitemap (all colleges, courses, exams, news and city pages — always up to date)
+Sitemap: https://www.digitalshiksha.in/api/sitemap.xml
+Sitemap: https://www.digitalshiksha.in/sitemap.xml

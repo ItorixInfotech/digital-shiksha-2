@@ -61,11 +61,20 @@ async def save_pages(body: SeoPagesIn, _: str = Depends(require_admin)):
     return await _pages()
 
 
+# Main public domain: sitemap/robots on ANY production host (e.g. digitalshikshaonline.com) list www.digitalshiksha.in URLs.
+CANONICAL_SITE = os.environ.get("CANONICAL_SITE_URL", "https://www.digitalshiksha.in").rstrip("/")
+_PREVIEW_HOSTS = ("localhost", "127.0.0.1")
+_PREVIEW_SUFFIXES = (".emergentagent.com", ".emergent.host")
+
+
 def _base(request: Request) -> str:
-    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or ""
-    if host and not host.startswith(("localhost", "127.0.0.1")):
-        return f"{request.headers.get('x-forwarded-proto', 'https').split(',')[0]}://{host.split(',')[0]}"
-    return os.environ.get("PUBLIC_SITE_URL", "").rstrip("/") or str(request.base_url).rstrip("/")
+    host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or "").split(",")[0].strip()
+    name = host.split(":")[0]
+    if not host or name in _PREVIEW_HOSTS:
+        return os.environ.get("PUBLIC_SITE_URL", "").rstrip("/") or str(request.base_url).rstrip("/")
+    if name.endswith(_PREVIEW_SUFFIXES):  # preview links keep their own host
+        return f"{request.headers.get('x-forwarded-proto', 'https').split(',')[0]}://{host}"
+    return CANONICAL_SITE
 
 
 def _lastmod(d: dict) -> str:
@@ -123,5 +132,6 @@ async def robots(request: Request):
         "Disallow: /*?q=",
         "",
         f"Sitemap: {base}/sitemap.xml",
+        f"Sitemap: {base}/api/sitemap.xml",
         "",
     ])
