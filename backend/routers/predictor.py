@@ -32,7 +32,8 @@ EXAMS = {
     "MAH MBA CET": PredictorExam(name="MAH MBA CET", metric="percentile", min=0, max=100, label="MAH MBA CET percentile", hint="e.g. 96 — MBA/MMS state CAP",
                                  fee=razorpay.PAID_EXAMS["MAH MBA CET"][0] // 100, payment_link=razorpay.PAID_EXAMS["MAH MBA CET"][1]),
     "JEE Advanced": PredictorExam(name="JEE Advanced", metric="rank", min=1, max=250000, label="JEE Advanced rank", hint="e.g. 1500 — IIT seats via JoSAA",
-                                  rank_note="Enter your category rank (e.g. OBC-NCL rank) if you selected a reserved category."),
+                                  rank_note="Enter your category rank (e.g. OBC-NCL rank) if you selected a reserved category.",
+                                  fee=razorpay.PAID_EXAMS["JEE Advanced"][0] // 100, payment_link=razorpay.PAID_EXAMS["JEE Advanced"][1]),
 }
 
 # Reserved-category closing cutoffs are estimated from the General Open value (approx. historical gaps).

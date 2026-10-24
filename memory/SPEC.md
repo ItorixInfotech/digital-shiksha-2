@@ -137,3 +137,4 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 - Admin: MHT CET payments table has a PDF column -> GET /api/admin/predictor-payments/{payment_id}/pdf (admin cookie) = receipt + full college list.
 - JEE Main is also paid: ₹2499 via https://rzp.io/rzp/UIqrKC9h (PAID_EXAMS). NEET UG, MAH MBA CET, JEE Advanced stay free. Admin table heading is now "Predictor payments".
 - MAH MBA CET is also paid: ₹1199 via https://rzp.io/rzp/aG2c274. Only NEET UG and JEE Advanced stay free.
+- JEE Advanced is also paid: ₹2999 via https://rzp.io/rzp/Yf8GaPJK. Only NEET UG stays free. Data is thin: JEE Advanced has cut-offs for only 3 colleges, MAH MBA CET 4, JEE Main ~8 options.
