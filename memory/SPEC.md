@@ -151,3 +151,6 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 - Phones (<768px): MobileBottomBar sticky (Predictor | Call | WhatsApp); floating call/WhatsApp buttons are desktop-only; compare bar sits above the bottom bar; page has pb-16 on mobile.
 - Exit intent (desktop ≥1024px + mouse only, not /admin): mouse leaving through the top after 5 s on a page opens a "Wait — which colleges can you get?" dialog -> /predictor. Once per session (sessionStorage ds_exit_intent_v1) and never if the visitor opened /predictor this session (ds_predictor_tried_v1).
 - Exam pages: ExamPredictorBox "Check colleges for your score" under the key facts. Exams whose name matches a predictor (MHT CET, JEE Main, JEE Advanced, NEET UG, MAH MBA CET) get a score box -> /predictor?exam=&score= (range-validated); other exams get an "Open College Predictor" link.
+
+## Course page predictor box
+- CourseDetail shows ExamPredictorBox (testid prefix `course-predictor`) for btech (MHT CET / JEE Main / JEE Advanced picker), mba (MAH MBA CET), mbbs (NEET UG), bpharm (MHT CET Pharmacy). Score -> /predictor?exam=..&score=..; other courses show no box.

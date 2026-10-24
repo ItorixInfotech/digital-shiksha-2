@@ -8,6 +8,15 @@ import { apiGet } from "@/lib/api";
 import type { College, Course, Exam } from "@/lib/types";
 import { slugify } from "@/lib/site";
 import { EntitySeo } from "@/components/Seo";
+import ExamPredictorBox from "@/components/ExamPredictorBox";
+
+/** Course slug -> predictor exams offered on that course page (B.Pharm uses the Pharmacy predictor, not engineering MHT CET). */
+const COURSE_PREDICTORS: Record<string, string[]> = {
+  btech: ["MHT CET", "JEE Main", "JEE Advanced"],
+  mba: ["MAH MBA CET"],
+  mbbs: ["NEET UG"],
+  bpharm: ["MHT CET Pharmacy"],
+};
 
 export default function CourseDetail() {
   const { slug = "" } = useParams();
@@ -30,6 +39,7 @@ export default function CourseDetail() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {facts.map(([Icon, l, v]) => <div key={l} className="rounded-xl border bg-white p-4"><p className="flex items-center gap-1.5 text-xs text-slate-500"><Icon className="size-3.5" /> {l}</p><p className="mt-1 text-sm font-semibold text-slate-900">{v}</p></div>)}
           </div>
+          {COURSE_PREDICTORS[c.slug] && <ExamPredictorBox examNames={COURSE_PREDICTORS[c.slug]} testid="course-predictor" />}
           <div className="rounded-2xl border bg-white p-6">
             <h2 className="text-xl font-semibold">What is {c.name}?</h2>
             <p className="mt-3 leading-relaxed text-slate-600" data-testid="course-overview">{c.overview}</p>
