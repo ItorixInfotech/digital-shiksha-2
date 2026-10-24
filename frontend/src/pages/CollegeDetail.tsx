@@ -14,6 +14,7 @@ import type { College } from "@/lib/types";
 import { SITE, feeRange } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
 import { EntitySeo } from "@/components/Seo";
+import PredictorNudge from "@/components/PredictorNudge";
 
 const TABS = ["Overview", "Courses & Fees", "Admission 2026", "Cutoff", "Placements", "Facilities"];
 
@@ -39,6 +40,7 @@ export default function CollegeDetail() {
   return (
     <div data-testid="college-detail-page">
       <EntitySeo kind="colleges" item={c} />
+      <PredictorNudge key={c.slug} collegeName={c.short_name || c.name} />
       <section className="relative overflow-hidden bg-brand-ink text-white">
         <img src={c.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-ink via-brand-ink/80 to-brand-ink/30" />

@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { CompareBar, EnquiryDialog, FloatingActions } from "@/components/Overlays";
+import { CompareBar, EnquiryDialog, FloatingActions, MobileBottomBar } from "@/components/Overlays";
 import { SiteProvider } from "@/lib/site-context";
 
 function ScrollTop() {
@@ -16,7 +16,7 @@ export default function Layout() {
   return (
     <SiteProvider>
       <ScrollTop />
-      <div className="flex min-h-screen flex-col">
+      <div className="flex min-h-screen flex-col pb-16 md:pb-0">
         <Navbar />
         <main className="flex-1">
           <Outlet />
@@ -24,6 +24,7 @@ export default function Layout() {
         <Footer />
       </div>
       <FloatingActions />
+      <MobileBottomBar />
       <CompareBar />
       <EnquiryDialog />
       <Toaster richColors />

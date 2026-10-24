@@ -1,3 +1,4 @@
+import PredictorBanner from "@/components/PredictorBanner";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -43,6 +44,7 @@ export default function Home() {
   return (
     <div data-testid="home-page">
       <PageSeo page="home" jsonLd={[organizationLd(), { "@context": "https://schema.org", "@type": "WebSite", name: "Digital Shiksha", url: window.location.origin }]} />
+      <PredictorBanner />
       {/* HERO */}
       <section className="relative overflow-hidden bg-brand-ink text-white" data-testid="home-hero">
         <img src={HERO_IMG} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />

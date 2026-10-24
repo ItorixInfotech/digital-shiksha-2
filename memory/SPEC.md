@@ -146,3 +146,6 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 - Production serves the static build, so root /robots.txt and /sitemap.xml are static files in frontend/public: robots.txt (rules + Sitemap lines) and sitemap.xml = sitemap index pointing to the live https://www.digitalshiksha.in/api/sitemap.xml. In dev the Vite proxy still serves the dynamic versions.
 
 - Header: College Predictor is a highlighted green pill (sparkle icon, light-sweep + soft halo animation, yellow "Try now" badge). Desktop: right side before search/Enquire (compact "Predictor · Try" at 1024-1279px). Mobile/tablet (<1024px): centred in the header right after the logo (testid mobile-header-predictor), also at the top of the mobile menu.
+- Home: PredictorBanner at the very top ("Find your college in 30 seconds"): exam chips from /api/predictor/exams + score input -> /predictor?exam=&score=&category=General&city=both (auto-runs; range-validated).
+- College pages: PredictorNudge card after 20 s ("Can you get into <college>?" -> /predictor), once per browser session (sessionStorage ds_predictor_nudge_v1); bottom-left on desktop, above the bottom bar on phones.
+- Phones (<768px): MobileBottomBar sticky (Predictor | Call | WhatsApp); floating call/WhatsApp buttons are desktop-only; compare bar sits above the bottom bar; page has pb-16 on mobile.
