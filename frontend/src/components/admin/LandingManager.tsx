@@ -62,7 +62,7 @@ export default function LandingManager({ editSlug, onClose }: { editSlug?: strin
               <Textarea id="landing-intro" rows={5} value={intro} onChange={(e) => setIntro(e.target.value)} placeholder="Leave empty to use the auto-generated intro (with live fees, placements and exams). Separate paragraphs with a blank line." data-testid="admin-landing-intro-input" />
             </div>
             <FaqEditor value={faqs} onChange={setFaqs} testid="admin-landing-faqs" hint="Leave empty to use 5–6 auto FAQs built from the college data" />
-            <SeoEditor value={seo} onChange={setSeo} defaults={{ title: editing.default_title, description: editing.default_description, keywords: [editing.label] }} path={`/${editing.slug}`} testid="admin-landing-seo" />
+            <SeoEditor value={seo} onChange={setSeo} defaults={{ title: editing.default_title, description: editing.default_description, keywords: [editing.label] }} path={`/${editing.slug}`} testid="admin-landing-seo" ai={{ kind: "page", facts: { page: editing.label, intro } }} />
             <DialogFooter className="sm:col-span-2">
               <Button variant="outline" onClick={close} data-testid="admin-landing-cancel-button">Cancel</Button>
               <Button onClick={submit} disabled={save.isPending} className="bg-brand-navy text-white hover:bg-brand-blue" data-testid="admin-landing-save-button">{save.isPending ? "Saving…" : "Save"}</Button>

@@ -56,7 +56,7 @@ export default function SeoPagesPanel() {
           ))}
         </nav>
         <div className="grid gap-4">
-          <SeoEditor key={page.key} value={form} onChange={(v) => setDrafts((d) => ({ ...d, [page.key]: v }))} defaults={{ title: page.default_title, description: page.default_description }} path={page.path} testid="admin-seo-page-editor" advanced={false} />
+          <SeoEditor key={page.key} value={form} onChange={(v) => setDrafts((d) => ({ ...d, [page.key]: v }))} defaults={{ title: page.default_title, description: page.default_description }} path={page.path} testid="admin-seo-page-editor" advanced={false} ai={{ kind: "page", facts: { page: page.label, default_title: page.default_title, default_description: page.default_description } }} />
           <div className="flex justify-end">
             <Button onClick={submit} disabled={!dirty || save.isPending} className="bg-brand-red text-white hover:bg-red-700" data-testid="admin-seo-pages-save-button">
               {save.isPending && <Loader2 className="size-4 animate-spin" />} Save page SEO

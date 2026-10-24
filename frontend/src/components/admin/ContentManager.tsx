@@ -15,8 +15,9 @@ import SeoEditor, { type SeoForm } from "@/components/admin/SeoEditor";
 import { useSeoPages } from "@/components/Seo";
 import SeoBadge from "@/components/admin/SeoBadge";
 import FaqEditor, { cleanFaqs } from "@/components/admin/FaqEditor";
+import { AIContentButton, toFacts } from "@/components/admin/AIButtons";
 import { defaultSeo, EMPTY_SEO, entityScore } from "@/lib/seo";
-import type { FaqItem, SeoMeta } from "@/lib/types";
+import type { AIKind, FaqItem, SeoMeta } from "@/lib/types";
 
 const toSeoForm = (s?: SeoMeta): SeoForm => { const v = { ...EMPTY_SEO, ...s }; return { ...v, keywords: v.keywords.join(", ") }; };
 const fromSeoForm = (f: SeoForm): SeoMeta => ({
@@ -143,10 +144,15 @@ export default function ContentManager({ resource, title, fields, columns, publi
               </div>
             );
           })}
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-brand-leaf/40 bg-green-50/40 p-3 sm:col-span-2">
+            <AIContentButton kind={resource as AIKind} facts={toFacts(form)} testid={`admin-${resource}-ai-write-button`}
+              onDraft={(d) => { setForm((f) => ({ ...f, ...d.text })); if (withFaqs && d.faqs.length) setFaqs(d.faqs); }} />
+            <p className="text-xs text-slate-600">Fill in the name and basic facts, then let AI draft the {resource === "articles" ? "excerpt and article" : "overview"}{withFaqs ? " and FAQs" : ""}. Always review before saving.</p>
+          </div>
           {withFaqs && <FaqEditor value={faqs} onChange={setFaqs} testid={`admin-${resource}-faqs`} />}
           {editing !== undefined && (() => { const sc = entityScore(resource, { ...toPayload(fields.filter((f) => f.type !== "json"), form), seo: fromSeoForm(seo), faqs: cleanFaqs(faqs) }, year); return <div className="flex items-center gap-2 text-sm sm:col-span-2"><span className="font-medium">Live SEO score</span><SeoBadge score={sc} testid={`admin-${resource}-live-seo-score`} /></div>; })()}
           <SeoEditor value={seo} onChange={setSeo} defaults={defaultSeo(resource, form, year)}
-            path={`${publicPath}/${String(form.slug ?? "")}`} testid={`admin-${resource}-seo`} />
+            path={`${publicPath}/${String(form.slug ?? "")}`} testid={`admin-${resource}-seo`} ai={{ kind: resource as AIKind, facts: toFacts(form) }} />
           <DialogFooter className="sm:col-span-2">
             <Button type="button" variant="outline" onClick={close} data-testid={`admin-${resource}-cancel-button`}>Cancel</Button>
             <Button type="submit" disabled={save.isPending} data-testid={`admin-${resource}-save-button`} className="bg-brand-navy text-white hover:bg-brand-blue">{save.isPending ? "Saving…" : "Save"}</Button>

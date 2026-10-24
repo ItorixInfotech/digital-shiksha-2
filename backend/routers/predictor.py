@@ -338,7 +338,8 @@ async def admin_payment_pdf(payment_id: str, _: str = Depends(require_admin)):
 async def _receipt_pdf(doc: dict) -> Response:
     body = PredictorIn(**doc["prediction"])
     out = await run_prediction(body)
-    pdf = build_prediction_pdf(out, body.cities, receipt={"name": doc.get("name"), "payment_id": doc["payment_id"],
+    from routers.ai import cached_advice
+    pdf = build_prediction_pdf(out, body.cities, advice=await cached_advice(body.model_dump()), receipt={"name": doc.get("name"), "payment_id": doc["payment_id"],
                                                           "amount": doc.get("amount", 0), "paid_at": _aware(doc["created_at"])})
     name = f"digital-shiksha-{out.exam.lower().replace(' ', '-')}-{out.score:g}-{doc['payment_id']}.pdf"
     return Response(content=pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="{name}"'})
@@ -362,7 +363,8 @@ async def predictor_pdf(request: Request, exam: str, score: float, category: Cat
                        ladies=ladies, home_university=home_university, branch_group=branch_group)
     await require_unlock(body, request)
     out = await run_prediction(body)
-    pdf = build_prediction_pdf(out, body.cities)
+    from routers.ai import cached_advice
+    pdf = build_prediction_pdf(out, body.cities, advice=await cached_advice(body.model_dump()))
     name = f"digital-shiksha-{out.exam.lower().replace(' ', '-')}-{out.score:g}-prediction.pdf"
     return Response(content=pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="{name}"'})
 

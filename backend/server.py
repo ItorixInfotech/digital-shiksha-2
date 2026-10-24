@@ -14,7 +14,7 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 from lib.cap import load_cap_data
 from lib.db import client, ensure_indexes
-from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export
+from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export, ai
 
 
 @asynccontextmanager
@@ -45,6 +45,7 @@ api_router.include_router(seo.router)
 api_router.include_router(landing.router)
 api_router.include_router(seo_tools.router)
 api_router.include_router(export.router)
+api_router.include_router(ai.router)
 
 app.add_middleware(
     CORSMiddleware,

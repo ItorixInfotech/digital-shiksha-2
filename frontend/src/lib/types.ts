@@ -572,3 +572,47 @@ export interface SeoReportSummary {
   turned_green: SeoReportItem[];
   top_fixes: SeoReportItem[];
 }
+
+// Mirrors backend/models/ai.py (Claude features)
+export type AIKind = "colleges" | "courses" | "exams" | "articles";
+export type AIFacts = Record<string, string | number | boolean | null>;
+export interface AIContentIn {
+  kind: AIKind;
+  fields: AIFacts;
+  instructions?: string;
+}
+export interface AIContentOut {
+  text: Record<string, string>; // field key -> drafted text
+  faqs: FaqItem[];
+}
+export interface AISeoIn {
+  kind: AIKind | "page";
+  fields: AIFacts;
+}
+export interface AISeoOut {
+  meta_title: string;
+  meta_description: string;
+  keywords: string[];
+}
+export interface AIStatus {
+  configured: boolean;
+  model: string;
+}
+export interface ChatIn {
+  session_id: string;
+  message: string;
+}
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+export interface ChatHistory {
+  messages: ChatMessage[];
+}
+export type ChatEvent = { delta: string } | { done: true } | { error: string };
+export interface AdviceIn {
+  prediction: PredictorIn;
+}
+export interface AdviceOut {
+  advice: string;
+}
