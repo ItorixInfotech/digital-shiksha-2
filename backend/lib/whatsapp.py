@@ -14,6 +14,8 @@ from urllib.parse import urlencode
 
 import httpx
 
+from lib.email import score_text
+
 from lib.db import db
 
 logger = logging.getLogger(__name__)
@@ -100,7 +102,7 @@ def _score_label(out) -> str:
         return f"{out.exam} rank {int(out.score)} ({out.category})"
     if out.metric == "score":
         return f"{out.exam} {int(out.score)}/720 ({out.category})"
-    return f"{out.exam} {out.score:g} percentile ({out.category})"
+    return f"{out.exam} {score_text(out.metric, out.score)} ({out.category})"
 
 
 def results_link(pred: dict) -> str:
@@ -252,13 +254,13 @@ async def notify_payment_whatsapp(rec: dict, out, pdf_url: str) -> None:
             seen.add(r.college_name)
             top.append(f"{r.short_name or r.college_name} ({r.chance})")
     name = rec.get("name") or "Student"
-    paid = f"PAID Rs.{int(rec['amount'])} - {exam} {rec['score']:g} percentile ({out.category})"
+    paid = f"PAID Rs.{int(rec['amount'])} - {exam} {score_text(out.metric, rec['score'])} ({out.category})"
     details = " | ".join(x for x in (
         rec.get("role"), f"Payment ID {rec['payment_id']}" + ("" if rec.get("verified") else " (check in Razorpay)"),
         "Top: " + ", ".join(top) if top else "", f"PDF: {pdf_url}" if pdf_url else "") if x)
     body = "\n".join(x for x in (
         "*New predictor payment - Digital Shiksha*", f"Name: {name}" + (f" ({rec['role']})" if rec.get("role") else ""),
-        f"Mobile: +91 {rec['phone']}", f"Exam: {exam}", f"Percentile: {rec['score']:g} ({out.category})", f"Amount: Rs.{int(rec['amount'])}",
+        f"Mobile: +91 {rec['phone']}", f"Exam: {exam}", f"Score: {score_text(out.metric, rec['score'])} ({out.category})", f"Amount: Rs.{int(rec['amount'])}",
         f"Payment ID: {rec['payment_id']}" + ("" if rec.get("verified") else " (not auto-verified, check in Razorpay)"),
         "Top colleges:\n" + "\n".join(f"- {t}" for t in top) if top else "", f"Prediction PDF: {pdf_url}" if pdf_url else "") if x)
     try:

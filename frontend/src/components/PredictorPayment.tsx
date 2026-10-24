@@ -19,7 +19,10 @@ interface Props {
   fee: number;
   paymentLink: string;
   autoCheck: boolean; // false = Razorpay keys missing, payment can't be found automatically
+  metric: string; // "percentile" | "score" | "rank" — wording only
 }
+
+const unitWord = (metric: string) => (metric === "rank" ? "rank" : metric === "score" ? "score" : "percentile");
 
 const download = (url: string) => {
   const a = document.createElement("a");
@@ -31,7 +34,7 @@ const download = (url: string) => {
 };
 
 /** Paid MHT CET step: pay on the Razorpay page, then we find the payment with Razorpay (by mobile) and unlock this exam + score. */
-export default function PredictorPayment({ open, onOpenChange, onPaid, prediction, fee, paymentLink, autoCheck }: Props) {
+export default function PredictorPayment({ open, onOpenChange, onPaid, prediction, fee, paymentLink, autoCheck, metric }: Props) {
   const [contact] = useState(readContact);
   const [phone, setPhone] = useState(contact.phone);
   // If Razorpay redirects back with ?razorpay_payment_id=…, use it silently (no field to fill).
@@ -68,8 +71,8 @@ export default function PredictorPayment({ open, onOpenChange, onPaid, predictio
           <span className="mb-1 grid size-10 place-items-center rounded-xl bg-green-50 text-brand-leaf">{paid ? <CheckCircle2 className="size-5" /> : <CreditCard className="size-5" />}</span>
           <DialogTitle>{paid ? "Payment confirmed" : `Unlock your ${prediction.exam} college list`}</DialogTitle>
           <DialogDescription>
-            {paid ? <>Thank you! Your full college list for percentile <span className="font-semibold text-slate-900">{paid.score}</span> is ready.</>
-              : <>Pay <span className="font-semibold text-slate-900" data-testid="predictor-payment-fee">₹{fee.toLocaleString("en-IN")}</span> once for percentile <span className="font-semibold text-slate-900">{prediction.score}</span>. You'll get the full college list PDF here and by email.</>}
+            {paid ? <>Thank you! Your full college list for {unitWord(metric)} <span className="font-semibold text-slate-900">{paid.score}</span> is ready.</>
+              : <>Pay <span className="font-semibold text-slate-900" data-testid="predictor-payment-fee">₹{fee.toLocaleString("en-IN")}</span> once for {unitWord(metric)} <span className="font-semibold text-slate-900">{prediction.score}</span>. You'll get the full college list PDF here and by email.</>}
           </DialogDescription>
         </DialogHeader>
 
@@ -116,7 +119,7 @@ export default function PredictorPayment({ open, onOpenChange, onPaid, predictio
             </li>
           </ol>
         )}
-        <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-slate-400"><MessageCircle className="mt-0.5 size-3.5 shrink-0" /> One payment unlocks one percentile. Changing your percentile needs a new payment. Category, branch and location filters stay free.</p>
+        <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-slate-400"><MessageCircle className="mt-0.5 size-3.5 shrink-0" /> One payment unlocks one {unitWord(metric)}. Changing your {unitWord(metric)} needs a new payment. Category, branch and location filters stay free.</p>
       </DialogContent>
     </Dialog>
   );

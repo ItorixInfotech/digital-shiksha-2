@@ -211,7 +211,7 @@ export default function Predictor() {
               </label>
             </div>
           )}
-          {spec && <p className="text-xs text-slate-500 sm:col-span-12">{spec.hint}{category !== "General" && spec.rank_note ? ` • ${spec.rank_note}` : ""}{spec.fee > 0 && <span className="ml-1 font-semibold text-brand-leaf" data-testid="predictor-fee-note">• Full college list: ₹{spec.fee.toLocaleString("en-IN")} per percentile</span>}</p>}
+          {spec && <p className="text-xs text-slate-500 sm:col-span-12">{spec.hint}{category !== "General" && spec.rank_note ? ` • ${spec.rank_note}` : ""}{spec.fee > 0 && <span className="ml-1 font-semibold text-brand-leaf" data-testid="predictor-fee-note">• Full college list: ₹{spec.fee.toLocaleString("en-IN")} per {spec.metric === "rank" ? "rank" : spec.metric === "score" ? "score" : "percentile"}</span>}</p>}
         </form>
       </PageHeader>
 
@@ -227,13 +227,13 @@ export default function Predictor() {
           prediction={body} examLabel={body ? `${body.exam}${body.branch_group ? ` – ${body.branch_group}` : ""}` : ""} />
         {body && unlocked && needsPay && (
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-green-200 bg-green-50 p-5" data-testid="predictor-paywall-card">
-            <p className="text-sm text-slate-700"><span className="font-semibold text-brand-leaf">Your {body.exam} college list for {body.score} percentile is ready.</span> Pay ₹{fee.toLocaleString("en-IN")} to view it and get it on WhatsApp.</p>
+            <p className="text-sm text-slate-700"><span className="font-semibold text-brand-leaf">Your {body.exam} college list for {urlSpec?.metric === "rank" ? `rank ${body.score}` : urlSpec?.metric === "score" ? `score ${body.score}` : `${body.score} percentile`} is ready.</span> Pay ₹{fee.toLocaleString("en-IN")} to view it and get the PDF by email.</p>
             <Button onClick={() => setPayDismissed(false)} className="bg-brand-red text-white hover:bg-red-700" data-testid="predictor-pay-button">Pay ₹{fee.toLocaleString("en-IN")} &amp; view</Button>
           </div>
         )}
         {body && urlSpec && fee > 0 && unlocked && (
           <PredictorPayment key={bodyKey} open={payOpen} onOpenChange={(o) => { if (!o) setPayDismissed(true); }} onPaid={() => void qc.invalidateQueries({ queryKey: accessKey })}
-            prediction={body} fee={fee} paymentLink={urlSpec.payment_link} autoCheck={urlSpec.payment_auto_check} />
+            prediction={body} fee={fee} paymentLink={urlSpec.payment_link} autoCheck={urlSpec.payment_auto_check} metric={urlSpec.metric} />
         )}
         {!data && !predict.isFetching && !(body && !unlocked) && !(body && needsPay) && (
           <div className="grid gap-4 md:grid-cols-3" data-testid="predictor-intro">

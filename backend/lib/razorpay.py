@@ -17,6 +17,7 @@ PAID_EXAMS = {
     "JEE Main": (249900, "https://rzp.io/rzp/UIqrKC9h"),          # ₹2499
     "MAH MBA CET": (119900, "https://rzp.io/rzp/aG2c274"),        # ₹1199
     "JEE Advanced": (299900, "https://rzp.io/rzp/Yf8GaPJK"),      # ₹2999
+    "NEET UG": (349900, "https://rzp.io/rzp/C5otnMZx"),           # ₹3499
 }
 API = "https://api.razorpay.com/v1"
 logger = logging.getLogger(__name__)

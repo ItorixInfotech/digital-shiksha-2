@@ -221,7 +221,12 @@ async def send_student_confirmation(lead: dict) -> None:
         logger.error("Student confirmation failed for %s: %s", lead.get("id"), exc)
 
 
-# ---- Paid MHT CET / Pharmacy predictor receipt (fixed server-side template; only escaped server data is interpolated)
+def score_text(metric: str, score: float) -> str:
+    """'95 percentile' / 'score 610' / 'rank 1500' — wording per exam metric."""
+    return {"score": f"score {score:g}", "rank": f"rank {score:g}"}.get(metric, f"{score:g} percentile")
+
+
+# ---- Paid predictor receipt (fixed server-side template; only escaped server data is interpolated)
 def predictor_receipt_html(rec: dict, out, pdf_url: str) -> str:
     c = COUNSELLOR
     first = escape(_first_name(rec.get("name", "")))
@@ -246,12 +251,12 @@ def predictor_receipt_html(rec: dict, out, pdf_url: str) -> str:
         '<span style="color:#ffffff;font-size:20px;font-weight:bold"><span style="color:#4ade80">Digital</span> Shiksha</span><br>'
         '<span style="color:#cbd5e1;font-size:12px;letter-spacing:1px">PAYMENT RECEIPT &bull; COLLEGE PREDICTOR</span></td></tr>'
         f'<tr><td style="padding:24px 24px 8px"><p style="margin:0 0 10px;font-size:18px;color:#0f172a;font-weight:bold">Hi {first}, thank you for your payment!</p>'
-        f'<p style="margin:0;font-size:15px;line-height:1.6;color:#334155">Here is your {escape(out.exam)} college prediction for <strong>{rec["score"]:g} percentile</strong> '
+        f'<p style="margin:0;font-size:15px;line-height:1.6;color:#334155">Here is your {escape(out.exam)} college prediction for <strong>{score_text(out.metric, rec["score"])}</strong> '
         f'({escape(out.category)}). The full list with all CAP round cut-offs is in the PDF below.</p></td></tr>'
         '<tr><td style="padding:12px 24px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px">'
         '<tr><td style="padding:14px 16px;font-size:14px;color:#0f172a;line-height:1.8">'
         f'Amount paid: <strong>&#8377;{int(rec["amount"]):,}</strong><br>Payment ID: <strong>{escape(rec["payment_id"])}</strong><br>'
-        f'Date: {escape(paid)}<br>For: {escape(out.exam)} College Predictor &ndash; {rec["score"]:g} percentile</td></tr></table></td></tr>'
+        f'Date: {escape(paid)}<br>For: {escape(out.exam)} College Predictor &ndash; {score_text(out.metric, rec["score"])}</td></tr></table></td></tr>'
         + btn +
         '<tr><td style="padding:12px 24px"><p style="margin:0 0 8px;font-size:13px;font-weight:bold;color:#dc2626;letter-spacing:1px">YOUR TOP COLLEGES</p>'
         f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:8px">{"".join(rows) or empty}</table></td></tr>'
@@ -267,7 +272,7 @@ def predictor_receipt_html(rec: dict, out, pdf_url: str) -> str:
 async def send_predictor_receipt(rec: dict, out, pdf_url: str) -> bool:
     """Background-safe: returns False instead of raising."""
     try:
-        email_id = await send_email(to=rec["email"], subject=f"Your Digital Shiksha receipt & {out.exam} college list ({rec['score']:g} percentile)",
+        email_id = await send_email(to=rec["email"], subject=f"Your Digital Shiksha receipt & {out.exam} college list ({score_text(out.metric, rec['score'])})",
                                     html=predictor_receipt_html(rec, out, pdf_url))
         logger.info("Predictor receipt %s sent: %s", rec["payment_id"], email_id)
         return bool(email_id)
@@ -281,7 +286,7 @@ def payment_alert_html(rec: dict, out, pdf_url: str) -> str:
     phone, pid = escape(rec["phone"]), escape(rec["payment_id"])
     exam = escape({"MHT CET": "MHT CET (Engineering)", "MHT CET Pharmacy": "MHT CET (Pharmacy)"}.get(out.exam, out.exam))
     rows = [_row("Name", escape(rec.get("name") or "—")), _row("Are you", escape(rec.get("role") or "—")), _row("Mobile", f'<a href="tel:+91{phone}" style="color:#1e3a8a">+91 {phone}</a>'),
-            _row("Exam", exam), _row("Percentile", f'{rec["score"]:g} ({escape(out.category)})'),
+            _row("Exam", exam), _row("Score", f'{escape(score_text(out.metric, rec["score"]))} ({escape(out.category)})'),
             _row("Amount", f'&#8377;{int(rec["amount"]):,}'),
             _row("Payment ID", f'<a href="https://dashboard.razorpay.com/app/payments/{pid}" style="color:#1e3a8a">{pid}</a>'),
             _row("Status", "Verified with Razorpay" if rec.get("verified") else '<strong style="color:#b45309">Not auto-verified &ndash; check this ID in Razorpay</strong>'),
@@ -312,7 +317,7 @@ async def notify_payment(rec: dict, out, pdf_url: str) -> None:
     if not to:
         return
     try:
-        subject = f"Payment ₹{int(rec['amount']):,}: {rec.get('name') or 'Student'} – {out.exam} {rec['score']:g} percentile"
+        subject = f"Payment ₹{int(rec['amount']):,}: {rec.get('name') or 'Student'} – {out.exam} {score_text(out.metric, rec['score'])}"
         email_id = await send_email(to=to, subject=subject[:150], html=payment_alert_html(rec, out, pdf_url), internal=True)
         logger.info("Payment alert %s sent: %s", rec["payment_id"], email_id)
     except Exception as exc:  # noqa: BLE001
