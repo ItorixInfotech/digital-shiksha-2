@@ -51,7 +51,7 @@ def _score(out: PredictorOut) -> str:
     return f"{out.score:g} percentile"
 
 
-def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | None = None, advice: str = "") -> bytes:
+def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | None = None) -> bytes:
     """receipt (paid MHT CET): {name, payment_id, amount, paid_at} — adds a payment receipt box under the title."""
     buf = BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=14 * mm, rightMargin=14 * mm, topMargin=14 * mm, bottomMargin=18 * mm,
@@ -111,13 +111,6 @@ def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | N
     notice.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#D97706")), ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#FFFBEB")),
                                 ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
     story += [summary, Spacer(1, 4 * mm), notice, Spacer(1, 5 * mm)]
-    if advice:  # AI counsellor note (Claude), shown on paid predictions once generated
-        lines = "<br/>".join(_ascii(l.strip().replace("•", "-")) for l in advice.splitlines() if l.strip())
-        adv = Table([[Paragraph(f"<b>PERSONAL ADVICE FROM DIGITAL SHIKSHA</b><br/>{lines}",
-                                ParagraphStyle("adv", parent=S["sub"], fontSize=8.5, leading=12))]], colWidths=[width])
-        adv.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#1E3A8A")), ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EFF6FF")),
-                                 ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
-        story += [adv, Spacer(1, 5 * mm)]
 
     if out.results:
         rows = [[Paragraph(h, S["head"]) for h in ("#", "College", "Course / Branch", ("Round I cutoff (official CAP)" if official else "Cutoff" + (" (est.)" if out.category != "General" else "")), "Chance", "Fees / yr")]]

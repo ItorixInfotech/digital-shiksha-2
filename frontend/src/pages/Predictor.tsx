@@ -6,7 +6,6 @@ import { BadgeCheck, Building2, Download, Info, Link2, Loader2, MapPin, MessageC
 import { Checkbox } from "@/components/ui/checkbox";
 import PredictorGate from "@/components/PredictorGate";
 import PredictorPayment from "@/components/PredictorPayment";
-import PredictorAdvice from "@/components/PredictorAdvice";
 import { dropLegacyStorage, GATE_KEY, PENDING_KEY } from "@/lib/predictor-storage";
 import { PageHeader, EmptyState } from "@/components/Common";
 import { Button } from "@/components/ui/button";
@@ -251,7 +250,6 @@ export default function Predictor() {
           </div>
         )}
 
-        {data && body && fee > 0 && data.results.length > 0 && <PredictorAdvice prediction={body} />}
         {data && (
           <div data-testid="predictor-results">
             <div className="flex flex-wrap items-end justify-between gap-4">

@@ -46,28 +46,3 @@ export const apiPatch = <T>(path: string, body?: JsonBody) =>
   request<T>("PATCH", path, body ?? null);
 export const apiDelete = <T>(path: string) => request<T>("DELETE", path);
 
-/**
- * Server-sent events over POST (Claude chat). Calls onEvent for each `data: {...}` JSON line.
- * Same BASE / cookie rules as request(); non-2xx throws ApiError like the other helpers.
- */
-export async function apiStream<E>(path: string, body: JsonBody, onEvent: (e: E) => void, signal?: AbortSignal): Promise<void> {
-  const res = await fetch(`${BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal });
-  if (!res.ok || !res.body) {
-    const errBody = await res.json().catch(() => null);
-    throw new ApiError(res.status, errBody);
-  }
-  const reader = res.body.getReader();
-  const dec = new TextDecoder();
-  let buf = "";
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buf += dec.decode(value, { stream: true });
-    let i: number;
-    while ((i = buf.indexOf("\n\n")) >= 0) {
-      const line = buf.slice(0, i).trim();
-      buf = buf.slice(i + 2);
-      if (line.startsWith("data:")) onEvent(JSON.parse(line.slice(5)) as E);
-    }
-  }
-}

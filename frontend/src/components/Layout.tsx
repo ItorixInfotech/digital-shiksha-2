@@ -5,7 +5,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { CompareBar, EnquiryDialog, FloatingActions } from "@/components/Overlays";
 import { SiteProvider } from "@/lib/site-context";
-import ChatWidget from "@/components/ChatWidget";
 
 function ScrollTop() {
   const { pathname } = useLocation();
@@ -24,7 +23,6 @@ export default function Layout() {
         </main>
         <Footer />
       </div>
-      <ChatWidget />
       <FloatingActions />
       <CompareBar />
       <EnquiryDialog />

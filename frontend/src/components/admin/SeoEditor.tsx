@@ -5,8 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DESC_MAX, TITLE_MAX } from "@/lib/seo";
 import { cn } from "@/lib/utils";
-import { AISeoButton } from "@/components/admin/AIButtons";
-import type { AIFacts, AISeoIn } from "@/lib/types";
 
 export interface SeoForm {
   meta_title: string;
@@ -24,7 +22,6 @@ interface Props {
   path: string;
   testid: string;
   advanced?: boolean; // keywords + canonical (entity pages)
-  ai?: { kind: AISeoIn["kind"]; facts: AIFacts }; // shows "Fill with AI" (Claude)
 }
 
 function Counter({ n, max, min, testid }: { n: number; max: number; min: number; testid: string }) {
@@ -33,7 +30,7 @@ function Counter({ n, max, min, testid }: { n: number; max: number; min: number;
 }
 
 /** On-page SEO fields + live Google search preview. Empty fields fall back to the auto-generated defaults shown as placeholders. */
-export default function SeoEditor({ value, onChange, defaults, path, testid, advanced = true, ai }: Props) {
+export default function SeoEditor({ value, onChange, defaults, path, testid, advanced = true }: Props) {
   const set = (k: keyof SeoForm, v: string | boolean) => onChange({ ...value, [k]: v });
   const title = value.meta_title || defaults.title;
   const desc = value.meta_description || defaults.description;
@@ -46,8 +43,6 @@ export default function SeoEditor({ value, onChange, defaults, path, testid, adv
         <Search className="size-4 text-brand-blue" />
         <h3 className="text-sm font-semibold text-slate-900">On-page SEO</h3>
         <span className="text-xs text-slate-500">Leave blank to use the smart auto-generated value</span>
-        {ai && <AISeoButton kind={ai.kind} facts={{ ...ai.facts, page_path: path }} testid={`${testid}-ai-fill-button`}
-          onFill={(s) => onChange({ ...value, meta_title: s.meta_title, meta_description: s.meta_description, ...(advanced ? { keywords: s.keywords.join(", ") } : {}) })} />}
       </div>
 
       <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200" data-testid={`${testid}-google-preview`}>
