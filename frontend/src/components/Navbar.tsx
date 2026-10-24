@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { ChevronDown, Mail, Menu, Phone, Search } from "lucide-react";
+import { ChevronDown, Mail, Menu, Phone, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { to: "/predictor", label: "Predictor" },
   { to: "/courses", label: "Courses" },
   { to: "/exams", label: "Exams" },
   { to: "/compare", label: "Compare" },
@@ -22,6 +21,27 @@ const LINKS = [
 
 const linkCls = ({ isActive }: { isActive: boolean }) =>
   cn("rounded-md px-3 py-2 text-[15px] font-medium transition-colors", isActive ? "text-brand-leaf" : "text-slate-700 hover:text-brand-leaf");
+
+/** Eye-catching College Predictor pill (gradient, light sweep, soft halo, "Free check" style badge). */
+function PredictorPill({ testid, compact = false, onClick }: { testid: string; compact?: boolean; onClick?: () => void }) {
+  return (
+    <NavLink to="/predictor" onClick={onClick} data-testid={testid} aria-label="College Predictor"
+      className={({ isActive }) => cn(
+        "group relative isolate inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-brand-leaf via-emerald-500 to-green-600 font-semibold text-white shadow-lg shadow-green-600/30 ring-2 ring-white transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-green-600/45 active:scale-95",
+        compact ? "h-9 px-3 text-[13px]" : "h-9 px-3 text-sm xl:px-4",
+        isActive && "ring-green-200")}>
+      <span aria-hidden className="absolute inset-0 -z-10 rounded-full bg-brand-leaf animate-ping-soft" />
+      <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-full">
+        <span className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/45 to-transparent animate-shine" />
+      </span>
+      <Sparkles className="relative size-4" />
+      <span className="relative whitespace-nowrap">{!compact && <span className="hidden xl:inline">College </span>}Predictor</span>
+      <span className="relative ml-0.5 whitespace-nowrap rounded-full bg-yellow-300 px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-slate-900">
+        Try{!compact && <span className="hidden xl:inline"> now</span>}
+      </span>
+    </NavLink>
+  );
+}
 
 export function Logo({ className = "h-11" }: { className?: string }) {
   return <img src={SITE.logo} alt="Digital Shiksha — Counselling & Admission" className={cn("w-auto select-none", className)} />;
@@ -52,7 +72,12 @@ export default function Navbar() {
       </div>
       <div className="border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-          <Link to="/" data-testid="nav-logo-link" className="shrink-0"><Logo className="h-11" /></Link>
+          <Link to="/" data-testid="nav-logo-link" className="shrink-0"><Logo className="h-9 sm:h-11" /></Link>
+
+          {/* Mobile / tablet: predictor in the middle of the header, right after the logo */}
+          <div className="flex flex-1 justify-center lg:hidden">
+            <PredictorPill testid="mobile-header-predictor" compact />
+          </div>
 
           <nav className="ml-4 hidden items-center gap-0.5 lg:flex" data-testid="main-nav">
             <DropdownMenu>
@@ -79,14 +104,16 @@ export default function Navbar() {
             ))}
           </nav>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto hidden lg:block"><PredictorPill testid="nav-link-predictor" /></div>
+
+          <div className="flex items-center gap-2 lg:ml-0">
             <button
               type="button"
               data-testid="nav-search-button"
               onClick={() => setSearchOpen(true)}
               className="hidden h-9 items-center gap-2 rounded-lg border bg-slate-50 px-3 text-sm text-slate-500 hover:border-slate-300 transition-colors md:flex"
             >
-              <Search className="size-4" /> <span className="hidden xl:inline">Search colleges, exams…</span>
+              <Search className="size-4" /> <span className="hidden whitespace-nowrap 2xl:inline">Search colleges, exams…</span>
             </button>
             <Button data-testid="nav-enquire-button" onClick={() => openEnquiry({ source: "header" })} className="hidden h-9 bg-brand-red px-4 text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform] sm:inline-flex">
               Enquire Now
@@ -99,7 +126,8 @@ export default function Navbar() {
                 <SheetTitle className="sr-only">Menu</SheetTitle>
                 <Logo className="h-10" />
                 <div className="mt-5"><GlobalSearch testid="mobile-search" onNavigate={() => setMobile(false)} /></div>
-                <nav className="mt-4 grid gap-1">
+                <div className="mt-4"><PredictorPill testid="mobile-nav-predictor" onClick={() => setMobile(false)} /></div>
+                <nav className="mt-3 grid gap-1">
                   {[{ to: "/colleges", label: "Colleges" }, ...LINKS].map((l) => (
                     <NavLink key={l.to} to={l.to} onClick={() => setMobile(false)} className={linkCls} data-testid={`mobile-nav-${slugify(l.label)}`}>
                       {l.label}
