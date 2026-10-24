@@ -128,6 +128,7 @@ class PredictionLog(BaseModel):
     cities: List[str]
     results: int
     high: int
+    params: dict = Field(default_factory=dict)  # full PredictorIn, so admin can re-create the exact PDF
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

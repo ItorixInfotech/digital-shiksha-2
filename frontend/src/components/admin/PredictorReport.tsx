@@ -84,7 +84,11 @@ export default function PredictorReportPanel() {
       </div>
 
       <div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-semibold">Predictor payments <span className="text-sm font-normal text-slate-500">— MHT CET Engineering ₹1500 / Pharmacy ₹599 / JEE Main ₹2499 / MAH MBA CET ₹1199 / JEE Advanced ₹2999 / NEET UG ₹3499 unlocks; "Check in Razorpay" ones were not auto-verified</span></h3>
+          <a href="/api/admin/predictor-payments/pdfs.zip" download data-testid="admin-predictor-payments-zip"
+            className="inline-flex items-center gap-1.5 rounded-md border bg-white px-3 py-1.5 text-xs font-semibold text-brand-blue hover:bg-slate-50 transition-colors"><Download className="size-3.5" /> Download all paid PDFs (ZIP)</a>
+        </div>
         <div className="mt-3 rounded-2xl border bg-white">
           <Table data-testid="admin-predictor-payments-table">
             <TableHeader><TableRow><TableHead>When</TableHead><TableHead>Student</TableHead><TableHead>Percentile</TableHead><TableHead>Payment ID</TableHead><TableHead>Receipt email</TableHead><TableHead>Status</TableHead><TableHead>PDF</TableHead></TableRow></TableHeader>
@@ -115,7 +119,7 @@ export default function PredictorReportPanel() {
           <h3 className="font-semibold">Recent predictions</h3>
           <div className="mt-3 rounded-2xl border bg-white">
             <Table data-testid="admin-predictor-recent-table">
-              <TableHeader><TableRow><TableHead>When</TableHead><TableHead>Exam</TableHead><TableHead>Score</TableHead><TableHead>Category</TableHead><TableHead>Where</TableHead><TableHead>Results</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>When</TableHead><TableHead>Exam</TableHead><TableHead>Score</TableHead><TableHead>Category</TableHead><TableHead>Where</TableHead><TableHead>Results</TableHead><TableHead>PDF</TableHead></TableRow></TableHeader>
               <TableBody>
                 {r.recent.map((p) => (
                   <TableRow key={p.id}>
@@ -125,9 +129,13 @@ export default function PredictorReportPanel() {
                     <TableCell>{p.category}</TableCell>
                     <TableCell className="text-xs">{p.cities.length ? p.cities.join(" & ") : "All India"}</TableCell>
                     <TableCell className="text-xs">{p.results} <span className="text-green-700">({p.high} high)</span></TableCell>
+                    <TableCell>
+                      <a href={`/api/admin/predictions/${encodeURIComponent(p.id)}/pdf`} download data-testid={`admin-predictor-recent-pdf-${p.id}`}
+                        className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold text-brand-blue hover:bg-slate-50 transition-colors"><Download className="size-3.5" /> PDF</a>
+                    </TableCell>
                   </TableRow>
                 ))}
-                {!r.recent.length && <TableRow><TableCell colSpan={6} className="py-6 text-center text-slate-500">No predictions yet.</TableCell></TableRow>}
+                {!r.recent.length && <TableRow><TableCell colSpan={7} className="py-6 text-center text-slate-500">No predictions yet.</TableCell></TableRow>}
               </TableBody>
             </Table>
           </div>

@@ -459,6 +459,7 @@ export interface PredictionLog {
   cities: string[];
   results: number;
   high: number;
+  params: Record<string, unknown>; // full PredictorIn used to re-create the PDF
   created_at: string;
 }
 

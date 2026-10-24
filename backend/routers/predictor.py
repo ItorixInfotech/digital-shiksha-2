@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from typing import List
 
+import io
 import secrets
+import zipfile
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response
 from pymongo.errors import DuplicateKeyError
@@ -297,6 +299,33 @@ async def predictor_receipt_pdf(receipt_id: str):
     return await _receipt_pdf(doc)
 
 
+@router.get("/admin/predictions/{log_id}/pdf")
+async def admin_prediction_pdf(log_id: str, _: str = Depends(require_admin)):
+    """Any logged prediction (paid or free) re-created as the same PDF the student saw."""
+    d = await db.predictions.find_one({"id": log_id}, {"_id": 0})
+    if not d:
+        raise HTTPException(status_code=404, detail="Prediction not found")
+    body = PredictorIn(**(d.get("params") or {"exam": d["exam"], "score": d["score"], "category": d["category"], "cities": d.get("cities", [])}))
+    out = await run_prediction(body)
+    name = f"digital-shiksha-{out.exam.lower().replace(' ', '-')}-{out.score:g}-{log_id[:8]}.pdf"
+    return Response(content=build_prediction_pdf(out, body.cities), media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="{name}"'})
+
+
+@router.get("/admin/predictor-payments/pdfs.zip")
+async def admin_payment_pdfs_zip(_: str = Depends(require_admin)):
+    """Every paid prediction's receipt PDF (latest 200) in one ZIP."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        async for doc in db.predictor_unlocks.find({}, {"_id": 0}).sort("created_at", -1).limit(200):
+            res = await _receipt_pdf(doc)
+            fname = res.headers["content-disposition"].split('filename="')[1].rstrip('"')
+            z.writestr(fname, res.body)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d")
+    return Response(content=buf.getvalue(), media_type="application/zip",
+                    headers={"Content-Disposition": f'attachment; filename="digital-shiksha-paid-predictions-{stamp}.zip"'})
+
+
 @router.get("/admin/predictor-payments/{payment_id}/pdf")
 async def admin_payment_pdf(payment_id: str, _: str = Depends(require_admin)):
     doc = await db.predictor_unlocks.find_one({"payment_id": payment_id}, {"_id": 0})
@@ -320,7 +349,7 @@ async def predict(body: PredictorIn, request: Request):
     out = await run_prediction(body)
     await db.predictions.insert_one(PredictionLog(
         exam=out.exam, metric=out.metric, score=out.score, category=out.category, cities=body.cities,
-        results=out.total or len(out.results), high=sum(r.chance == "High" for r in out.results),
+        results=out.total or len(out.results), high=sum(r.chance == "High" for r in out.results), params=body.model_dump(),
     ).model_dump())
     return out
 
@@ -372,7 +401,7 @@ async def predictor_report(_: str = Depends(require_admin)):
         last_7_days=sum(d["created_at"] >= week_ago for d in logs),
         predictor_leads=await db.leads.count_documents({"source": "predictor"}),
         exams=exams,
-        recent=[PredictionLog(**d) for d in logs[:50]],
+        recent=[PredictionLog(**d) for d in logs[:200]],
     )
 
 
