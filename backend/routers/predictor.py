@@ -29,7 +29,8 @@ EXAMS = {
     "JEE Main": PredictorExam(name="JEE Main", metric="percentile", min=0, max=100, label="JEE Main percentile", hint="e.g. 98.2 — All India quota seats in Maharashtra",
                               fee=razorpay.PAID_EXAMS["JEE Main"][0] // 100, payment_link=razorpay.PAID_EXAMS["JEE Main"][1]),
     "NEET UG": PredictorExam(name="NEET UG", metric="score", min=0, max=720, label="NEET UG score (out of 720)", hint="e.g. 610 — MBBS state quota / deemed seats"),
-    "MAH MBA CET": PredictorExam(name="MAH MBA CET", metric="percentile", min=0, max=100, label="MAH MBA CET percentile", hint="e.g. 96 — MBA/MMS state CAP"),
+    "MAH MBA CET": PredictorExam(name="MAH MBA CET", metric="percentile", min=0, max=100, label="MAH MBA CET percentile", hint="e.g. 96 — MBA/MMS state CAP",
+                                 fee=razorpay.PAID_EXAMS["MAH MBA CET"][0] // 100, payment_link=razorpay.PAID_EXAMS["MAH MBA CET"][1]),
     "JEE Advanced": PredictorExam(name="JEE Advanced", metric="rank", min=1, max=250000, label="JEE Advanced rank", hint="e.g. 1500 — IIT seats via JoSAA",
                                   rank_note="Enter your category rank (e.g. OBC-NCL rank) if you selected a reserved category."),
 }

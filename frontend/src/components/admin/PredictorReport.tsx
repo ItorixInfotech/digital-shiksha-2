@@ -84,7 +84,7 @@ export default function PredictorReportPanel() {
       </div>
 
       <div>
-        <h3 className="font-semibold">Predictor payments <span className="text-sm font-normal text-slate-500">— MHT CET Engineering ₹1500 / Pharmacy ₹599 / JEE Main ₹2499 unlocks; "Check in Razorpay" ones were not auto-verified</span></h3>
+        <h3 className="font-semibold">Predictor payments <span className="text-sm font-normal text-slate-500">— MHT CET Engineering ₹1500 / Pharmacy ₹599 / JEE Main ₹2499 / MAH MBA CET ₹1199 unlocks; "Check in Razorpay" ones were not auto-verified</span></h3>
         <div className="mt-3 rounded-2xl border bg-white">
           <Table data-testid="admin-predictor-payments-table">
             <TableHeader><TableRow><TableHead>When</TableHead><TableHead>Student</TableHead><TableHead>Percentile</TableHead><TableHead>Payment ID</TableHead><TableHead>Receipt email</TableHead><TableHead>Status</TableHead><TableHead>PDF</TableHead></TableRow></TableHeader>
