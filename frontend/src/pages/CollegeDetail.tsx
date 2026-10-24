@@ -16,7 +16,7 @@ import { useSite } from "@/lib/site-context";
 import { EntitySeo } from "@/components/Seo";
 import PredictorNudge from "@/components/PredictorNudge";
 
-const TABS = ["Overview", "Courses & Fees", "Admission 2026", "Cutoff", "Placements", "Facilities"];
+const TABS = ["Overview", "Courses & Fees", "Admission 2027", "Cutoff", "Placements", "Facilities"];
 
 export default function CollegeDetail() {
   const { slug = "" } = useParams();
@@ -100,7 +100,7 @@ export default function CollegeDetail() {
           )}
           {tab === "Courses & Fees" && (
             <div className="rounded-2xl border bg-white p-2 sm:p-4">
-              <h2 className="px-2 pt-2 text-xl font-semibold">{c.short_name} courses & fees 2026</h2>
+              <h2 className="px-2 pt-2 text-xl font-semibold">{c.short_name} courses & fees 2027</h2>
               <Table className="mt-3" data-testid="college-courses-table">
                 <TableHeader><TableRow><TableHead>Course</TableHead><TableHead>Duration</TableHead><TableHead>Fees</TableHead><TableHead className="hidden md:table-cell">Eligibility</TableHead><TableHead /></TableRow></TableHeader>
                 <TableBody>
@@ -118,9 +118,9 @@ export default function CollegeDetail() {
               {!c.courses.length && <p className="p-4 text-sm text-slate-500">Course details coming soon — enquire for the latest fee structure.</p>}
             </div>
           )}
-          {tab === "Admission 2026" && (
+          {tab === "Admission 2027" && (
             <div className="rounded-2xl border bg-white p-6">
-              <h2 className="text-xl font-semibold">{c.short_name} admission process 2026</h2>
+              <h2 className="text-xl font-semibold">{c.short_name} admission process 2027</h2>
               <p className="mt-3 leading-relaxed text-slate-600">{c.admission}</p>
               <ol className="mt-6 space-y-4">
                 {["Appear for the accepted entrance exam: " + c.exams_accepted.join(", "), "Register for state / central counselling (CAP, MCC, JoSAA or institute process)", "Fill and lock college-branch choices", "Seat allotment, document verification & fee payment", "Report to the institute for commencement of classes"].map((s, i) => (

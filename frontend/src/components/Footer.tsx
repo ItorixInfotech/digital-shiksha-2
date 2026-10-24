@@ -44,7 +44,7 @@ export default function Footer() {
         </div>
         <div className="mt-12 border-t border-white/10 pt-6 text-xs leading-relaxed text-slate-500">
           <p>DISCLAIMER – Published in good faith and for general information purposes only. Fees, cutoffs and dates are indicative; please verify with the respective institute or exam authority.</p>
-          <p className="mt-3 text-slate-400">© {new Date().getFullYear()} Digital Shiksha – All Rights Reserved.</p>
+          <p className="mt-3 text-slate-400">© Digital Shiksha – All Rights Reserved.</p>
         </div>
       </div>
     </footer>

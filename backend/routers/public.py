@@ -116,6 +116,8 @@ async def list_articles(category: Optional[str] = None, q: Optional[str] = None)
 
 @router.get("/articles/{slug}", response_model=Article)
 async def get_article(slug: str):
+    if "2026" in slug and await db.articles.find_one({"slug": slug.replace("2026", "2027")}, {"_id": 1}):
+        slug = slug.replace("2026", "2027")  # old 2026 links keep working after the 2027 rollover
     return await _one("articles", slug)
 
 

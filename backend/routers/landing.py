@@ -6,6 +6,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 
 from lib.dates import today_iso
+from lib.year_rollover import ADMISSION_YEAR
 from lib.db import db
 from models.content import FaqItem, SeoMeta
 from models.landing import LandingLink, LandingOverrideIn, LandingPage, LandingStats, LandingSummary
@@ -32,7 +33,7 @@ def _inr(n: float) -> str:
 
 
 def _year() -> int:
-    return int(today_iso("Asia/Kolkata")[:4])
+    return max(ADMISSION_YEAR, int(today_iso("Asia/Kolkata")[:4]))  # admission season, not calendar year
 
 
 def _defaults(stream: str, city: str, count: int, year: int) -> tuple[str, str]:

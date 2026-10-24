@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import PlainTextResponse, Response
 
 from lib.dates import today_iso
+from lib.year_rollover import ADMISSION_YEAR
 from lib.db import db
 from models.seo import PageSeo, SeoPages, SeoPagesIn
 from routers.admin import require_admin
@@ -36,7 +37,7 @@ STATIC_PAGES = [
 
 
 def _year() -> int:
-    return int(today_iso("Asia/Kolkata")[:4])
+    return max(ADMISSION_YEAR, int(today_iso("Asia/Kolkata")[:4]))  # admission season, not calendar year
 
 
 async def _pages() -> SeoPages:

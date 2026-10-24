@@ -58,7 +58,7 @@ export default function Navbar() {
       <div className="bg-brand-navy text-slate-200">
         <div className="mx-auto flex h-9 max-w-7xl items-center justify-between gap-4 px-4 text-xs sm:px-6 lg:px-8">
           <p className="truncate" data-testid="topbar-tagline">
-            Career counselling for MBBS • B.Tech • MBA • Law • Design — admissions open for 2026
+            Career counselling for MBBS • B.Tech • MBA • Law • Design — admissions open for 2027
           </p>
           <div className="flex shrink-0 items-center gap-4">
             <a href={SITE.phoneHref} data-testid="topbar-phone-link" className="flex items-center gap-1.5 hover:text-white transition-colors">

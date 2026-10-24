@@ -9,6 +9,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from lib import seo_score as ss
 from lib.cron import accept_cron
 from lib.dates import today_iso
+from lib.year_rollover import ADMISSION_YEAR
 from lib.db import db
 from lib.email import send_email
 from models.seo import KeywordFillItem, KeywordFillResult, SeoReportItem, SeoReportKind, SeoReportSummary
@@ -23,7 +24,7 @@ SNAPSHOT = "seo_snapshot"
 
 
 def _year() -> int:
-    return int(today_iso("Asia/Kolkata")[:4])
+    return max(ADMISSION_YEAR, int(today_iso("Asia/Kolkata")[:4]))
 
 
 @router.post("/admin/seo/keywords", response_model=KeywordFillResult)

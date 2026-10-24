@@ -24,7 +24,7 @@ export default function Exams() {
   return (
     <div data-testid="exams-page">
       <PageSeo page="exams" jsonLd={[breadcrumbLd([["Home", "/"], ["Exams", "/exams"]])]} />
-      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Exams" }]} title="Entrance Exams in India 2026" subtitle="National, state and university-level entrance exams — dates, eligibility, syllabus and application deadlines." testid="exams-header" />
+      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Exams" }]} title="Entrance Exams in India 2027" subtitle="National, state and university-level entrance exams — dates, eligibility, syllabus and application deadlines." testid="exams-header" />
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-2">
           {LEVELS.map((l) => (

@@ -139,7 +139,7 @@ export default function Home() {
           </div>
         </div>
         <div className="lg:col-span-5" data-testid="home-upcoming-exams">
-          <SectionTitle overline="Entrance exams" title="Upcoming exams 2026" action={<Link to="/exams" className="text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid="home-all-exams-link">All exams</Link>} />
+          <SectionTitle overline="Entrance exams" title="Upcoming exams 2027" action={<Link to="/exams" className="text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid="home-all-exams-link">All exams</Link>} />
           <ul className="mt-6 divide-y rounded-2xl border bg-white">
             {upcoming.map((e) => (
               <li key={e.id}>
@@ -164,7 +164,7 @@ export default function Home() {
           <div className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-brand-teal/30 blur-3xl" />
           <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf-soft">New • College Predictor 2026</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf-soft">New • College Predictor 2027</p>
               <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Got your MHT CET, JEE or NEET score?</h2>
               <p className="mt-2 max-w-xl text-slate-200">See which Pune & Mumbai colleges you can likely get — based on last year's closing cutoffs.</p>
             </div>

@@ -14,13 +14,15 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 from lib.cap import load_cap_data
 from lib.db import client, ensure_indexes
+from lib.year_rollover import run_year_rollover
 from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.index_task = asyncio.create_task(ensure_indexes())  # background: a big index build must not block boot
-    app.state.cap_task = asyncio.create_task(load_cap_data())  # official CAP cut-offs; reloads only when the data file version changes
+    app.state.cap_task = asyncio.create_task(load_cap_data())
+    app.state.rollover_task = asyncio.create_task(run_year_rollover())  # one-time 2026 -> 2027 content rollover  # official CAP cut-offs; reloads only when the data file version changes
     yield
     client.close()
 

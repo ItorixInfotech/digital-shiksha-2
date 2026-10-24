@@ -33,7 +33,7 @@ export default function CourseDetail() {
   return (
     <div data-testid="course-detail-page">
       <EntitySeo kind="courses" item={c} />
-      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Courses", to: "/courses" }, { label: c.name }]} title={<>{c.name}: <span className="text-brand-leaf-soft">{c.full_name}</span></>} subtitle={`${c.stream} • Admission 2026, fees, eligibility, entrance exams & career scope`} testid="course-header" />
+      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Courses", to: "/courses" }, { label: c.name }]} title={<>{c.name}: <span className="text-brand-leaf-soft">{c.full_name}</span></>} subtitle={`${c.stream} • Admission 2027, fees, eligibility, entrance exams & career scope`} testid="course-header" />
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:px-8">
         <div className="space-y-6 lg:col-span-8">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

@@ -154,3 +154,7 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 
 ## Course page predictor box
 - CourseDetail shows ExamPredictorBox (testid prefix `course-predictor`) for btech (MHT CET / JEE Main / JEE Advanced picker), mba (MAH MBA CET), mbbs (NEET UG), bpharm (MHT CET Pharmacy). Score -> /predictor?exam=..&score=..; other courses show no box.
+
+## 2027 season rollover
+- Site copy says 2027 (frontend strings; SEO/landing year = max(ADMISSION_YEAR=2027, current year) in backend lib/year_rollover.py).
+- Startup migration lib/year_rollover.py (settings flags year_rollover_2027 / _text): exam dates/deadlines/overview shifted +1 year once; articles/SEO text 2026->2027 incl. slugs; GET /api/articles/{old-2026-slug} still resolves. Article publish dates untouched. Footer copyright has no year.

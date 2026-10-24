@@ -81,7 +81,7 @@ export default function Colleges() {
     </div>
   );
 
-  const heading = get("stream") ? `Top ${get("stream")} Colleges${get("city") ? ` in ${get("city")}` : " in India"}` : get("city") ? `Top Colleges in ${get("city")}` : "Top Colleges in India 2026";
+  const heading = get("stream") ? `Top ${get("stream")} Colleges${get("city") ? ` in ${get("city")}` : " in India"}` : get("city") ? `Top Colleges in ${get("city")}` : "Top Colleges in India 2027";
 
   return (
     <div data-testid="colleges-page">
