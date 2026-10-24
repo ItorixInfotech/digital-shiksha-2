@@ -46,6 +46,10 @@ class UnlockOut(BaseModel):  # the unlock token itself only travels in the httpO
     payment_id: str
     exam: str
     score: float
+    amount: int = 0
+    email: str = ""  # payer email from Razorpay (masked) — the PDF is emailed here
+    phone: str = ""  # payer mobile from Razorpay (masked)
+    pdf_url: str = ""  # receipt + full college list PDF
 
 
 class PredictorAccess(BaseModel):

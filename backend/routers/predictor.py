@@ -247,7 +247,7 @@ async def unlock(body: UnlockIn, background: BackgroundTasks, request: Request, 
            "phone": body.phone, "name": body.name.strip(), "amount": payment["amount"] // 100,
            "payer_contact": payment.get("contact", ""), "payer_email": payment.get("email", ""),
            "prediction": pred.model_dump(), "verified": verified, "created_at": datetime.now(timezone.utc),
-           "receipt_id": secrets.token_urlsafe(18), "email": str(body.email or payment.get("email") or ""), "email_sent": False}
+           "receipt_id": secrets.token_urlsafe(18), "email": str(payment.get("email") or body.email or ""), "email_sent": False}
     gate = await db.leads.find_one({"phone": body.phone, "role": {"$nin": [None, ""]}}, {"role": 1}, sort=[("created_at", -1)])
     doc["role"] = (gate or {}).get("role", "")  # Parent / Student from the predictor details pop-up
     try:
@@ -259,7 +259,19 @@ async def unlock(body: UnlockIn, background: BackgroundTasks, request: Request, 
     background.add_task(_payment_emails, doc, out)
     tokens = (_cookie_tokens(request) + [doc["token"]])[-20:]
     response.set_cookie(UNLOCK_COOKIE, ".".join(tokens), httponly=True, samesite="lax", secure=True, max_age=365 * 86400, path="/api/predictor")
-    return UnlockOut(payment_id=doc["payment_id"], exam=pred.exam, score=pred.score)
+    return UnlockOut(payment_id=doc["payment_id"], exam=pred.exam, score=pred.score, amount=doc["amount"],
+                     email=_mask_email(doc["email"]), phone=_mask_phone(doc["payer_contact"] or body.phone),
+                     pdf_url=f"/api/predictor/receipt/{doc['receipt_id']}.pdf")
+
+
+def _mask_email(e: str) -> str:
+    user, _, domain = e.partition("@")
+    return f"{user[:2]}{'*' * max(len(user) - 2, 3)}@{domain}" if domain else ""
+
+
+def _mask_phone(p: str) -> str:
+    d = "".join(ch for ch in p if ch.isdigit())[-10:]
+    return f"+91 {d[:2]}******{d[-2:]}" if len(d) == 10 else ""
 
 
 async def _payment_emails(doc: dict, out: PredictorOut) -> None:
@@ -274,15 +286,27 @@ async def _payment_emails(doc: dict, out: PredictorOut) -> None:
 
 @router.get("/predictor/receipt/{receipt_id}.pdf")
 async def predictor_receipt_pdf(receipt_id: str):
-    """Emailed download link: receipt + full college list for the paid percentile."""
+    """Emailed / step-2 download link: receipt + full college list for the paid percentile."""
     doc = await db.predictor_unlocks.find_one({"receipt_id": receipt_id}, {"_id": 0}) if receipt_id else None
     if not doc:
         raise HTTPException(status_code=404, detail="Receipt not found")
+    return await _receipt_pdf(doc)
+
+
+@router.get("/admin/predictor-payments/{payment_id}/pdf")
+async def admin_payment_pdf(payment_id: str, _: str = Depends(require_admin)):
+    doc = await db.predictor_unlocks.find_one({"payment_id": payment_id}, {"_id": 0})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    return await _receipt_pdf(doc)
+
+
+async def _receipt_pdf(doc: dict) -> Response:
     body = PredictorIn(**doc["prediction"])
     out = await run_prediction(body)
     pdf = build_prediction_pdf(out, body.cities, receipt={"name": doc.get("name"), "payment_id": doc["payment_id"],
                                                           "amount": doc.get("amount", 0), "paid_at": _aware(doc["created_at"])})
-    name = f"digital-shiksha-mht-cet-{out.score:g}-receipt.pdf"
+    name = f"digital-shiksha-{'pharmacy' if 'Pharmacy' in out.exam else 'mht-cet'}-{out.score:g}-{doc['payment_id']}.pdf"
     return Response(content=pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="{name}"'})
 
 

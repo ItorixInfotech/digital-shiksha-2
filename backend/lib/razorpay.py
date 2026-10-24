@@ -60,5 +60,5 @@ async def find_by_phone(phone: str, used: set[str], fee: int) -> dict:
     mine = [p for p in r.json().get("items", []) if (p.get("contact") or "").replace(" ", "")[-10:] == phone
             and p.get("amount") == fee and p["id"] not in used]
     if not mine:
-        raise PaymentError(404, f"No new ₹{fee // 100} payment found from this mobile number. Enter your Razorpay payment ID instead")
+        raise PaymentError(404, f"No new ₹{fee // 100} payment found from this mobile number yet. If you just paid, wait a minute and try again, or check the mobile number you paid with")
     return _check(sorted(mine, key=lambda p: p.get("created_at", 0), reverse=True)[0], fee)

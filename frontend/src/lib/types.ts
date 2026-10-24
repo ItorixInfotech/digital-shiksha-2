@@ -368,7 +368,7 @@ export interface UnlockIn {
   prediction: PredictorIn;
   name: string;
   phone: string;
-  email: string; // receipt + full college list PDF
+  email?: string; // optional: receipt goes to the Razorpay payer email
   payment_id: string; // "" = find the payment by mobile number
 }
 
@@ -394,6 +394,10 @@ export interface UnlockOut {
   payment_id: string;
   exam: string;
   score: number;
+  amount: number;
+  email: string; // payer email from Razorpay (masked) — the PDF is emailed here
+  phone: string; // payer mobile from Razorpay (masked)
+  pdf_url: string; // receipt + full college list PDF
 }
 
 export interface RoundCutoff {

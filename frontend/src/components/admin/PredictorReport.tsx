@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Activity, CalendarClock, PhoneCall, Search } from "lucide-react";
+import { Activity, CalendarClock, Download, PhoneCall, Search } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { apiGet } from "@/lib/api";
 import type { Lead, PaymentRecord, PredictorReport } from "@/lib/types";
@@ -87,7 +87,7 @@ export default function PredictorReportPanel() {
         <h3 className="font-semibold">MHT CET payments <span className="text-sm font-normal text-slate-500">— Engineering ₹1500 / Pharmacy ₹599 unlocks; "Check in Razorpay" ones were not auto-verified</span></h3>
         <div className="mt-3 rounded-2xl border bg-white">
           <Table data-testid="admin-predictor-payments-table">
-            <TableHeader><TableRow><TableHead>When</TableHead><TableHead>Student</TableHead><TableHead>Percentile</TableHead><TableHead>Payment ID</TableHead><TableHead>Receipt email</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead>When</TableHead><TableHead>Student</TableHead><TableHead>Percentile</TableHead><TableHead>Payment ID</TableHead><TableHead>Receipt email</TableHead><TableHead>Status</TableHead><TableHead>PDF</TableHead></TableRow></TableHeader>
             <TableBody>
               {(payments.data ?? []).map((p) => (
                 <TableRow key={p.payment_id} data-testid={`admin-predictor-payment-${p.payment_id}`}>
@@ -97,9 +97,14 @@ export default function PredictorReportPanel() {
                   <TableCell><a href={`https://dashboard.razorpay.com/app/payments/${p.payment_id}`} target="_blank" rel="noreferrer" className="font-mono text-xs text-brand-blue hover:underline">{p.payment_id}</a></TableCell>
                   <TableCell className="text-xs">{p.email ? <><p>{p.email}</p><p className={p.email_sent ? "text-green-700" : "text-amber-700"}>{p.email_sent ? "Receipt sent" : "Not sent"}</p></> : "—"}</TableCell>
                   <TableCell><span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1", p.verified ? "bg-green-50 text-green-800 ring-green-200" : "bg-amber-50 text-amber-800 ring-amber-200")}>{p.verified ? "Verified ₹" + p.amount : "Check in Razorpay"}</span></TableCell>
+                  <TableCell>
+                    {/* Plain same-origin link: the GET carries the admin cookie. */}
+                    <a href={`/api/admin/predictor-payments/${encodeURIComponent(p.payment_id)}/pdf`} download data-testid={`admin-predictor-payment-pdf-${p.payment_id}`}
+                      className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold text-brand-blue hover:bg-slate-50 transition-colors"><Download className="size-3.5" /> PDF</a>
+                  </TableCell>
                 </TableRow>
               ))}
-              {!payments.data?.length && <TableRow><TableCell colSpan={6} className="py-6 text-center text-slate-500">No payments yet.</TableCell></TableRow>}
+              {!payments.data?.length && <TableRow><TableCell colSpan={7} className="py-6 text-center text-slate-500">No payments yet.</TableCell></TableRow>}
             </TableBody>
           </Table>
         </div>
