@@ -1,6 +1,7 @@
 """Server-side SEO scoring — a Python mirror of frontend/src/lib/seo.ts (defaultSeo / seoScore / FIX_EFFORT).
 Keep the two in sync: the admin UI scores live while typing, this module powers bulk keywords + the weekly email."""
 import re
+from lib.year_rollover import EXAM_YEAR
 
 SITE = "Digital Shiksha"
 PHONE = "+91 8149 68 9468"
@@ -44,6 +45,7 @@ def default_seo(kind: str, r: dict, year: int) -> tuple[str, str]:
                                                        "eligibility, entrance exams, top colleges and career scope in India.")
         return title, clip(desc, DESC_MAX)
     if kind == "exams":
+        year = EXAM_YEAR  # exams keep their 2026 titles
         name, full, date = _s(r.get("name")), _s(r.get("full_name")), _s(r.get("exam_date"))
         return (f"{name} {year}: Exam Date, Eligibility, Syllabus, Cutoff | {SITE}",
                 clip(f"{full or name} {year}{f' on {date}' if date else ''} — application dates, eligibility, syllabus, pattern, cutoff and colleges accepting {name}.", DESC_MAX))
@@ -99,7 +101,7 @@ def suggest_keyword(kind: str, r: dict, year: int) -> str:
     elif kind == "courses":
         cands = [f"{name} course", f"{name} admission", f"{name} fees", name]
     elif kind == "exams":
-        cands = [f"{name} {year}", name]
+        cands = [f"{name} {EXAM_YEAR}", name]
     else:
         words = name.split()
         cands = [*[str(t) for t in r.get("tags") or []], " ".join(words[:4]), " ".join(words[:3])]

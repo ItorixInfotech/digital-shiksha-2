@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import PlainTextResponse, Response
 
 from lib.dates import today_iso
-from lib.year_rollover import ADMISSION_YEAR
+from lib.year_rollover import ADMISSION_YEAR, EXAM_YEAR
 from lib.db import db
 from models.seo import PageSeo, SeoPages, SeoPagesIn
 from routers.admin import require_admin
@@ -43,7 +43,7 @@ def _year() -> int:
 async def _pages() -> SeoPages:
     y = _year()
     saved = (await db.settings.find_one({"key": KEY}, {"_id": 0}) or {}).get("pages", {})
-    pages = [PageSeo(key=k, label=label, path=path, default_title=t.format(y=y), default_description=d,
+    pages = [PageSeo(key=k, label=label, path=path, default_title=t.format(y=EXAM_YEAR if k == "exams" else y), default_description=d,
                      **{f: saved.get(k, {}).get(f, PageSeo.model_fields[f].default) for f in ("meta_title", "meta_description", "og_image", "noindex")})
              for k, label, path, t, d in STATIC_PAGES]
     return SeoPages(year=y, pages=pages)

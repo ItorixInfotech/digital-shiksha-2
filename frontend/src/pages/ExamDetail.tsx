@@ -1,3 +1,4 @@
+import { EXAM_YEAR } from "@/lib/site";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import ExamPredictorBox from "@/components/ExamPredictorBox";
 import { Link, useParams } from "react-router-dom";
@@ -25,7 +26,7 @@ export default function ExamDetail() {
   return (
     <div data-testid="exam-detail-page">
       <EntitySeo kind="exams" item={e} />
-      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Exams", to: "/exams" }, { label: e.name }]} title={`${e.name} 2027`} subtitle={`${e.full_name} — dates, eligibility, syllabus & accepting colleges`} testid="exam-header" />
+      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Exams", to: "/exams" }, { label: e.name }]} title={`${e.name} ${EXAM_YEAR}`} subtitle={`${e.full_name} — dates, eligibility, syllabus & accepting colleges`} testid="exam-header" />
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:px-8">
         <div className="space-y-6 lg:col-span-8">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

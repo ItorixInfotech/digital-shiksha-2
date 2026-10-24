@@ -4,6 +4,9 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+/** Exam pages keep 2026 dates/titles while the rest of the site talks about the 2027 season (mirrors backend EXAM_YEAR). */
+export const EXAM_YEAR = 2026;
+
 export const SITE = {
   name: "Digital Shiksha",
   phone: "+91 8149 68 9468",

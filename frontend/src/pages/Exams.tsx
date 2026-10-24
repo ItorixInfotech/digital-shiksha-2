@@ -5,7 +5,7 @@ import { CalendarDays, Clock, Monitor } from "lucide-react";
 import { EmptyState, PageHeader } from "@/components/Common";
 import { apiGet } from "@/lib/api";
 import type { Exam } from "@/lib/types";
-import { slugify } from "@/lib/site";
+import { slugify, EXAM_YEAR } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { PageSeo } from "@/components/Seo";
 import { breadcrumbLd } from "@/lib/seo";
@@ -25,7 +25,7 @@ export default function Exams() {
   return (
     <div data-testid="exams-page">
       <PageSeo page="exams" jsonLd={[breadcrumbLd([["Home", "/"], ["Exams", "/exams"]])]} />
-      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Exams" }]} title="Entrance Exams in India 2027" subtitle="National, state and university-level entrance exams — dates, eligibility, syllabus and application deadlines." testid="exams-header" />
+      <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "Exams" }]} title={`Entrance Exams in India ${EXAM_YEAR}`} subtitle="National, state and university-level entrance exams — dates, eligibility, syllabus and application deadlines." testid="exams-header" />
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-2">
           {LEVELS.map((l) => (

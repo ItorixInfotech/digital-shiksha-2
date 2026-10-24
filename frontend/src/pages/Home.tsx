@@ -11,7 +11,7 @@ import { CardSkeleton, EmptyState, SectionTitle } from "@/components/Common";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiGet } from "@/lib/api";
 import type { Article, College, Course, Exam, Meta } from "@/lib/types";
-import { SITE, STATS, STREAMS, slugify } from "@/lib/site";
+import { SITE, STATS, STREAMS, slugify, EXAM_YEAR } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
 import { PageSeo } from "@/components/Seo";
 import { organizationLd } from "@/lib/seo";
@@ -140,7 +140,7 @@ export default function Home() {
           </div>
         </div>
         <div className="lg:col-span-5" data-testid="home-upcoming-exams">
-          <SectionTitle overline="Entrance exams" title="Upcoming exams 2027" action={<Link to="/exams" className="text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid="home-all-exams-link">All exams</Link>} />
+          <SectionTitle overline="Entrance exams" title={`Upcoming exams ${EXAM_YEAR}`} action={<Link to="/exams" className="text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid="home-all-exams-link">All exams</Link>} />
           <ul className="mt-6 divide-y rounded-2xl border bg-white">
             {upcoming.map((e) => (
               <li key={e.id}>

@@ -1,4 +1,4 @@
-import { SITE } from "@/lib/site";
+import { EXAM_YEAR, SITE } from "@/lib/site";
 import type { FaqItem, SeoMeta } from "@/lib/types";
 
 export type SeoKind = "colleges" | "courses" | "exams" | "articles";
@@ -39,9 +39,9 @@ export function defaultSeo(kind: SeoKind, raw: object, year: number): { title: s
   if (kind === "exams") {
     const name = str(r.name), full = str(r.full_name);
     return {
-      title: `${name} ${year}: Exam Date, Eligibility, Syllabus, Cutoff | ${SITE.name}`,
-      description: clip(`${full || name} ${year}${str(r.exam_date) ? ` on ${str(r.exam_date)}` : ""} — application dates, eligibility, syllabus, pattern, cutoff and colleges accepting ${name}.`, DESC_MAX),
-      keywords: [`${name} ${year}`, `${name} exam date`, `${name} syllabus`, `${name} eligibility`, `${name} cutoff`],
+      title: `${name} ${EXAM_YEAR}: Exam Date, Eligibility, Syllabus, Cutoff | ${SITE.name}`,
+      description: clip(`${full || name} ${EXAM_YEAR}${str(r.exam_date) ? ` on ${str(r.exam_date)}` : ""} — application dates, eligibility, syllabus, pattern, cutoff and colleges accepting ${name}.`, DESC_MAX),
+      keywords: [`${name} ${EXAM_YEAR}`, `${name} exam date`, `${name} syllabus`, `${name} eligibility`, `${name} cutoff`],
     };
   }
   return {

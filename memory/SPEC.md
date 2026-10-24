@@ -162,3 +162,6 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 ## 2027 guides + deadline countdown
 - lib/articles_2027.py inserts 3 Admission articles at startup if slug missing: jee-main-2027-admission-guide, mht-cet-2027-admission-guide, neet-ug-2027-admission-guide (published_at = insert day).
 - Exam API adds computed days_left (end of last month in application_deadline, IST today; null for Rolling). DeadlineBadge shows "X days left to apply" on /exams cards, home upcoming list and exam detail (red <=30, amber <=90, "Applications closed" if past).
+
+## Exams keep 2026 (user request)
+- Exam data/titles/SEO stay on 2026 (EXAM_YEAR=2026 in backend lib/year_rollover.py and frontend lib/site.ts). restore_exam_years() undid the earlier +1 exam shift once (flag exam_years_2026_restored). Rest of site stays 2027. Countdown badges reflect 2026 deadlines (many show "Applications closed").
