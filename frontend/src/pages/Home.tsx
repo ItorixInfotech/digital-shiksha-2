@@ -1,3 +1,4 @@
+import DeadlineBadge from "@/components/DeadlineBadge";
 import PredictorBanner from "@/components/PredictorBanner";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -149,7 +150,7 @@ export default function Home() {
                     <span className="block font-semibold text-slate-900">{e.name}</span>
                     <span className="block truncate text-xs text-slate-500">{e.conducting_body} • {e.mode}</span>
                   </span>
-                  <span className="shrink-0 text-right text-xs font-semibold text-brand-navy">{e.exam_date}</span>
+                  <span className="flex shrink-0 flex-col items-end gap-1 text-right text-xs font-semibold text-brand-navy">{e.exam_date}<DeadlineBadge daysLeft={e.days_left} deadline={e.application_deadline} testid={`home-exam-${e.slug}-days-left`} /></span>
                 </Link>
               </li>
             ))}

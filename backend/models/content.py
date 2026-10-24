@@ -117,6 +117,7 @@ class ExamIn(BaseModel):
 
 class Exam(ExamIn):
     id: str = Field(default_factory=_id)
+    days_left: Optional[int] = None  # computed per request from application_deadline (end of that month); None = rolling/unknown
 
 
 class ArticleIn(BaseModel):

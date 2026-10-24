@@ -1,3 +1,4 @@
+import DeadlineBadge from "@/components/DeadlineBadge";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, Clock, Monitor } from "lucide-react";
@@ -48,6 +49,7 @@ export default function Exams() {
                     <p className="text-lg font-semibold text-slate-900 group-hover:text-brand-leaf transition-colors">{e.name}</p>
                     <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-semibold text-slate-600">{e.level}</span>
                     <span className="rounded bg-red-50 px-1.5 py-0.5 text-[11px] font-semibold text-brand-leaf">{e.stream}</span>
+                    <DeadlineBadge daysLeft={e.days_left} deadline={e.application_deadline} testid={`exam-card-${e.slug}-days-left`} />
                   </div>
                   <p className="truncate text-sm text-slate-500">{e.full_name}</p>
                   <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-600">

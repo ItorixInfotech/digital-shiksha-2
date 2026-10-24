@@ -1,3 +1,4 @@
+import DeadlineBadge from "@/components/DeadlineBadge";
 import ExamPredictorBox from "@/components/ExamPredictorBox";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -30,6 +31,7 @@ export default function ExamDetail() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {facts.map(([Icon, l, v]) => <div key={l} className="rounded-xl border bg-white p-4"><p className="flex items-center gap-1.5 text-xs text-slate-500"><Icon className="size-3.5" /> {l}</p><p className="mt-1 text-sm font-semibold text-slate-900">{v}</p></div>)}
           </div>
+          {e.days_left !== null && <DeadlineBadge daysLeft={e.days_left} deadline={e.application_deadline} testid="exam-detail-days-left" className="px-3 py-1 text-sm" />}
           <ExamPredictorBox examName={e.name} />
           <div className="rounded-2xl border bg-white p-6">
             <h2 className="text-xl font-semibold">About {e.name}</h2>

@@ -158,3 +158,7 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 ## 2027 season rollover
 - Site copy says 2027 (frontend strings; SEO/landing year = max(ADMISSION_YEAR=2027, current year) in backend lib/year_rollover.py).
 - Startup migration lib/year_rollover.py (settings flags year_rollover_2027 / _text): exam dates/deadlines/overview shifted +1 year once; articles/SEO text 2026->2027 incl. slugs; GET /api/articles/{old-2026-slug} still resolves. Article publish dates untouched. Footer copyright has no year.
+
+## 2027 guides + deadline countdown
+- lib/articles_2027.py inserts 3 Admission articles at startup if slug missing: jee-main-2027-admission-guide, mht-cet-2027-admission-guide, neet-ug-2027-admission-guide (published_at = insert day).
+- Exam API adds computed days_left (end of last month in application_deadline, IST today; null for Rolling). DeadlineBadge shows "X days left to apply" on /exams cards, home upcoming list and exam detail (red <=30, amber <=90, "Applications closed" if past).

@@ -173,6 +173,8 @@ export interface ExamIn {
 }
 export interface Exam extends ExamIn {
   id: string;
+  /** Server-computed days to the end of the application_deadline month; null = rolling / no fixed deadline. */
+  days_left: number | null;
 }
 
 export interface ArticleIn {

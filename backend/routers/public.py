@@ -1,10 +1,12 @@
+import calendar
 import logging
 import re
-from datetime import timedelta
+from datetime import date, timedelta
 from typing import List, Optional
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 
+from lib.dates import today_iso
 from lib.db import db
 from lib.counsellors import alert_lead, get_settings, next_counsellor
 from lib.email import send_student_confirmation
@@ -15,6 +17,24 @@ from models.content import (
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+
+_MONTHS = {m: i for i, m in enumerate(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"], 1)}
+
+
+def _days_left(deadline: str, today: date) -> Optional[int]:
+    """Days from today to the end of the last month named in e.g. "Nov 2026" / "Feb - Mar 2027"; None if no month+year."""
+    year = re.findall(r"\b(20\d\d)\b", deadline or "")
+    months = [_MONTHS[m[:3].lower()] for m in re.findall(r"[A-Za-z]{3,}", deadline or "") if m[:3].lower() in _MONTHS]
+    if not year or not months:
+        return None
+    y, m = int(year[-1]), months[-1]
+    end = date(y, m, calendar.monthrange(y, m)[1])
+    return (end - today).days
+
+
+def _with_days(e: dict, today: date) -> dict:
+    return {**e, "days_left": _days_left(e.get("application_deadline", ""), today)}
 
 
 def _rx(q: str) -> dict:
@@ -96,12 +116,13 @@ async def list_exams(stream: Optional[str] = None, level: Optional[str] = None, 
         f["level"] = level
     if q:
         f["$or"] = [{"name": _rx(q)}, {"full_name": _rx(q)}]
-    return await db.exams.find(f, {"_id": 0}).sort("name", 1).to_list(500)
+    today = date.fromisoformat(today_iso("Asia/Kolkata"))
+    return [_with_days(e, today) for e in await db.exams.find(f, {"_id": 0}).sort("name", 1).to_list(500)]
 
 
 @router.get("/exams/{slug}", response_model=Exam)
 async def get_exam(slug: str):
-    return await _one("exams", slug)
+    return _with_days(await _one("exams", slug), date.fromisoformat(today_iso("Asia/Kolkata")))
 
 
 @router.get("/articles", response_model=List[Article])
