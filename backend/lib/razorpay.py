@@ -6,13 +6,14 @@ finding a recent ₹1500 captured payment made from the student's mobile number.
 """
 import logging
 import os
+import re
 import time
 
 import httpx
 
 # exam -> (fee in paise, static Razorpay Payment Page)
 PAID_EXAMS = {
-    "MHT CET": (150000, "https://rzp.io/rzp/6wXdLUk"),            # ₹1500 engineering
+    "MHT CET": (149900, "https://rzp.io/rzp/6wXdLUk"),            # ₹1499 engineering
     "MHT CET Pharmacy": (59900, "https://rzp.io/rzp/6vvZNmq"),    # ₹599 pharmacy
     "JEE Main": (249900, "https://rzp.io/rzp/UIqrKC9h"),          # ₹2499
     "MAH MBA CET": (119900, "https://rzp.io/rzp/aG2c274"),        # ₹1199
@@ -21,6 +22,30 @@ PAID_EXAMS = {
 }
 API = "https://api.razorpay.com/v1"
 logger = logging.getLogger(__name__)
+_FEE_CACHE: dict[str, tuple[float, int]] = {}  # exam -> (fetched_at, paise)
+_FEE_TTL = 600
+
+
+async def exam_fee(exam: str) -> int:
+    """Live price of the exam's Razorpay Payment Page (paise), cached 10 min; falls back to PAID_EXAMS if the page can't be read.
+    Keeps the site in step when the owner changes a price on Razorpay."""
+    fallback, link = PAID_EXAMS[exam]
+    hit = _FEE_CACHE.get(exam)
+    if hit and time.time() - hit[0] < _FEE_TTL:
+        return hit[1]
+    fee = fallback
+    try:
+        async with httpx.AsyncClient(timeout=8, follow_redirects=True) as c:
+            r = await c.get(link)
+        amounts = {int(a) for a in re.findall(r'"amount":(\d+)', r.text)} if r.status_code == 200 else set()
+        if len(amounts) == 1 and (a := amounts.pop()) >= 100:
+            fee = a
+        else:
+            logger.warning("Razorpay page price unreadable for %s (status %s, amounts %s) — using %s", exam, r.status_code, amounts, fallback)
+    except httpx.HTTPError as exc:
+        logger.warning("Razorpay page fetch failed for %s: %s — using %s", exam, exc, fallback)
+    _FEE_CACHE[exam] = (time.time(), fee)
+    return fee
 
 
 class PaymentError(Exception):

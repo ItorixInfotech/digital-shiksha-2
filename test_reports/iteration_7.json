@@ -1,0 +1,62 @@
+{
+  "iteration": 7,
+  "passed": 6,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [
+    "Pre-existing out-of-scope backend test files unrelated to this iteration's briefing (unchanged from prior iterations, not caused by this iteration): test_tscheck_mhtcet_predictor.py, test_tscheck_pharmacy_cap_predictor.py, test_tscheck_predictor_paywall.py expect the old Rs 1500/599 fee model with a dedicated payment_id/unlock_token flow -- per this iteration's spec_deviations these files are explicitly obsolete now that every exam's fee follows the live Razorpay Payment Page and all exams require phone-based matching. test_tscheck_health_probe_and_no_regression.py uses a stale admin password (per seed_facts, never touch db.admin_auth / password logins). test_tscheck_weekly_seo_report_cron.py / test_tscheck_duplicate_enquiry_round_robin.py error only under xdist parallel execution (pre-existing shared-state/event-loop issue, reproduced again below as a flake on my own new unlock test).",
+    "This iteration's own new backend test (test_tscheck_unlock_matches_real_shaped_1499_payment.py) failed once when the FULL suite ran under pytest-xdist ('Event loop is closed' inside an unrelated DB call), but passed cleanly both before and after in isolation -- classified as flaky/pre-existing xdist parallelism, not a bug in this test or the app."
+  ],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Fee follows the live Razorpay Payment Page price (GET /api/predictor/exams fees; lib.razorpay.exam_fee cached/fallback)",
+      "name": "test_tscheck_live_fee_follows_razorpay_page.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/predictor/exams -> 200, fees {MHT CET:1499, MHT CET Pharmacy:599, JEE Main:2499, NEET UG:3499, MAH MBA CET:1199, JEE Advanced:2999} all matched. In-process: razorpay.exam_fee('MHT CET') (cache cleared) -> 149900 from the live rzp.io page; second call within 10 min served from cache (AsyncClient.get patched to raise if called, confirmed not called); with httpx.AsyncClient.get patched to raise ConnectError, exam_fee falls back to PAID_EXAMS['MHT CET'][0] == 149900."
+    },
+    {
+      "criterion": "Step 2 with a typed mobile matches a real-shaped Rs1499 payment and creates the PDF",
+      "name": "test_tscheck_unlock_matches_real_shaped_1499_payment.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "httpx.ASGITransport against server.app; only GET api.razorpay.com/v1/payments mocked (to [{id:pay_TESTAGENT1499, amount:149900, currency:INR, status:captured, contact:+919876543210, email:delivered@resend.dev, notes:{}}]), all other httpx.AsyncClient.get calls passed through to the real implementation. POST /predictor/unlock {exam:MHT CET, score:93.5, name:Test Agent, phone:9876543210, payment_id:''} -> 200 {amount:1499, pdf_url}; GET pdf_url with ds_unlocks cookie -> 200 application/pdf (%PDF header); POST /predictor with same cookie -> 200 (no stale 150000-only rejection). predictor_unlocks doc for pay_TESTAGENT1499 deleted in finally."
+    },
+    {
+      "criterion": "Admin: every prediction available as PDF (report, per-prediction PDF, ZIP, 401 without cookie) -- API",
+      "name": "test_tscheck_admin_predictor_report_and_pdfs.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "JWT minted with backend JWT_SECRET (sub, pv=live admin_auth.session_version(), exp) as ds_admin cookie -- db.admin_auth and owner password never touched. Without cookie: GET /admin/predictor-report -> 401, GET /admin/predictor-payments/pdfs.zip -> 401. Unlocked a fresh MAH MBA CET/91.0 prediction in-process (mocked find_by_phone) then logged it via POST /predictor; with the admin cookie: GET /admin/predictor-report -> 200 with 'recent' (<=200 rows, each has params, found the just-created row); GET /admin/predictions/{id}/pdf -> 200 application/pdf (%PDF header); GET /admin/predictor-payments/pdfs.zip -> 200 application/zip. predictor_unlocks fixture doc deleted in finally."
+    },
+    {
+      "criterion": "Admin: every prediction available as PDF -- UI (Predictor Report tab shows PDF buttons + ZIP download button, both trigger downloads)",
+      "name": "admin-predictor-report-shows-pdf-and-zip-buttons",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Set ds_admin cookie directly to a JWT minted with JWT_SECRET + live pv (no password login). Admin -> Predictor Report tab shows admin-predictor-panel; 'Download all paid PDFs (ZIP)' link (admin-predictor-payments-zip) points at /api/admin/predictor-payments/pdfs.zip and a real browser download event fired with a .zip filename on click; recent predictions table (admin-predictor-recent-table) has per-row PDF links (admin-predictor-recent-pdf-{id}) and clicking the first fired a real download with a .pdf filename."
+    },
+    {
+      "criterion": "Payment dialog shows the live price",
+      "name": "predictor-payment-dialog-shows-live-price",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "On /predictor with localStorage ds_predictor_details_v1='1' set (skips the details pop-up), exam MHT CET, percentile 93.5: predictor-payment-dialog appeared directly, predictor-payment-fee text == exactly '₹1,499', predictor-payment-link href == https://rzp.io/rzp/6wXdLUk, predictor-results had 0 rows (gated), and the dialog had zero payment-id-like or email inputs."
+    },
+    {
+      "criterion": "smoke: preview ingress reachability (cross-check lane)",
+      "name": "home-page-loads",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran existing check against https://digital-shiksha-2.preview.emergentagent.com -> homepage rendered, passed."
+    }
+  ],
+  "notes": [
+    "Matrix had 4 acceptance criteria; produced 6 artifacts: criterion 1 (pure API/library behavior) -> 1 backend test; criterion 2 (API-only end-to-end payment match) -> 1 backend test; criterion 3 (API-backed UI) -> 1 backend test + 1 browser check; criterion 4 (UI-only) -> 1 browser check; plus the mandatory re-run of an existing browser check through the public preview URL.",
+    "Confirmed via code review + live GET /api/predictor/exams that every exam (not just MHT CET) is now a paid exam following razorpay.PAID_EXAMS, so the admin-report fixture had to go through the unlock flow (mocked Razorpay) rather than a 'free exam' shortcut.",
+    "Admin JWT cookie required pv to equal the CURRENT db-backed admin_auth.session_version() (1 in this environment, since the owner reset the password via email link) -- minted dynamically via lib.admin_auth.session_version() rather than hard-coding pv=0, per the seed_fact to never touch db.admin_auth.",
+    "Cleaned up fixtures: deleted both predictor_unlocks docs created by the two new backend tests (finally blocks); the admin-report UI browser check only read existing data via GET requests and created no new rows.",
+    "No backend test or browser check in this iteration mocked more than the single Razorpay HTTP call required by its criterion; all other I/O (Mongo, PDF generation, the live rzp.io price page for criterion 1's happy path) hit the real implementation."
+  ]
+}

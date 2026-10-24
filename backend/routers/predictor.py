@@ -87,7 +87,8 @@ def chance_for(metric: str, score: float, closing: float) -> str | None:
 @router.get("/predictor/exams", response_model=List[PredictorExam])
 async def predictor_exams():
     auto = razorpay.configured()
-    return [e.model_copy(update={"payment_auto_check": auto}) if e.fee else e for e in EXAMS.values()]
+    return [e.model_copy(update={"payment_auto_check": auto, "fee": await razorpay.exam_fee(e.name) // 100}) if e.fee else e
+            for e in EXAMS.values()]
 
 
 def _program_filter(program: str) -> dict:
@@ -229,7 +230,7 @@ async def unlock(body: UnlockIn, background: BackgroundTasks, request: Request, 
         raise HTTPException(status_code=400, detail="This exam's predictor is free")
     out = await run_prediction(pred)  # validates exam + score range first
     used_msg = "This payment has already been used for a prediction. Changing your percentile needs a new payment"
-    fee = razorpay.PAID_EXAMS[pred.exam][0]
+    fee = await razorpay.exam_fee(pred.exam)  # live Payment Page price
     verified = razorpay.configured()
     if body.email and await db.predictor_unlocks.count_documents(
             {"email": body.email, "created_at": {"$gte": datetime.now(timezone.utc) - timedelta(hours=24)}}) >= 5:
