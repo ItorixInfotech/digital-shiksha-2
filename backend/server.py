@@ -16,15 +16,16 @@ from lib.cap import load_cap_data
 from lib.db import client, ensure_indexes
 from lib.year_rollover import run_year_rollover
 from lib.articles_2027 import ensure_2027_guides
-from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export
+from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export, redirects
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.index_task = asyncio.create_task(ensure_indexes())  # background: a big index build must not block boot
-    app.state.cap_task = asyncio.create_task(load_cap_data())
+    app.state.cap_task = asyncio.create_task(load_cap_data())  # official CAP cut-offs; reloads only when the data file version changes
     app.state.rollover_task = asyncio.create_task(run_year_rollover())  # one-time 2026 -> 2027 content rollover
-    app.state.guides_task = asyncio.create_task(ensure_2027_guides())  # 2027 admission guides, inserted once  # official CAP cut-offs; reloads only when the data file version changes
+    app.state.guides_task = asyncio.create_task(ensure_2027_guides())  # 2027 admission guides, inserted once
+    app.state.redirects_task = asyncio.create_task(redirects.seed_redirects())  # starter /blog -> /news redirect, once
     yield
     client.close()
 
@@ -49,6 +50,7 @@ api_router.include_router(seo.router)
 api_router.include_router(landing.router)
 api_router.include_router(seo_tools.router)
 api_router.include_router(export.router)
+api_router.include_router(redirects.router)
 
 app.add_middleware(
     CORSMiddleware,

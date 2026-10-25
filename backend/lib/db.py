@@ -35,6 +35,10 @@ INDEXES: dict[str, list[IndexModel]] = {
         IndexModel([("slug", ASCENDING)], name="slug", unique=True),
         IndexModel([("stream", ASCENDING), ("name", ASCENDING)], name="stream_name"),
     ],
+    "redirects": [
+        IndexModel([("id", ASCENDING)], name="id", unique=True),
+        IndexModel([("from_path", ASCENDING)], name="from_path", unique=True),
+    ],
     "articles": [
         IndexModel([("id", ASCENDING)], name="id", unique=True),
         IndexModel([("slug", ASCENDING)], name="slug", unique=True),

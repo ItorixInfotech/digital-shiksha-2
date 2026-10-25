@@ -165,3 +165,7 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 
 ## Exams keep 2026 (user request)
 - Exam data/titles/SEO stay on 2026 (EXAM_YEAR=2026 in backend lib/year_rollover.py and frontend lib/site.ts). restore_exam_years() undid the earlier +1 exam shift once (flag exam_years_2026_restored). Rest of site stays 2027. Countdown badges reflect 2026 deadlines (many show "Applications closed").
+
+## Redirects (old website pages)
+- Collection `redirects` {id, from_path (normalised lower-case, no trailing slash, unique), to_path (/path or https://), include_subpages, created_at}. Admin tab "Redirects" (CRUD via /api/admin/redirects, admin cookie). Public GET /api/redirects read by useOldPageRedirect() in Layout: exact match, else longest include_subpages prefix; navigates with replace. Unknown top-level addresses wait for the list before rendering (no flash).
+- Seeded once at startup (flag redirects_seeded): /blog (+sub-pages) -> /news. Redirect is client-side (SPA), Google follows JS redirects.

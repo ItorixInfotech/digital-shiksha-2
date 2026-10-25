@@ -575,3 +575,14 @@ export interface SeoReportSummary {
   top_fixes: SeoReportItem[];
 }
 
+
+/** Mirrors backend models/redirect.py */
+export interface RedirectIn {
+  from_path: string;
+  to_path: string;
+  include_subpages: boolean;
+}
+export interface Redirect extends RedirectIn {
+  id: string;
+  created_at: string;
+}
