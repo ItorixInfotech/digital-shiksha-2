@@ -1,3 +1,4 @@
+import RichText from "@/components/RichText";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Briefcase, Clock, GraduationCap, IndianRupee, Wallet } from "lucide-react";
@@ -42,7 +43,7 @@ export default function CourseDetail() {
           {COURSE_PREDICTORS[c.slug] && <ExamPredictorBox examNames={COURSE_PREDICTORS[c.slug]} testid="course-predictor" />}
           <div className="rounded-2xl border bg-white p-6">
             <h2 className="text-xl font-semibold">What is {c.name}?</h2>
-            <p className="mt-3 leading-relaxed text-slate-600" data-testid="course-overview">{c.overview}</p>
+            <RichText value={c.overview} className="mt-3 text-slate-600" testid="course-overview" />
             <h3 className="mt-6 font-semibold">Eligibility</h3>
             <p className="mt-1 text-slate-600">{c.eligibility}</p>
             <h3 className="mt-6 font-semibold">Entrance exams</h3>

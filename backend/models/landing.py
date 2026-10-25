@@ -6,7 +6,7 @@ from models.content import College, FaqItem, SeoMeta
 
 
 class LandingOverrideIn(BaseModel):
-    intro: str = Field(default="", max_length=5000)
+    intro: str = Field(default="", max_length=100000)  # editor HTML
     faqs: List[FaqItem] = []
     seo: SeoMeta = Field(default_factory=SeoMeta)
 

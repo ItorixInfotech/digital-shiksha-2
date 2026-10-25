@@ -1,3 +1,4 @@
+import RichText from "@/components/RichText";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, UserRound } from "lucide-react";
@@ -82,9 +83,7 @@ export function ArticleDetail() {
         <article className="lg:col-span-8">
           {a.image && <img src={a.image} alt="" className="h-72 w-full rounded-2xl object-cover sm:h-96" />}
           <p className="mt-8 text-lg font-medium leading-relaxed text-slate-800">{a.excerpt}</p>
-          <div className="mt-6 space-y-5 text-[17px] leading-[1.75] text-slate-700" data-testid="article-content">
-            {a.content.split(/\n\n+/).map((p, i) => <p key={`${i}-${p.slice(0, 32)}`}>{p}</p>)}
-          </div>
+          <RichText value={a.content} className="mt-6 text-[17px]" testid="article-content" />
           <div className="mt-8 flex flex-wrap gap-2">{a.tags.map((t) => <span key={t} className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-600">#{t}</span>)}</div>
         </article>
         <aside className="space-y-6 lg:col-span-4">

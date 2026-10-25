@@ -1,3 +1,4 @@
+import { toPlain } from "@/lib/richtext";
 import { EXAM_YEAR, SITE } from "@/lib/site";
 import type { FaqItem, SeoMeta } from "@/lib/types";
 
@@ -32,7 +33,7 @@ export function defaultSeo(kind: SeoKind, raw: object, year: number): { title: s
     const name = str(r.name), full = str(r.full_name);
     return {
       title: `${name}${full && full !== name ? ` (${full})` : ""}: Fees, Eligibility, Colleges ${year} | ${SITE.name}`,
-      description: clip(firstSentence(str(r.overview)) || `${full || name} course details — duration ${str(r.duration) || "-"}, fees ${str(r.avg_fees) || "-"}, eligibility, entrance exams, top colleges and career scope in India.`, DESC_MAX),
+      description: clip(firstSentence(toPlain(str(r.overview))) || `${full || name} course details — duration ${str(r.duration) || "-"}, fees ${str(r.avg_fees) || "-"}, eligibility, entrance exams, top colleges and career scope in India.`, DESC_MAX),
       keywords: [`${name} course`, `${name} fees`, `${name} eligibility`, `${name} colleges`, `${name} admission ${year}`],
     };
   }
@@ -46,7 +47,7 @@ export function defaultSeo(kind: SeoKind, raw: object, year: number): { title: s
   }
   return {
     title: `${clip(str(r.title), 48)} | ${SITE.name}`,
-    description: clip(str(r.excerpt) || firstSentence(str(r.content)), DESC_MAX),
+    description: clip(str(r.excerpt) || firstSentence(toPlain(str(r.content))), DESC_MAX),
     keywords: list(r.tags),
   };
 }
@@ -144,7 +145,7 @@ export function entityScore(kind: SeoKind, raw: object, year: number): SeoScore 
   const d = defaultSeo(kind, r, year);
   return seoScore({
     title: s.meta_title || d.title, description: s.meta_description || d.description, keywords: s.keywords,
-    hasImage: !!(s.og_image || str(r.image)), bodyLength: str(kind === "articles" ? r.content : r.overview).length,
+    hasImage: !!(s.og_image || str(r.image)), bodyLength: toPlain(str(kind === "articles" ? r.content : r.overview)).length,
     faqCount: kind === "colleges" || kind === "exams" ? ((r.faqs as unknown[] | undefined) ?? []).length : null, noindex: s.noindex,
   });
 }

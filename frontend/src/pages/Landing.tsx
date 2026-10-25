@@ -1,3 +1,4 @@
+import RichText from "@/components/RichText";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
@@ -75,7 +76,7 @@ export default function Landing() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:px-8">
         <div className="space-y-8 lg:col-span-8">
           <section className="rounded-2xl border-l-4 border-brand-teal bg-white p-6 shadow-sm" data-testid="landing-intro">
-            {p.intro.split(/\n\s*\n/).map((para, i) => <p key={`${i}-${para.slice(0, 32)}`} className="mt-3 first:mt-0 leading-relaxed text-slate-700">{para}</p>)}
+            <RichText value={p.intro} testid="landing-intro-content" />
             {p.stats.exams.length > 0 && <p className="mt-4 text-sm text-slate-500">Popular entrance exams: <span className="font-medium text-slate-800">{p.stats.exams.join(" · ")}</span></p>}
           </section>
 

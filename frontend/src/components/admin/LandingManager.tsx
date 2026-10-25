@@ -4,7 +4,8 @@ import { toast } from "sonner";
 import { Pencil, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "@/components/admin/RichTextEditor";
+import { toPlain } from "@/lib/richtext";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import SeoEditor, { type SeoForm } from "@/components/admin/SeoEditor";
@@ -21,7 +22,7 @@ export const landingScore = (l: LandingSummary) => {
   return seoScore({
     title: o?.seo.meta_title || l.default_title, description: o?.seo.meta_description || l.default_description,
     // Auto intro (300+ chars), auto FAQs and the top college's photo fill in whatever the admin leaves empty.
-    keywords: o?.seo.keywords.length ? o.seo.keywords : [l.label], hasImage: true, bodyLength: o?.intro ? o.intro.length : 300, faqCount: o?.faqs.length || 5, noindex: !!o?.seo.noindex,
+    keywords: o?.seo.keywords.length ? o.seo.keywords : [l.label], hasImage: true, bodyLength: o?.intro ? toPlain(o.intro).length : 300, faqCount: o?.faqs.length || 5, noindex: !!o?.seo.noindex,
   });
 };
 
@@ -58,8 +59,9 @@ export default function LandingManager({ editSlug, onClose }: { editSlug?: strin
         {editing && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-1.5 sm:col-span-2">
-              <Label htmlFor="landing-intro">Intro paragraph</Label>
-              <Textarea id="landing-intro" rows={5} value={intro} onChange={(e) => setIntro(e.target.value)} placeholder="Leave empty to use the auto-generated intro (with live fees, placements and exams). Separate paragraphs with a blank line." data-testid="admin-landing-intro-input" />
+              <Label>Intro content</Label>
+              <RichTextEditor key={editing.slug} value={intro} onChange={setIntro} testid="admin-landing-intro-input" minHeight={160} />
+              <p className="text-xs text-slate-500">Leave empty to use the auto-generated intro (with live fees, placements and exams).</p>
             </div>
             <FaqEditor value={faqs} onChange={setFaqs} testid="admin-landing-faqs" hint="Leave empty to use 5–6 auto FAQs built from the college data" />
             <SeoEditor value={seo} onChange={setSeo} defaults={{ title: editing.default_title, description: editing.default_description, keywords: [editing.label] }} path={`/${editing.slug}`} testid="admin-landing-seo" />

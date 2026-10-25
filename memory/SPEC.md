@@ -169,3 +169,8 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 ## Redirects (old website pages)
 - Collection `redirects` {id, from_path (normalised lower-case, no trailing slash, unique), to_path (/path or https://), include_subpages, created_at}. Admin tab "Redirects" (CRUD via /api/admin/redirects, admin cookie). Public GET /api/redirects read by useOldPageRedirect() in Layout: exact match, else longest include_subpages prefix; navigates with replace. Unknown top-level addresses wait for the list before rendering (no flash).
 - Seeded once at startup (flag redirects_seeded): /blog (+sub-pages) -> /news. Redirect is client-side (SPA), Google follows JS redirects.
+
+## Rich text editor (admin)
+- components/admin/RichTextEditor.tsx (TipTap v3): paragraph/H1-H6, font size, bold/italic/strike, text + background colour, align L/C/R/Justify, bullet/numbered/check lists + nest/un-nest, links (internal /path, external https with new-tab option, mailto, tel, #anchor) with edit/remove, anchors (id on paragraph/heading), tables (insert, add/delete rows & columns, header toggle, delete), image by URL + alt, YouTube embed (nocookie). Undo/redo via Ctrl+Z/Y only (user did not want buttons).
+- Used for: college overview + admission, course overview, exam overview, article content, city page intro (resources.ts type "richtext"; LandingManager). Stores HTML; legacy plain text auto-converted on edit.
+- Public render: components/RichText.tsx -> DOMPurify sanitize (lib/richtext.ts; iframes only youtube embed), .rich-content CSS in index.css; internal links navigate in-app. SEO scoring/descriptions strip HTML (frontend toPlain, backend seo_score._plain).

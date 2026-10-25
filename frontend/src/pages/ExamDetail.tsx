@@ -1,3 +1,4 @@
+import RichText from "@/components/RichText";
 import { EXAM_YEAR } from "@/lib/site";
 import DeadlineBadge from "@/components/DeadlineBadge";
 import ExamPredictorBox from "@/components/ExamPredictorBox";
@@ -36,7 +37,7 @@ export default function ExamDetail() {
           <ExamPredictorBox examName={e.name} />
           <div className="rounded-2xl border bg-white p-6">
             <h2 className="text-xl font-semibold">About {e.name}</h2>
-            <p className="mt-3 leading-relaxed text-slate-600" data-testid="exam-overview">{e.overview}</p>
+            <RichText value={e.overview} className="mt-3 text-slate-600" testid="exam-overview" />
             <h3 className="mt-6 font-semibold">Eligibility</h3>
             <p className="mt-1 text-slate-600">{e.eligibility}</p>
             <h3 className="mt-6 font-semibold">Syllabus / sections</h3>

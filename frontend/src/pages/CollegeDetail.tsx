@@ -1,3 +1,4 @@
+import RichText from "@/components/RichText";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -90,7 +91,7 @@ export default function CollegeDetail() {
               </div>
               <div className="rounded-2xl border bg-white p-6">
                 <h2 className="text-xl font-semibold">About {c.short_name || c.name}</h2>
-                <p className="mt-3 leading-relaxed text-slate-600" data-testid="college-overview">{c.overview}</p>
+                <RichText value={c.overview} className="mt-3 text-slate-600" testid="college-overview" />
                 <h3 className="mt-6 font-semibold">Streams offered</h3>
                 <div className="mt-2 flex flex-wrap gap-2">{c.streams.map((s) => <Link key={s} to={`/colleges?stream=${encodeURIComponent(s)}`} className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700 hover:bg-red-50 hover:text-brand-leaf transition-colors">{s}</Link>)}</div>
                 <h3 className="mt-6 font-semibold">Exams accepted</h3>
@@ -121,7 +122,7 @@ export default function CollegeDetail() {
           {tab === "Admission 2027" && (
             <div className="rounded-2xl border bg-white p-6">
               <h2 className="text-xl font-semibold">{c.short_name} admission process 2027</h2>
-              <p className="mt-3 leading-relaxed text-slate-600">{c.admission}</p>
+              <RichText value={c.admission} className="mt-3 text-slate-600" testid="college-admission" />
               <ol className="mt-6 space-y-4">
                 {["Appear for the accepted entrance exam: " + c.exams_accepted.join(", "), "Register for state / central counselling (CAP, MCC, JoSAA or institute process)", "Fill and lock college-branch choices", "Seat allotment, document verification & fee payment", "Report to the institute for commencement of classes"].map((s, i) => (
                   <li key={s} className="flex gap-3"><span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-navy text-sm font-semibold text-white">{i + 1}</span><span className="pt-0.5 text-slate-700">{s}</span></li>

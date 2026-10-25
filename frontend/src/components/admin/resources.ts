@@ -22,8 +22,8 @@ const COLLEGE_FIELDS: FieldSpec[] = [
   { key: "top_recruiters", label: "Top recruiters", type: "list" },
   { key: "facilities", label: "Facilities", type: "list" },
   { key: "image", label: "Cover image URL", type: "text", full: true },
-  { key: "overview", label: "Overview", type: "textarea" },
-  { key: "admission", label: "Admission process", type: "textarea" },
+  { key: "overview", label: "Overview", type: "richtext" },
+  { key: "admission", label: "Admission process", type: "richtext" },
   { key: "courses", label: "Courses & fees (JSON)", type: "json", hint: 'e.g. [{"name":"B.Tech","duration":"4 Years","fees":"₹1 L/yr","eligibility":"10+2 PCM","seats":60}]' },
   { key: "cutoffs", label: "Cutoffs (JSON)", type: "json", hint: 'e.g. [{"exam":"MHT CET","branch":"Computer","cutoff":"99.50 percentile","value":99.5,"category":"General"}] — "value" (percentile, NEET score or JEE Adv rank) powers the College Predictor' },
   { key: "featured", label: "Featured on home page", type: "bool" },
@@ -41,7 +41,7 @@ const COURSE_FIELDS: FieldSpec[] = [
   { key: "entrance_exams", label: "Entrance exams", type: "list" },
   { key: "specializations", label: "Specialisations", type: "list" },
   { key: "careers", label: "Careers", type: "list", full: true },
-  { key: "overview", label: "Overview", type: "textarea" },
+  { key: "overview", label: "Overview", type: "richtext" },
   { key: "popular", label: "Show in popular courses", type: "bool" },
 ];
 const EXAM_FIELDS: FieldSpec[] = [
@@ -57,7 +57,7 @@ const EXAM_FIELDS: FieldSpec[] = [
   { key: "website", label: "Official website", type: "text" },
   { key: "eligibility", label: "Eligibility", type: "text", full: true },
   { key: "syllabus", label: "Syllabus sections", type: "list", full: true },
-  { key: "overview", label: "Overview", type: "textarea" },
+  { key: "overview", label: "Overview", type: "richtext" },
 ];
 const ARTICLE_FIELDS: FieldSpec[] = [
   { key: "title", label: "Title", type: "text", required: true, full: true },
@@ -68,7 +68,7 @@ const ARTICLE_FIELDS: FieldSpec[] = [
   { key: "image", label: "Image URL", type: "text", full: true },
   { key: "tags", label: "Tags", type: "list", full: true },
   { key: "excerpt", label: "Excerpt", type: "textarea" },
-  { key: "content", label: "Content", type: "textarea", hint: "Separate paragraphs with a blank line" },
+  { key: "content", label: "Content", type: "richtext" },
 ];
 
 export interface ResourceConfig {

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -24,7 +25,7 @@ const fromSeoForm = (f: SeoForm): SeoMeta => ({
   keywords: f.keywords.split(",").map((x) => x.trim()).filter(Boolean),
 });
 
-export type FieldType = "text" | "number" | "textarea" | "list" | "json" | "bool";
+export type FieldType = "text" | "number" | "textarea" | "richtext" | "list" | "json" | "bool";
 export interface FieldSpec {
   key: string;
   label: string;
@@ -125,6 +126,13 @@ export default function ContentManager({ resource, title, fields, columns, publi
             const id = `f-${resource}-${s.key}`;
             const tid = `admin-${resource}-field-${s.key.replace(/_/g, "-")}`;
             const val = form[s.key];
+            if (s.type === "richtext") return (
+              <div key={s.key} className="grid gap-1.5 sm:col-span-2">
+                <Label>{s.label}{s.required ? " *" : ""}</Label>
+                <RichTextEditor value={String(val ?? "")} onChange={(v) => setForm((f) => ({ ...f, [s.key]: v }))} testid={tid} />
+                {s.hint && <p className="text-xs text-slate-500">{s.hint}</p>}
+              </div>
+            );
             if (s.type === "bool") return (
               <label key={s.key} className="flex items-center gap-2 text-sm sm:col-span-2"><Checkbox checked={Boolean(val)} onCheckedChange={(c) => setForm((f) => ({ ...f, [s.key]: Boolean(c) }))} data-testid={tid} /> {s.label}</label>
             );

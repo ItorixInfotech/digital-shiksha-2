@@ -1,5 +1,6 @@
 """Server-side SEO scoring — a Python mirror of frontend/src/lib/seo.ts (defaultSeo / seoScore / FIX_EFFORT).
 Keep the two in sync: the admin UI scores live while typing, this module powers bulk keywords + the weekly email."""
+import html
 import re
 from lib.year_rollover import EXAM_YEAR
 
@@ -24,8 +25,14 @@ def clip(s: str, n: int) -> str:
     return s if len(s) <= n else re.sub(r"\s+\S*$", "", s[: n - 1]) + "…"
 
 
+def _plain(s) -> str:
+    """Editor HTML -> text (plain text passes through)."""
+    t = _s(s)
+    return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", t)).split()) if "<" in t else t
+
+
 def _first_sentence(s: str) -> str:
-    return re.split(r"(?<=\.)\s", _s(s))[0] if _s(s) else ""
+    return re.split(r"(?<=\.)\s", _plain(s))[0] if _plain(s) else ""
 
 
 def default_seo(kind: str, r: dict, year: int) -> tuple[str, str]:
@@ -79,7 +86,7 @@ def score(*, title: str, description: str, keywords: list, has_image: bool, body
 def entity_score(kind: str, r: dict, year: int) -> dict:
     title, desc, seo = effective(kind, r, year)
     return score(title=title, description=desc, keywords=seo.get("keywords") or [], has_image=bool(seo.get("og_image") or _s(r.get("image"))),
-                 body_len=len(_s(r.get("content" if kind == "articles" else "overview"))),
+                 body_len=len(_plain(r.get("content" if kind == "articles" else "overview"))),
                  faq_count=len(r.get("faqs") or []) if kind in ("colleges", "exams") else None, noindex=bool(seo.get("noindex")))
 
 
@@ -87,7 +94,7 @@ def landing_score(l) -> dict:
     o = l.override
     return score(title=(o and o.seo.meta_title) or l.default_title, description=(o and o.seo.meta_description) or l.default_description,
                  keywords=(o.seo.keywords if o and o.seo.keywords else [l.label]), has_image=True,
-                 body_len=len(o.intro) if o and o.intro else 300, faq_count=(len(o.faqs) if o else 0) or 5, noindex=bool(o and o.seo.noindex))
+                 body_len=len(_plain(o.intro)) if o and o.intro else 300, faq_count=(len(o.faqs) if o else 0) or 5, noindex=bool(o and o.seo.noindex))
 
 
 def suggest_keyword(kind: str, r: dict, year: int) -> str:
