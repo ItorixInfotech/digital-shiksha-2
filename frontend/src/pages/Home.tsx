@@ -124,7 +124,7 @@ export default function Home() {
 
       {/* POPULAR COURSES + EXAMS */}
       <section className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-12 lg:px-8">
-        <div className="lg:col-span-7" data-testid="home-popular-courses">
+        <div className="min-w-0 lg:col-span-7" data-testid="home-popular-courses">
           <SectionTitle overline="Courses" title="Popular courses" />
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {popular.map((c) => (
@@ -139,7 +139,7 @@ export default function Home() {
             {courses.isLoading && <p className="text-sm text-slate-500">Loading courses…</p>}
           </div>
         </div>
-        <div className="lg:col-span-5" data-testid="home-upcoming-exams">
+        <div className="min-w-0 lg:col-span-5" data-testid="home-upcoming-exams">
           <SectionTitle overline="Entrance exams" title={`Upcoming exams ${EXAM_YEAR}`} action={<Link to="/exams" className="text-sm font-semibold text-brand-blue hover:text-brand-leaf" data-testid="home-all-exams-link">All exams</Link>} />
           <ul className="mt-6 divide-y rounded-2xl border bg-white">
             {upcoming.map((e) => (
@@ -149,8 +149,9 @@ export default function Home() {
                   <span className="min-w-0 flex-1">
                     <span className="block font-semibold text-slate-900">{e.name}</span>
                     <span className="block truncate text-xs text-slate-500">{e.conducting_body} • {e.mode}</span>
+                    <DeadlineBadge daysLeft={e.days_left} deadline={e.application_deadline} testid={`home-exam-${e.slug}-days-left`} className="mt-1" />
                   </span>
-                  <span className="flex shrink-0 flex-col items-end gap-1 text-right text-xs font-semibold text-brand-navy">{e.exam_date}<DeadlineBadge daysLeft={e.days_left} deadline={e.application_deadline} testid={`home-exam-${e.slug}-days-left`} /></span>
+                  <span className="max-w-[40%] shrink-0 text-right text-xs font-semibold text-brand-navy">{e.exam_date}</span>
                 </Link>
               </li>
             ))}

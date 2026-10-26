@@ -42,7 +42,7 @@ export default function Exams() {
             : isError ? <EmptyState title="Exams are unavailable right now" />
             : !list.length ? <EmptyState title="No exams match" testid="exams-empty" />
             : list.map((e) => (
-              <Link key={e.id} to={`/exams/${e.slug}`} data-testid={`exam-card-${e.slug}`} className="group flex gap-4 rounded-2xl border bg-white p-5 hover:-translate-y-0.5 hover:shadow-lg transition-[transform,box-shadow]">
+              <Link key={e.id} to={`/exams/${e.slug}`} data-testid={`exam-card-${e.slug}`} className="group flex min-w-0 gap-4 rounded-2xl border bg-white p-5 hover:-translate-y-0.5 hover:shadow-lg transition-[transform,box-shadow]">
                 <span className="grid size-14 shrink-0 place-items-center rounded-xl bg-brand-navy text-center text-[11px] font-bold leading-tight text-white">{e.name.split(" ")[0]}</span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">

@@ -213,3 +213,6 @@
 .rich-editor [id]::before { content: "#" attr(id); display: inline-block; margin-right: .4em; padding: 0 .35em; border-radius: 4px; font-size: 11px; font-weight: 600; vertical-align: middle; color: var(--color-slate-500); background: var(--color-slate-100); }
 .rich-editor img.ProseMirror-selectednode, .rich-editor div[data-youtube-video].ProseMirror-selectednode { outline: 3px solid color-mix(in oklab, var(--color-brand-navy, #0f172a) 35%, transparent); }
 .rich-editor p.is-editor-empty:first-child::before { content: attr(data-placeholder); color: var(--color-slate-400); float: left; height: 0; pointer-events: none; }
+
+/* Never let a stray wide element make the page slide sideways on phones (clip keeps sticky headers working). */
+html, body { overflow-x: clip; max-width: 100%; }
