@@ -177,3 +177,8 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 
 ## Draft autosave (admin)
 - lib/drafts.ts + ContentManager (colleges/courses/exams/articles dialogs): edits autosave to this browser localStorage (key ds-admin-draft:{resource}:{id|new}) ~1s after typing; saved also on tab close (beforeunload prompt) and on Cancel/Escape (toast). Reopening shows amber banner Restore/Discard; rows with drafts show a "Draft" chip; "Add new (draft)" for unsaved new records. Draft cleared on successful Save, Discard or record delete. City page intro editor not covered.
+
+## Same-tab payment + auto confirm
+- Pay button opens the Razorpay payment page in the SAME tab; before leaving, sessionStorage ds_predictor_pending_v2 stores the exam/score query (no personal data).
+- Return: Razorpay dashboard redirect -> /predictor?paid=1 (optionally with razorpay_payment_id) restores the prediction and polls POST /api/predictor/unlock (10 tries x 4s) using the gate mobile; Back button without redirect -> one quiet check. Success shows the "Payment confirmed" screen + PDF download automatically; otherwise manual "I've paid" form remains.
+- Each of the 6 Razorpay Payment Pages must have Page Settings -> Action after successful payment -> Redirect to https://www.digitalshiksha.in/predictor?paid=1

@@ -6,7 +6,7 @@ import { BadgeCheck, Building2, Download, Info, Link2, Loader2, MapPin, MessageC
 import { Checkbox } from "@/components/ui/checkbox";
 import PredictorGate from "@/components/PredictorGate";
 import PredictorPayment from "@/components/PredictorPayment";
-import { dropLegacyStorage, GATE_KEY, PENDING_KEY } from "@/lib/predictor-storage";
+import { clearPending, dropLegacyStorage, GATE_KEY, readPending } from "@/lib/predictor-storage";
 import { PageHeader, EmptyState } from "@/components/Common";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,17 +45,19 @@ const CHANCE: Record<PredictorChance, { label: string; cls: string; desc: string
 export default function Predictor() {
   const { openEnquiry } = useSite();
   const [sp, setSp] = useSearchParams();
-  // Razorpay may redirect back to /predictor?razorpay_payment_id=… — restore the prediction the student paid for.
+  // Same-tab payment: the student leaves for the Razorpay page and comes back here — either redirected by
+  // Razorpay (/predictor?paid=1, maybe with razorpay_payment_id) or with the Back button. Restore what they
+  // paid for and confirm the payment automatically.
   const rzpId = sp.get("razorpay_payment_id");
-  const needsRestore = !!rzpId && !sp.get("exam");
+  const [pending] = useState(readPending);
+  const [autoConfirm] = useState<"poll" | "once" | undefined>(() => (rzpId || sp.get("paid") === "1" ? "poll" : pending ? "once" : undefined));
+  const needsRestore = !!pending && !!autoConfirm && !sp.get("exam");
   useEffect(() => {
-    const pending = needsRestore ? localStorage.getItem(PENDING_KEY) : null;
-    if (!pending || !rzpId) return;
-    localStorage.removeItem(PENDING_KEY);
-    const next = new URLSearchParams(pending);
-    next.set("razorpay_payment_id", rzpId);
+    if (!needsRestore || !pending) return;
+    const next = new URLSearchParams(pending.qs);
+    if (rzpId) next.set("razorpay_payment_id", rzpId);
     setSp(next, { replace: true });
-  }, [needsRestore, rzpId, setSp]);
+  }, [needsRestore, pending, rzpId, setSp]);
   const urlExam = sp.get("exam") ?? "";
   const urlScore = sp.get("score") ?? "";
   const urlCategory = (sp.get("category") ?? "General") as PredictorCategory;
@@ -232,7 +234,8 @@ export default function Predictor() {
           </div>
         )}
         {body && urlSpec && fee > 0 && unlocked && (
-          <PredictorPayment key={bodyKey} open={payOpen} onOpenChange={(o) => { if (!o) setPayDismissed(true); }} onPaid={() => void qc.invalidateQueries({ queryKey: accessKey })}
+          <PredictorPayment key={bodyKey} open={payOpen} onOpenChange={(o) => { if (!o) setPayDismissed(true); }} onPaid={() => { clearPending(); void qc.invalidateQueries({ queryKey: accessKey }); }}
+            autoConfirm={pending && body && pending.exam === body.exam && Number(pending.score) === body.score ? autoConfirm : undefined}
             prediction={body} fee={fee} paymentLink={urlSpec.payment_link} autoCheck={urlSpec.payment_auto_check} metric={urlSpec.metric} />
         )}
         {!data && !predict.isFetching && !(body && !unlocked) && !(body && needsPay) && (
