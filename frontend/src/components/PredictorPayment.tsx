@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowRight, CheckCircle2, CreditCard, Download, Loader2, Mail, MessageCircle, Phone, ShieldCheck } from "lucide-react";
+import { CheckCircle2, ExternalLink, CreditCard, Download, Loader2, Mail, MessageCircle, Phone, ShieldCheck } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -130,15 +130,15 @@ export default function PredictorPayment({ open, onOpenChange, onPaid, predictio
           <ol className="grid gap-4 text-sm">
             <li className="grid gap-2">
               <p className="font-medium"><span className="mr-2 inline-grid size-5 place-items-center rounded-full bg-brand-navy text-[11px] text-white">1</span>Pay securely on Razorpay</p>
-              <a href={paymentLink} data-testid="predictor-payment-link" onClick={() => setPending(window.location.search)}
+              <a href={paymentLink} target="_blank" rel="noreferrer" data-testid="predictor-payment-link" onClick={() => setPending(window.location.search)}
                 className={cn(buttonVariants(), "h-11 bg-brand-red text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform]")}>
-                Pay ₹{fee.toLocaleString("en-IN")} <ArrowRight className="size-4" />
+                Pay ₹{fee.toLocaleString("en-IN")} <ExternalLink className="size-4" />
               </a>
-              <p className="text-xs text-slate-500">Opens Razorpay in this tab — after paying you come straight back here and your payment is confirmed automatically. Pay with the same mobile number{mobile ? ` (+91 ${mobile})` : ""}.</p>
+              <p className="text-xs text-slate-500">Opens in a new tab. Use the same mobile number below when paying.</p>
             </li>
             <li>
               <form onSubmit={submit} className="grid gap-3" noValidate data-testid="predictor-payment-form">
-                <p className="font-medium"><span className="mr-2 inline-grid size-5 place-items-center rounded-full bg-brand-navy text-[11px] text-white">2</span>Not confirmed automatically? Check here</p>
+                <p className="font-medium"><span className="mr-2 inline-grid size-5 place-items-center rounded-full bg-brand-navy text-[11px] text-white">2</span>After paying, confirm here</p>
                 <div className="grid gap-1.5">
                   <Label htmlFor="pp-phone">Mobile number used to pay</Label>
                   <div className="flex">

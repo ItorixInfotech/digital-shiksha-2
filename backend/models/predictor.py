@@ -34,6 +34,13 @@ class PredictorIn(BaseModel):
     branch_group: str = ""
 
 
+class PredictionLogIn(BaseModel):
+    """Sent when a student submits a score (after the details pop-up) — logged even before any payment."""
+    prediction: PredictorIn
+    name: str = Field(default="", max_length=80)
+    phone: str = Field(default="", pattern=r"^([6-9]\d{9})?$")
+
+
 class UnlockIn(BaseModel):
     prediction: PredictorIn
     name: str = Field(default="", max_length=80)
@@ -129,6 +136,11 @@ class PredictionLog(BaseModel):
     results: int
     high: int
     params: dict = Field(default_factory=dict)  # full PredictorIn, so admin can re-create the exact PDF
+    name: str = ""  # from the predictor details pop-up (empty for older logs)
+    phone: str = ""
+    paid_exam: bool = False  # exam needs a payment to see the full list
+    paid: bool = False  # payment verified for this exam + score
+    payment_id: str = ""
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

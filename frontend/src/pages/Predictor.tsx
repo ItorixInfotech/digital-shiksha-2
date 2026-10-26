@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -6,7 +6,7 @@ import { BadgeCheck, Building2, Download, Info, Link2, Loader2, MapPin, MessageC
 import { Checkbox } from "@/components/ui/checkbox";
 import PredictorGate from "@/components/PredictorGate";
 import PredictorPayment from "@/components/PredictorPayment";
-import { clearPending, dropLegacyStorage, GATE_KEY, readPending } from "@/lib/predictor-storage";
+import { clearPending, dropLegacyStorage, GATE_KEY, readContact, readPending } from "@/lib/predictor-storage";
 import { PageHeader, EmptyState } from "@/components/Common";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiGet, apiPost, ApiError } from "@/lib/api";
 import { buttonVariants } from "@/components/ui/button";
-import type { CapMeta, PredictorCategory, PredictorChance, PredictorExam, PredictorAccess, PredictorIn, PredictorOut } from "@/lib/types";
+import type { CapMeta, PredictorCategory, PredictorChance, PredictorExam, PredictorAccess, PredictorIn, PredictorOut, PredictionLogIn } from "@/lib/types";
 import { feeRange, slugify } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
 import { cn } from "@/lib/utils";
@@ -102,6 +102,17 @@ export default function Predictor() {
   const [payDismissed, setPayDismissed] = useState(false);
   const needsPay = !!body && fee > 0 && access.data?.paid !== true;
   const payOpen = !!body && unlocked && needsPay && !payDismissed;
+  // Log every submitted score once (paid exams too, before payment) so admin can download its PDF.
+  const logged = useRef(new Set<string>());
+  const logKey = body ? JSON.stringify(body) : "";
+  useEffect(() => {
+    if (!body || !unlocked || !urlSpec || logged.current.has(logKey)) return;
+    logged.current.add(logKey);
+    const c = readContact();
+    const phone = c.phone.replace(/\D/g, "").slice(-10);
+    void apiPost<void>("/predictor/log", { prediction: body, name: c.name, phone: /^[6-9]\d{9}$/.test(phone) ? phone : "" } satisfies PredictionLogIn).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by logKey
+  }, [logKey, unlocked, urlSpec]);
   const predict = useQuery({
     queryKey: ["predictor", "run", body],
     queryFn: () => apiPost<PredictorOut>("/predictor", body),

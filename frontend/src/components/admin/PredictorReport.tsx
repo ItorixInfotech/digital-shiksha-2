@@ -114,20 +114,26 @@ export default function PredictorReportPanel() {
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6">
         <div>
           <h3 className="font-semibold">Recent predictions</h3>
           <div className="mt-3 rounded-2xl border bg-white">
             <Table data-testid="admin-predictor-recent-table">
-              <TableHeader><TableRow><TableHead>When</TableHead><TableHead>Exam</TableHead><TableHead>Score</TableHead><TableHead>Category</TableHead><TableHead>Where</TableHead><TableHead>Results</TableHead><TableHead>PDF</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>When</TableHead><TableHead>Student</TableHead><TableHead>Exam</TableHead><TableHead>Score</TableHead><TableHead>Category</TableHead><TableHead>Results</TableHead><TableHead>PDF</TableHead></TableRow></TableHeader>
               <TableBody>
                 {r.recent.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell className="whitespace-nowrap text-xs text-slate-500">{when(p.created_at)}</TableCell>
-                    <TableCell className="font-medium">{p.exam}</TableCell>
+                    <TableCell className="text-xs" data-testid={`admin-predictor-recent-student-${p.id}`}>
+                      {p.name || p.phone ? <><span className="block font-medium text-slate-900">{p.name || "—"}</span>{p.phone && <a href={`tel:+91${p.phone}`} className="text-brand-blue hover:underline">+91 {p.phone}</a>}</> : <span className="text-slate-400">—</span>}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {p.exam}
+                      {p.paid_exam && <span className={`ml-1.5 rounded px-1.5 py-0.5 text-[10px] font-bold ${p.paid ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-800"}`} data-testid={`admin-predictor-recent-paid-${p.id}`}>{p.paid ? "Paid" : "Not paid"}</span>}
+                      <span className="block text-[11px] font-normal text-slate-500">{p.cities.length ? p.cities.join(" & ") : "All India"}</span>
+                    </TableCell>
                     <TableCell>{fmtScore(p.metric, p.score)}</TableCell>
                     <TableCell>{p.category}</TableCell>
-                    <TableCell className="text-xs">{p.cities.length ? p.cities.join(" & ") : "All India"}</TableCell>
                     <TableCell className="text-xs">{p.results} <span className="text-green-700">({p.high} high)</span></TableCell>
                     <TableCell>
                       <a href={`/api/admin/predictions/${encodeURIComponent(p.id)}/pdf`} download data-testid={`admin-predictor-recent-pdf-${p.id}`}

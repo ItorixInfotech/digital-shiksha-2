@@ -182,3 +182,9 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 - Pay button opens the Razorpay payment page in the SAME tab; before leaving, sessionStorage ds_predictor_pending_v2 stores the exam/score query (no personal data).
 - Return: Razorpay dashboard redirect -> /predictor?paid=1 (optionally with razorpay_payment_id) restores the prediction and polls POST /api/predictor/unlock (10 tries x 4s) using the gate mobile; Back button without redirect -> one quiet check. Success shows the "Payment confirmed" screen + PDF download automatically; otherwise manual "I've paid" form remains.
 - Each of the 6 Razorpay Payment Pages must have Page Settings -> Action after successful payment -> Redirect to https://www.digitalshiksha.in/predictor?paid=1
+
+## Predictor log for every submitted score
+- POST /api/predictor/log {prediction, name, phone} (PredictionLogIn) is sent by the predictor page once per submitted prediction after the details pop-up — including paid exams before payment. POST /api/predictor no longer logs. Log rows carry name, phone, paid_exam, paid, payment_id; unlock marks matching rows paid. Admin Predictor Report "Recent predictions" (full width) shows Student + Paid/Not paid and a PDF for every row.
+
+## Payment flow reverted to new tab (user request)
+- Pay button opens the Razorpay page in a NEW tab again; student returns and taps "I've paid" (step 2 "After paying, confirm here"). The Razorpay dashboard redirect link (/predictor?paid=1) is no longer needed; the page still handles it harmlessly if it is set.

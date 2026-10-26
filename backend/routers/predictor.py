@@ -16,6 +16,7 @@ from lib.whatsapp import notify_payment_whatsapp, send_student_prediction
 from lib.db import db
 from lib.pdf import build_prediction_pdf
 from models.predictor import (
+    PredictionLogIn,
     Bucket, CapMeta, Category, ExamReport, RoundCutoff, PredictionLog, PredictorExam, PredictorIn, PredictorOut, PredictorReport, PredictorResult,
     PaymentRecord, PredictorAccess, UnlockIn, UnlockOut,
 )
@@ -261,6 +262,8 @@ async def unlock(body: UnlockIn, background: BackgroundTasks, request: Request, 
         await db.predictor_unlocks.insert_one(doc)
     except DuplicateKeyError:
         raise HTTPException(status_code=409, detail=used_msg)
+    await db.predictions.update_many({"exam": pred.exam, "score": pred.score, "phone": body.phone, "paid": False},
+                                     {"$set": {"paid": True, "payment_id": doc["payment_id"]}})
     lead = {"id": doc["payment_id"], "name": doc["name"] or "Student", "phone": body.phone}
     background.add_task(send_student_prediction, lead, out, doc["prediction"])
     background.add_task(_payment_emails, doc, out)
@@ -347,12 +350,20 @@ async def _receipt_pdf(doc: dict) -> Response:
 @router.post("/predictor", response_model=PredictorOut)
 async def predict(body: PredictorIn, request: Request):
     await require_unlock(body, request)
-    out = await run_prediction(body)
+    return await run_prediction(body)  # logged separately via /predictor/log (also before payment)
+
+
+@router.post("/predictor/log", status_code=204)
+async def log_prediction(body: PredictionLogIn, request: Request):
+    """Every submitted score (paid exams too, before payment) — admin can download its PDF from the Predictor Report."""
+    pred = body.prediction
+    out = await run_prediction(pred)
+    paid_exam = pred.exam in razorpay.PAID_EXAMS
     await db.predictions.insert_one(PredictionLog(
-        exam=out.exam, metric=out.metric, score=out.score, category=out.category, cities=body.cities,
-        results=out.total or len(out.results), high=sum(r.chance == "High" for r in out.results), params=body.model_dump(),
+        exam=out.exam, metric=out.metric, score=out.score, category=out.category, cities=pred.cities,
+        results=out.total or len(out.results), high=sum(r.chance == "High" for r in out.results), params=pred.model_dump(),
+        name=body.name.strip(), phone=body.phone, paid_exam=paid_exam, paid=paid_exam and await _is_unlocked(request, pred.exam, pred.score),
     ).model_dump())
-    return out
 
 
 @router.get("/predictor/pdf")

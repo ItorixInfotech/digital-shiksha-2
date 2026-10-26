@@ -462,7 +462,19 @@ export interface PredictionLog {
   results: number;
   high: number;
   params: Record<string, unknown>; // full PredictorIn used to re-create the PDF
+  name: string;
+  phone: string;
+  paid_exam: boolean;
+  paid: boolean;
+  payment_id: string;
   created_at: string;
+}
+
+/** Mirrors backend PredictionLogIn — sent when a score is submitted (before any payment). */
+export interface PredictionLogIn {
+  prediction: PredictorIn;
+  name: string;
+  phone: string;
 }
 
 export interface PredictorBucket {
