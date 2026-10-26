@@ -16,7 +16,7 @@ from lib.whatsapp import notify_payment_whatsapp, send_student_prediction
 from lib.db import db
 from lib.pdf import build_prediction_pdf
 from models.predictor import (
-    PredictionLogIn,
+    PredictionLogIn, RazorpayStatus,
     Bucket, CapMeta, Category, ExamReport, RoundCutoff, PredictionLog, PredictorExam, PredictorIn, PredictorOut, PredictorReport, PredictorResult,
     PaymentRecord, PredictorAccess, UnlockIn, UnlockOut,
 )
@@ -314,6 +314,11 @@ async def admin_prediction_pdf(log_id: str, _: str = Depends(require_admin)):
     name = f"digital-shiksha-{out.exam.lower().replace(' ', '-')}-{out.score:g}-{log_id[:8]}.pdf"
     return Response(content=build_prediction_pdf(out, body.cities), media_type="application/pdf",
                     headers={"Content-Disposition": f'attachment; filename="{name}"'})
+
+
+@router.get("/admin/razorpay-status", response_model=RazorpayStatus)
+async def admin_razorpay_status(_: str = Depends(require_admin)):
+    return await razorpay.connection_status()
 
 
 @router.get("/admin/predictor-payments/pdfs.zip")

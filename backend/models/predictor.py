@@ -34,6 +34,20 @@ class PredictorIn(BaseModel):
     branch_group: str = ""
 
 
+class RazorpayStatus(BaseModel):
+    """Admin check of the Razorpay connection — counts only, never key values or payer details."""
+    configured: bool
+    mode: str  # "live" | "test" | "unknown" | ""
+    api_ok: bool
+    error: str
+    pages_found: List[str]
+    pages_missing: List[str]
+    payments_48h: int
+    fee_payments_48h: int
+    with_contact_48h: int
+    last_payment_at: Optional[int] = None  # unix seconds
+
+
 class PredictionLogIn(BaseModel):
     """Sent when a student submits a score (after the details pop-up) — logged even before any payment."""
     prediction: PredictorIn

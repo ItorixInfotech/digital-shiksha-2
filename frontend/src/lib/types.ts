@@ -470,6 +470,20 @@ export interface PredictionLog {
   created_at: string;
 }
 
+/** Mirrors backend RazorpayStatus (admin connection check; counts only). */
+export interface RazorpayStatus {
+  configured: boolean;
+  mode: string;
+  api_ok: boolean;
+  error: string;
+  pages_found: string[];
+  pages_missing: string[];
+  payments_48h: number;
+  fee_payments_48h: number;
+  with_contact_48h: number;
+  last_payment_at: number | null;
+}
+
 /** Mirrors backend PredictionLogIn — sent when a score is submitted (before any payment). */
 export interface PredictionLogIn {
   prediction: PredictorIn;

@@ -188,3 +188,6 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 
 ## Payment flow reverted to new tab (user request)
 - Pay button opens the Razorpay page in a NEW tab again; student returns and taps "I've paid" (step 2 "After paying, confirm here"). The Razorpay dashboard redirect link (/predictor?paid=1) is no longer needed; the page still handles it harmlessly if it is set.
+
+## Razorpay connection check (admin)
+- GET /api/admin/razorpay-status (admin) -> RazorpayStatus: key mode live/test (prefix only), API ok, which of the 6 predictor payment pages this account owns (GET /v1/payment_pages), payments in last 48h, captured at predictor prices, with contact, last payment time. Shown as a card at the top of Admin -> Predictor Report with "Check again". No key values or payer details returned.

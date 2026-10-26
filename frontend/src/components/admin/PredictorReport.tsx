@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { apiGet } from "@/lib/api";
 import type { Lead, PaymentRecord, PredictorReport } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import RazorpayStatusCard from "@/components/admin/RazorpayStatusCard";
 
 const fmtScore = (metric: string, v: number) => (metric === "rank" ? `Rank ${Math.round(v)}` : metric === "score" ? `${Math.round(v)}/720` : `${v}%ile`);
 const when = (d: string) => new Date(d).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
@@ -36,6 +37,7 @@ export default function PredictorReportPanel() {
         <h2 className="text-xl font-semibold">College Predictor report</h2>
         <p className="text-sm text-slate-500">Which exams and score ranges students are checking — use it to plan follow-up calls.</p>
       </div>
+      <RazorpayStatusCard />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {cards.map(([Icon, l, v]) => (
           <div key={l} className="rounded-xl border bg-white p-4" data-testid={`admin-predictor-stat-${l.toLowerCase().replace(/\s+/g, "-")}`}>

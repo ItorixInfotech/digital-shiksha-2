@@ -122,3 +122,36 @@ async def find_by_phone(phone: str, used: set[str], fee: int) -> dict:
         raise PaymentError(404, f"No new ₹{fee // 100} payment found from this mobile number yet. If you just paid, wait a minute and try again, or check the mobile number you paid with")
     captured = [p for p in mine if p.get("status") == "captured"] or mine
     return _check(sorted(captured, key=lambda p: p.get("created_at", 0), reverse=True)[0], fee)
+
+
+async def connection_status() -> dict:
+    """Admin health check (no secrets returned): which Razorpay mode/account the keys reach, and whether
+    that account owns the predictor payment pages and has recent payments the matcher can see."""
+    out = {"configured": configured(), "mode": "", "api_ok": False, "error": "", "pages_found": [], "pages_missing": [],
+           "payments_48h": 0, "fee_payments_48h": 0, "with_contact_48h": 0, "last_payment_at": None}
+    if not out["configured"]:
+        out["error"] = "Razorpay keys are not set"
+        return out
+    key = os.environ["RAZORPAY_KEY_ID"]
+    out["mode"] = "live" if key.startswith("rzp_live_") else "test" if key.startswith("rzp_test_") else "unknown"
+    fees = {f for f, _ in PAID_EXAMS.values()}
+    try:
+        async with httpx.AsyncClient(timeout=15, auth=_auth()) as c:
+            r = await c.get(f"{API}/payments", params={"from": int(time.time()) - 2 * 86400, "count": 100})
+            if r.status_code != 200:
+                out["error"] = "Razorpay rejected the keys" if r.status_code == 401 else f"Razorpay error {r.status_code}"
+                return out
+            out["api_ok"] = True
+            items = r.json().get("items", [])
+            out["payments_48h"] = len(items)
+            out["fee_payments_48h"] = sum(1 for p in items if p.get("status") == "captured" and any(f <= int(p.get("amount", 0)) <= f * 1.05 for f in fees))
+            out["with_contact_48h"] = sum(1 for p in items if _phones(p))
+            out["last_payment_at"] = max((p.get("created_at", 0) for p in items), default=0) or None
+            pr = await c.get(f"{API}/payment_pages", params={"count": 100})
+            urls = {str(p.get("short_url", "")).rstrip("/").rsplit("/", 1)[-1] for p in pr.json().get("items", [])} if pr.status_code == 200 else set()
+    except httpx.HTTPError:
+        out["error"] = "Could not reach Razorpay"
+        return out
+    for exam, (_, link) in PAID_EXAMS.items():
+        (out["pages_found"] if link.rsplit("/", 1)[-1] in urls else out["pages_missing"]).append(exam)
+    return out
