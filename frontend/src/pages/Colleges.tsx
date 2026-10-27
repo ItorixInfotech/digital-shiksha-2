@@ -177,7 +177,7 @@ export default function Colleges() {
           <div className="sticky z-30 -mx-4 border-b border-slate-200 bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:-mx-6 sm:px-6 lg:hidden"
             style={{ top: headerH }} data-testid="mobile-sticky-filters">
             <div className="flex items-center gap-1.5">
-            <div className="grid min-w-0 flex-1 grid-cols-4 gap-1.5">
+            <div className="grid min-w-0 flex-1 grid-cols-[1.3fr_1fr_1fr_1fr] gap-1.5">
               <QuickSelect label="Stream" value={get("stream")} options={(meta.data?.streams ?? []).map((f) => [f.name, f.name])} onPick={(v) => set("stream", v)} testid="sticky-filter-stream" />
               <QuickSelect label="City" value={get("city")} options={(meta.data?.cities ?? []).map((f) => [f.name, f.name])} onPick={(v) => set("city", v)} testid="sticky-filter-city" />
               <QuickSelect label="Fees" value={get("max_fees")} options={FEES.filter(([v]) => v).map(([v, l]) => [v, l])} onPick={(v) => set("max_fees", v)} testid="sticky-filter-fees" />

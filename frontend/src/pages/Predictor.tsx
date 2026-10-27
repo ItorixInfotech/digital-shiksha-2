@@ -42,7 +42,7 @@ const KCET_CATEGORIES: { value: PredictorCategory; label: string }[] = [
   { value: "General", label: "General Merit (GM)" }, { value: "1", label: "Category 1" }, { value: "2A", label: "Category 2A" }, { value: "2B", label: "Category 2B" },
   { value: "3A", label: "Category 3A" }, { value: "3B", label: "Category 3B" }, { value: "SC", label: "SC" }, { value: "ST", label: "ST" },
 ];
-const COMEDK_CATEGORIES: { value: PredictorCategory; label: string }[] = [{ value: "General", label: "General Merit (GM) — all India" }];
+const COMEDK_CATEGORIES: { value: PredictorCategory; label: string }[] = [{ value: "General", label: "General Merit (all India)" }];
 const categoriesFor = (exam: string) => (exam === KCET ? KCET_CATEGORIES : exam === COMEDK ? COMEDK_CATEGORIES : CATEGORIES);
 const categoryLabel = (exam: string, v: string) => categoriesFor(exam).find((c) => c.value === v)?.label ?? v;
 const citiesFor = (exam: string, key: string) => (isKa(exam) ? (KA_KEYS.includes(key) ? CITY_LIST[key] : []) : KA_KEYS.includes(key) ? [] : CITY_LIST[key]);
@@ -212,8 +212,8 @@ export default function Predictor() {
       <PageSeo page="predictor" />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "College Predictor" }]} title={<>College <span className="text-brand-leaf-soft">Predictor</span></>}
         subtitle="Enter your MHT CET, KCET, COMEDK, JEE Main, NEET or MBA CET score and see which colleges you can likely get. MHT CET uses the official CAP cut-offs for 380+ engineering and 520+ pharmacy colleges in Maharashtra; KCET and COMEDK use the official KEA / COMEDK closing ranks for Karnataka colleges." testid="predictor-header">
-        <form onSubmit={submit} className="mt-8 grid max-w-4xl gap-4 rounded-2xl bg-white p-5 text-slate-900 shadow-2xl sm:grid-cols-12 sm:items-end" data-testid="predictor-form">
-          <div className="grid gap-1.5 sm:col-span-3">
+        <form onSubmit={submit} className="mt-8 grid max-w-5xl gap-4 rounded-2xl bg-white p-5 text-slate-900 shadow-2xl sm:grid-cols-2 lg:grid-cols-12 lg:items-end" data-testid="predictor-form">
+          <div className="grid min-w-0 gap-1.5 lg:col-span-3">
             <Label>Entrance exam</Label>
             <Select value={exam} onValueChange={changeExam}>
               <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-exam-select"><SelectValue>{(v) => examLabel(v as string)}</SelectValue></SelectTrigger>
@@ -222,35 +222,41 @@ export default function Predictor() {
               </SelectContent>
             </Select>
           </div>
-          <div className="grid gap-1.5 sm:col-span-3">
+          <div className="grid min-w-0 gap-1.5 lg:col-span-2">
             <Label htmlFor="predictor-score">{spec?.label ?? "Your score"}</Label>
             <Input id="predictor-score" data-testid="predictor-score-input" inputMode="decimal" className="h-11" placeholder={spec?.hint.split(" — ")[0] ?? "Score"} value={score} onChange={(e) => setScore(e.target.value)} />
           </div>
-          <div className="grid gap-1.5 sm:col-span-2">
+          <div className="grid min-w-0 gap-1.5 lg:col-span-3">
             <Label>Category</Label>
+            {categoryOptions.length === 1 ? (
+              <div className="flex h-11 min-w-0 items-center rounded-lg border border-input bg-slate-50 px-2.5 text-sm text-slate-700" title="COMEDK has one merit list for all students" data-testid="predictor-category-fixed">
+                <span className="truncate">{categoryOptions[0].label}</span>
+              </div>
+            ) : (
             <Select value={category} onValueChange={(v: string) => setCategory(v as PredictorCategory)}>
               <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-category-select"><SelectValue>{(v) => categoryLabel(exam, v as string)}</SelectValue></SelectTrigger>
               <SelectContent>{categoryOptions.map((c) => <SelectItem key={c.value} value={c.value} data-testid={`predictor-category-option-${c.value.toLowerCase()}`}>{c.label}</SelectItem>)}</SelectContent>
             </Select>
+            )}
           </div>
-          <div className="grid gap-1.5 sm:col-span-2">
+          <div className="grid min-w-0 gap-1.5 lg:col-span-2">
             <Label>Location</Label>
             <Select value={city} onValueChange={(v: string) => setCity(v)}>
               <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-city-select"><SelectValue>{(v) => CITIES[v as string]}</SelectValue></SelectTrigger>
               <SelectContent>{cityOptions.map(([k, l]) => <SelectItem key={k} value={k} data-testid={`predictor-city-option-${k.toLowerCase()}`}>{l}</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <Button type="submit" disabled={predict.isFetching} data-testid="predictor-submit-button" className="h-11 bg-brand-red text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform] sm:col-span-2">
+          <Button type="submit" disabled={predict.isFetching} data-testid="predictor-submit-button" className="h-11 bg-brand-red text-white hover:bg-red-700 active:scale-[0.98] transition-[background-color,transform] sm:col-span-2 lg:col-span-2">
             {predict.isFetching ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />} Predict
           </Button>
           {isCap && (
-            <div className="grid gap-4 border-t border-slate-100 pt-4 sm:col-span-12 sm:grid-cols-12 sm:items-end animate-fade-up" data-testid="predictor-cap-options">
+            <div className="grid gap-4 border-t border-slate-100 pt-4 sm:col-span-2 lg:col-span-12 sm:grid-cols-2 lg:grid-cols-12 lg:items-end animate-fade-up" data-testid="predictor-cap-options">
               {isComedk ? (
-                <label className="flex h-11 items-center gap-2.5 rounded-lg border border-slate-200 px-3 text-sm sm:col-span-5">
+                <label className="flex min-h-11 items-center gap-2.5 rounded-lg border border-slate-200 px-3 py-2 text-sm lg:col-span-5">
                   <Checkbox checked={kkr} onCheckedChange={(v) => setKkr(Boolean(v))} data-testid="predictor-kkr-checkbox" /> Kalyana-Karnataka (371J) candidate — include KKR seats
                 </label>
               ) : isKcet ? (
-                <div className="flex flex-col gap-2 sm:col-span-5 sm:flex-row">
+                <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row lg:col-span-5">
                   <label className="flex h-11 flex-1 items-center gap-2.5 rounded-lg border border-slate-200 px-3 text-sm">
                     <Checkbox checked={kannada} onCheckedChange={(v) => setKannada(Boolean(v))} data-testid="predictor-kannada-checkbox" /> Kannada medium (K seats)
                   </label>
@@ -259,7 +265,7 @@ export default function Predictor() {
                   </label>
                 </div>
               ) : (
-              <div className="grid gap-1.5 sm:col-span-5">
+              <div className="grid min-w-0 gap-1.5 lg:col-span-5">
                 <Label>Home university (for HU / OHU seats)</Label>
                 <Select value={hu} onValueChange={(v: string) => setHu(v)}>
                   <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-hu-select"><SelectValue>{(v) => (v === ANY_HU ? "Not sure — show Other-than-HU seats" : (v as string))}</SelectValue></SelectTrigger>
@@ -270,7 +276,7 @@ export default function Predictor() {
                 </Select>
               </div>
               )}
-              <div className={cn("grid gap-1.5", ka ? "sm:col-span-7" : "sm:col-span-4")}>
+              <div className={cn("grid min-w-0 gap-1.5", ka ? "lg:col-span-7" : "lg:col-span-4")}>
                 <Label>{program === "pharmacy" ? "Course" : "Branch"}</Label>
                 <Select value={branch} onValueChange={(v: string) => setBranch(v)}>
                   <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-branch-select"><SelectValue>{(v) => (v === ALL_BRANCHES ? (program === "pharmacy" ? "B.Pharm + Pharm.D" : "All branches") : (v as string))}</SelectValue></SelectTrigger>
@@ -280,13 +286,13 @@ export default function Predictor() {
                   </SelectContent>
                 </Select>
               </div>
-              {!ka && <label className="flex h-11 items-center gap-2.5 rounded-lg border border-slate-200 px-3 text-sm sm:col-span-3">
+              {!ka && <label className="flex min-h-11 items-center gap-2.5 rounded-lg border border-slate-200 px-3 py-2 text-sm sm:col-span-2 lg:col-span-3">
                 <Checkbox checked={ladies} onCheckedChange={(v) => setLadies(Boolean(v))} data-testid="predictor-ladies-checkbox" />
                 Girl candidate (include Ladies seats)
               </label>}
             </div>
           )}
-          {spec && <p className="text-xs text-slate-500 sm:col-span-12">{spec.hint}{category !== "General" && spec.rank_note ? ` • ${spec.rank_note}` : ""}{spec.fee > 0 && <span className="ml-1 font-semibold text-brand-leaf" data-testid="predictor-fee-note">• Full college list: ₹{spec.fee.toLocaleString("en-IN")} per {spec.metric === "rank" ? "rank" : spec.metric === "score" ? "score" : "percentile"}</span>}</p>}
+          {spec && <p className="text-xs text-slate-500 sm:col-span-2 lg:col-span-12">{spec.hint}{category !== "General" && spec.rank_note ? ` • ${spec.rank_note}` : ""}{spec.fee > 0 && <span className="ml-1 font-semibold text-brand-leaf" data-testid="predictor-fee-note">• Full college list: ₹{spec.fee.toLocaleString("en-IN")} per {spec.metric === "rank" ? "rank" : spec.metric === "score" ? "score" : "percentile"}</span>}</p>}
         </form>
       </PageHeader>
 
