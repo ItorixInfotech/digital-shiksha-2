@@ -39,6 +39,13 @@ class LandingLink(BaseModel):
     count: int
 
 
+class LandingCutoff(BaseModel):
+    college: str
+    slug: str = ""  # college page on this site, if any
+    branch: str
+    closing_rank: int
+
+
 class LandingPage(LandingSummary):
     year: int
     h1: str
@@ -49,3 +56,7 @@ class LandingPage(LandingSummary):
     colleges: List[College]
     same_city: List[LandingLink]
     same_stream: List[LandingLink]
+    # Karnataka engineering pages: official KCET closing ranks (best Computer Science seat per college, else best branch)
+    cutoff_table: List[LandingCutoff] = []
+    cutoff_source: str = ""
+    predictor_exam: str = ""

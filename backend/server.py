@@ -17,16 +17,26 @@ from lib.db import client, ensure_indexes
 from lib.year_rollover import run_year_rollover
 from lib.articles_2027 import ensure_2027_guides
 from lib.college_import import run_college_import
+from lib.college_enrich import run_college_enrich
+from lib.kcet import load_kcet_data
+from lib.karnataka_pages import setup_karnataka_pages
 from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export, redirects
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.index_task = asyncio.create_task(ensure_indexes())  # background: a big index build must not block boot
-    app.state.cap_task = asyncio.create_task(load_cap_data())  # official CAP cut-offs; reloads only when the data file version changes
+    cap_task = app.state.cap_task = asyncio.create_task(load_cap_data())  # official CAP cut-offs; reloads only when the data file version changes
     app.state.rollover_task = asyncio.create_task(run_year_rollover())  # one-time 2026 -> 2027 content rollover
     app.state.guides_task = asyncio.create_task(ensure_2027_guides())  # 2027 admission guides, inserted once
-    app.state.college_import_task = asyncio.create_task(run_college_import())  # MH + KA B.Tech colleges with logos, once
+
+    async def colleges_chain() -> None:  # order matters: colleges -> cut-off data (maps to college pages) -> placements/cut-offs
+        await run_college_import()  # MH + KA B.Tech colleges with logos, once
+        await cap_task
+        await load_kcet_data()  # official KEA KCET closing ranks; reloads only when the data file version changes
+        await run_college_enrich()  # top new MH + KA colleges: packages + cut-offs, once
+        await setup_karnataka_pages()  # Bengaluru / Mysuru / Mangaluru engineering page content, once
+    app.state.college_import_task = asyncio.create_task(colleges_chain())
     app.state.redirects_task = asyncio.create_task(redirects.seed_redirects())  # starter /blog -> /news redirect, once
     yield
     client.close()

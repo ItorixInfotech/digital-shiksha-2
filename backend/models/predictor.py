@@ -7,7 +7,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 Metric = Literal["percentile", "score", "rank"]
 Chance = Literal["High", "Medium", "Reach"]
-Category = Literal["General", "OBC", "EWS", "SC", "ST", "VJ", "NT1", "NT2", "NT3", "SEBC", "TFWS"]
+Category = Literal["General", "OBC", "EWS", "SC", "ST", "VJ", "NT1", "NT2", "NT3", "SEBC", "TFWS", "1", "2A", "2B", "3A", "3B"]  # 1–3B: Karnataka (KCET) only
 
 
 class PredictorExam(BaseModel):
@@ -31,7 +31,10 @@ class PredictorIn(BaseModel):
     # MHT CET (official CAP data) only:
     ladies: bool = False
     home_university: str = ""
-    branch_group: str = ""
+    branch_group: str = ""  # MHT CET + KCET
+    # KCET (official KEA data) only:
+    kannada: bool = False  # Kannada-medium candidate -> also K seats
+    rural: bool = False  # rural candidate -> also R seats
 
 
 class RazorpayStatus(BaseModel):
@@ -106,6 +109,7 @@ class CapMeta(BaseModel):
     home_universities: List[str]
     branch_groups: List[str]
     categories: List[str]
+    cities: List[str] = []  # KCET: cities with colleges in the data
 
 
 class PredictorResult(BaseModel):

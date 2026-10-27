@@ -5,11 +5,12 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from lib import kcet
 from lib.dates import today_iso
 from lib.year_rollover import ADMISSION_YEAR
 from lib.db import db
 from models.content import FaqItem, SeoMeta
-from models.landing import LandingLink, LandingOverrideIn, LandingPage, LandingStats, LandingSummary
+from models.landing import LandingCutoff, LandingLink, LandingOverrideIn, LandingPage, LandingStats, LandingSummary
 from routers.admin import require_admin
 
 router = APIRouter()
@@ -115,12 +116,22 @@ async def get_landing(slug: str):
                      f"Fees range from {_inr(st.fees_min)} to {_inr(st.fees_max)} per year" + (f", average placements are around ₹{st.avg_package:g} LPA" if st.avg_package else "")
                      + (f" and admission is through {', '.join(exams)}" if exams else "")
                      + f". Compare fees, cutoffs and placements below, then book free admission counselling with Digital Shiksha.")
+    table: list[LandingCutoff] = []
+    if summary.stream == "Engineering":
+        best: dict[str, tuple] = {}
+        async for r in db.kcet_cutoffs.find({"city": summary.city, "ranks.GM": {"$exists": True}}, {"_id": 0, "display_name": 1, "college_slug": 1, "branch": 1, "branch_lc": 1, "ranks.GM": 1}):
+            key = (0 if re.search(r"^(b ?tech in )?computer science and engineering$", r["branch_lc"]) else 1, r["ranks"]["GM"])
+            if r["display_name"] not in best or key < best[r["display_name"]][0]:
+                best[r["display_name"]] = (key, r)
+        rows = sorted(best.values(), key=lambda x: x[1]["ranks"]["GM"])[:30]
+        table = [LandingCutoff(college=r["display_name"], slug=r.get("college_slug", ""), branch=r["branch"], closing_rank=r["ranks"]["GM"]) for _, r in rows]
     others = await list_landing()
     link = lambda s: LandingLink(slug=s.slug, label=s.label, count=s.count)  # noqa: E731
     return LandingPage(**summary.model_dump(), year=year, h1=f"Top {lab} Colleges in {summary.city} {year}",
                        intro=o.intro or default_intro, faqs=o.faqs or _auto_faqs(lab, summary.city, cols, st, year), seo=o.seo, stats=st, colleges=cols,
                        same_city=[link(s) for s in others if s.city == summary.city and s.slug != slug][:8],
-                       same_stream=[link(s) for s in others if s.stream == summary.stream and s.slug != slug][:8])
+                       same_stream=[link(s) for s in others if s.stream == summary.stream and s.slug != slug][:8],
+                       cutoff_table=table, cutoff_source=kcet.SOURCE if table else "", predictor_exam="KCET" if table else "")
 
 
 @router.put("/admin/landing/{slug}", response_model=LandingSummary)

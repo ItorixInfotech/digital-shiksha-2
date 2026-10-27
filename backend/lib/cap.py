@@ -30,6 +30,10 @@ SLUG_BY_CODE = {
     "06278": "aissms-coe-pune", "06272": "dypcoe-akurdi", "06177": "scoe-pune", "06146": "mitaoe-pune",
     "03215": "spit-mumbai", "03199": "djsce-mumbai", "03182": "tsec-mumbai", "03184": "frcrce-mumbai",
     "03185": "vesit-mumbai", "03012": "vjti-mumbai", "03036": "ict-mumbai",
+    # Collegedunia import (Nov 2026)
+    "06754": "i2it-pune", "06007": "wce-sangli", "06274": "pvgcoet-pune", "06285": "bharati-vidyapeeth-college-of-engineering-for-women-pune",
+    "06139": "mcoe-pune", "03211": "sies-gst-navi-mumbai", "02008": "geca-aurangabad", "04116": "ghrce-nagpur", "06822": "pccoer-pune",
+    "03214": "xie-mumbai", "03204": "sfit-mumbai", "03139": "vit-mumbai",
 }
 
 # Rightmost match wins. Locality aliases fold into their city.
@@ -108,6 +112,11 @@ async def load_cap_data() -> None:
     """Startup task: (re)load each bundled cut-off file when its version changes. Never raises."""
     for program, path in DATA_FILES.items():
         await _load_program(program, path)
+    try:  # college-page links for newly mapped CAP codes (cheap; the data reload only runs on a version change)
+        for code, slug in SLUG_BY_CODE.items():
+            await db.cap_cutoffs.update_many({"college_code": code, "program": {"$in": ["engineering", None]}, "college_slug": {"$ne": slug}}, {"$set": {"college_slug": slug}})
+    except Exception as exc:  # noqa: BLE001
+        logger.error("CAP slug sync failed: %s", exc)
 
 
 async def _load_program(program: str, path: Path) -> None:

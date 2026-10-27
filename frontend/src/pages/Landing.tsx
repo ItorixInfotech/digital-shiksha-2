@@ -6,6 +6,8 @@ import { Building2, IndianRupee, MapPin, TrendingUp, Trophy } from "lucide-react
 import CollegeCard from "@/components/CollegeCard";
 import EnquiryForm from "@/components/EnquiryForm";
 import FaqSection from "@/components/FaqSection";
+import ExamPredictorBox from "@/components/ExamPredictorBox";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CardSkeleton, EmptyState, PageHeader } from "@/components/Common";
 import { NotFound } from "@/pages/Consultation";
 import { Seo } from "@/components/Seo";
@@ -79,6 +81,31 @@ export default function Landing() {
             <RichText value={p.intro} testid="landing-intro-content" />
             {p.stats.exams.length > 0 && <p className="mt-4 text-sm text-slate-500">Popular entrance exams: <span className="font-medium text-slate-800">{p.stats.exams.join(" · ")}</span></p>}
           </section>
+
+          {p.predictor_exam && <ExamPredictorBox examName={p.predictor_exam} city={p.city} testid="landing-predictor" />}
+
+          {p.cutoff_table.length > 0 && (
+            <section className="rounded-2xl border bg-white p-6 shadow-sm" data-testid="landing-cutoff-table">
+              <h2 className="text-xl font-semibold">KCET cut-off for engineering colleges in {p.city}</h2>
+              <p className="mt-1 text-sm text-slate-500">Official KEA 2025 Round I closing ranks, General Merit: Computer Science where offered, otherwise the most competitive branch. Lower rank = harder to get.</p>
+              <div className="mt-4 overflow-x-auto">
+                <Table>
+                  <TableHeader><TableRow><TableHead>#</TableHead><TableHead>College</TableHead><TableHead>Branch</TableHead><TableHead className="text-right">Closing rank (GM)</TableHead></TableRow></TableHeader>
+                  <TableBody>
+                    {p.cutoff_table.map((r, i) => (
+                      <TableRow key={`${r.college}-${r.branch}`} data-testid={`landing-cutoff-row-${i + 1}`}>
+                        <TableCell className="text-slate-400">{i + 1}</TableCell>
+                        <TableCell className="min-w-48 font-medium">{r.slug ? <Link to={`/colleges/${r.slug}`} className="hover:text-brand-leaf transition-colors" data-testid={`landing-cutoff-link-${r.slug}`}>{r.college}</Link> : r.college}</TableCell>
+                        <TableCell className="min-w-40 text-slate-600">{r.branch}</TableCell>
+                        <TableCell className="text-right font-semibold tabular-nums">{r.closing_rank.toLocaleString("en-IN")}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <p className="mt-3 text-xs text-slate-400" data-testid="landing-cutoff-source">Source: {p.cutoff_source}</p>
+            </section>
+          )}
 
           <section data-testid="landing-colleges">
             <h2 className="text-xl font-semibold">{p.colleges.length} {p.label} — ranked</h2>

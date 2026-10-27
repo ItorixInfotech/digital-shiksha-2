@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 const EXAM_LABEL: Record<string, string> = { "MHT CET": "MHT CET (Engineering)", "MHT CET Pharmacy": "MHT CET (Pharmacy)" };
 
 /** Score -> the matching predictor (names match the predictor's). Several names show an exam picker; none matching shows a link. */
-export default function ExamPredictorBox({ examName, examNames, testid = "exam-predictor" }: { examName?: string; examNames?: string[]; testid?: string }) {
+export default function ExamPredictorBox({ examName, examNames, testid = "exam-predictor", city = "both" }: { examName?: string; examNames?: string[]; testid?: string; city?: string }) {
   const nav = useNavigate();
   const exams = useQuery({ queryKey: ["predictor", "exams"], queryFn: () => apiGet<PredictorExam[]>("/predictor/exams") });
   const wanted = examNames ?? (examName ? [examName] : []);
@@ -22,7 +22,7 @@ export default function ExamPredictorBox({ examName, examNames, testid = "exam-p
   const valid = !!spec && score !== "" && !Number.isNaN(n) && n >= spec.min && n <= spec.max;
   const submit = (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (spec && valid) nav(`/predictor?${new URLSearchParams({ exam: spec.name, score, category: "General", city: "both" })}`);
+    if (spec && valid) nav(`/predictor?${new URLSearchParams({ exam: spec.name, score, category: "General", city })}`);
   };
   const shell = "relative overflow-hidden rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 via-white to-emerald-50 p-5 shadow-sm";
 

@@ -8,7 +8,7 @@ import zipfile
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response
 from pymongo.errors import DuplicateKeyError
 
-from lib import cap, razorpay
+from lib import cap, kcet, razorpay
 import os
 
 from lib.email import notify_payment, send_predictor_receipt
@@ -38,6 +38,8 @@ EXAMS = {
     "JEE Advanced": PredictorExam(name="JEE Advanced", metric="rank", min=1, max=250000, label="JEE Advanced rank", hint="e.g. 1500 — IIT seats via JoSAA",
                                   rank_note="Enter your category rank (e.g. OBC-NCL rank) if you selected a reserved category.",
                                   fee=razorpay.PAID_EXAMS["JEE Advanced"][0] // 100, payment_link=razorpay.PAID_EXAMS["JEE Advanced"][1]),
+    "KCET": PredictorExam(name="KCET", metric="rank", min=1, max=300000, label="KCET engineering rank", hint="e.g. 15000 — official KEA 2025 Round I closing ranks, 220+ Karnataka engineering colleges",
+                          rank_note="Enter your KCET engineering rank — the predictor applies your category seats itself."),
 }
 
 # Reserved-category closing cutoffs are estimated from the General Open value (approx. historical gaps).
@@ -52,10 +54,10 @@ MARGINS = {"percentile": (0.8, 2.0), "score": (15.0, 35.0)}
 
 def category_cutoff(metric: str, general: float, category: str) -> float:
     if metric == "percentile":
-        return round(max(0.0, 100 - (100 - general) * PCT_FACTOR[category]), 2)
+        return round(max(0.0, 100 - (100 - general) * PCT_FACTOR.get(category, 1.6)), 2)
     if metric == "score":
-        return max(0.0, general - SCORE_DROP[category])
-    return max(1.0, round(general * RANK_SHARE[category]))
+        return max(0.0, general - SCORE_DROP.get(category, 12))
+    return max(1.0, round(general * RANK_SHARE.get(category, 0.45)))
 
 
 def fmt(metric: str, v: float) -> str:
@@ -98,6 +100,12 @@ def _program_filter(program: str) -> dict:
 
 @router.get("/predictor/cap-meta", response_model=CapMeta)
 async def cap_meta(program: str = "engineering"):
+    if program == "kcet":
+        n = await db.kcet_cutoffs.count_documents({})
+        cities = await db.kcet_cutoffs.distinct("city")
+        return CapMeta(available=n > 0, year=kcet.YEAR, source=kcet.SOURCE_URL, colleges=len(await db.kcet_cutoffs.distinct("college_code")) if n else 0,
+                       courses=n, home_universities=[], branch_groups=list(cap.BRANCH_GROUPS), categories=kcet.CATEGORIES,
+                       cities=[c for c in kcet.CITIES if c in cities])
     if program not in cap.DATA_FILES:
         raise HTTPException(status_code=400, detail="Unknown program")
     f = _program_filter(program)
@@ -153,12 +161,50 @@ async def run_cap_prediction(exam: PredictorExam, body: PredictorIn) -> Predicto
                         total=len(results), source=f"Official CET Cell CAP cut-offs, {cap.PROGRAM_LABEL[program]} (Rounds I–IV) — {cap.SOURCE_URL}")
 
 
+async def run_kcet_prediction(exam: PredictorExam, body: PredictorIn) -> PredictorOut:
+    """KCET on the official KEA closing ranks: best (highest) closing rank among the seat types the student qualifies for."""
+    if body.category not in kcet.PREFIX:
+        raise HTTPException(status_code=422, detail="Choose a Karnataka category (GM, 1, 2A, 2B, 3A, 3B, SC or ST)")
+    f: dict = {}
+    if body.cities:
+        f["city"] = {"$in": body.cities}
+    if body.branch_group in cap.BRANCH_GROUPS:
+        f["branch_lc"] = {"$regex": cap.BRANCH_GROUPS[body.branch_group]}
+    rows = await db.kcet_cutoffs.find(f, {"_id": 0}).to_list(5000)
+    slugs = {r["college_slug"] for r in rows if r.get("college_slug")}
+    site = {c["slug"]: c for c in await db.colleges.find({"slug": {"$in": list(slugs)}}, {"_id": 0, "slug": 1, "short_name": 1, "image": 1, "logo": 1,
+                                                                                         "fees_min": 1, "fees_max": 1, "avg_package": 1}).to_list(500)}
+    codes = kcet.seat_codes(body.category, body.kannada, body.rural)
+    results: List[PredictorResult] = []
+    for r in rows:
+        seats = [(code, r["ranks"][code]) for code in codes if code in r["ranks"]]
+        if not seats:
+            continue
+        seat, closing = max(seats, key=lambda s: s[1])
+        ch = chance_for("rank", body.score, closing)
+        if not ch:
+            continue
+        c = site.get(r.get("college_slug") or "", {})
+        results.append(PredictorResult(
+            college_slug=r.get("college_slug") or "", college_name=r.get("display_name") or r["college_name"], short_name=c.get("short_name") or r.get("display_name") or r["college_name"],
+            city=r["city"], type=r.get("type", ""), image=c.get("logo") or c.get("image", ""), course=r["branch"],
+            cutoff=f"Closing rank {closing:,} ({seat})", cutoff_value=float(closing), general_cutoff=f"{r['ranks']['GM']:,}" if "GM" in r["ranks"] else "—",
+            estimated=False, chance=ch, fees_min=c.get("fees_min", 0), fees_max=c.get("fees_max", 0), avg_package=c.get("avg_package", 0),
+            seat=seat, official=True, course_code=r["course_code"],
+        ))
+    results.sort(key=lambda x: x.cutoff_value)  # most competitive (lowest closing rank) first
+    return PredictorOut(exam=exam.name, metric=exam.metric, score=body.score, category=body.category, results=results[:MAX_RESULTS],
+                        total=len(results), source=kcet.SOURCE)
+
+
 async def run_prediction(body: PredictorIn) -> PredictorOut:
     exam = EXAMS.get(body.exam)
     if not exam:
         raise HTTPException(status_code=400, detail="Unsupported exam")
     if not (exam.min <= body.score <= exam.max):
         raise HTTPException(status_code=422, detail=f"{exam.label} must be between {exam.min:g} and {exam.max:g}")
+    if exam.name == "KCET":
+        return await run_kcet_prediction(exam, body)
     if exam.name in cap.EXAM_PROGRAM:
         out = await run_cap_prediction(exam, body)
         if out is not None:
@@ -373,9 +419,9 @@ async def log_prediction(body: PredictionLogIn, request: Request):
 
 @router.get("/predictor/pdf")
 async def predictor_pdf(request: Request, exam: str, score: float, category: Category = "General", cities: str = "", ladies: bool = False,
-                        home_university: str = "", branch_group: str = ""):
+                        home_university: str = "", branch_group: str = "", kannada: bool = False, rural: bool = False):
     body = PredictorIn(exam=exam, score=score, category=category, cities=[c for c in cities.split(",") if c],
-                       ladies=ladies, home_university=home_university, branch_group=branch_group)
+                       ladies=ladies, home_university=home_university, branch_group=branch_group, kannada=kannada, rural=rural)
     await require_unlock(body, request)
     out = await run_prediction(body)
     pdf = build_prediction_pdf(out, body.cities)

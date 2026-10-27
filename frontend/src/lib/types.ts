@@ -55,6 +55,13 @@ export interface LandingLink {
   count: number;
 }
 
+export interface LandingCutoff {
+  college: string;
+  slug: string;
+  branch: string;
+  closing_rank: number;
+}
+
 export interface LandingPage extends LandingSummary {
   year: number;
   h1: string;
@@ -65,6 +72,9 @@ export interface LandingPage extends LandingSummary {
   colleges: College[];
   same_city: LandingLink[];
   same_stream: LandingLink[];
+  cutoff_table: LandingCutoff[]; // Karnataka engineering pages: official KCET closing ranks
+  cutoff_source: string;
+  predictor_exam: string;
 }
 
 export interface SeoMeta {
@@ -341,7 +351,7 @@ export interface CutoffImportResult {
 // Mirrors backend/models/predictor.py
 export type PredictorMetric = "percentile" | "score" | "rank";
 export type PredictorChance = "High" | "Medium" | "Reach";
-export type PredictorCategory = "General" | "OBC" | "EWS" | "SC" | "ST" | "VJ" | "NT1" | "NT2" | "NT3" | "SEBC" | "TFWS";
+export type PredictorCategory = "General" | "OBC" | "EWS" | "SC" | "ST" | "VJ" | "NT1" | "NT2" | "NT3" | "SEBC" | "TFWS" | "1" | "2A" | "2B" | "3A" | "3B"; // 1–3B: KCET only
 
 export interface PredictorExam {
   name: string;
@@ -365,6 +375,8 @@ export interface PredictorIn {
   ladies?: boolean;
   home_university?: string;
   branch_group?: string;
+  kannada?: boolean; // KCET only
+  rural?: boolean; // KCET only
 }
 
 export interface UnlockIn {
@@ -419,6 +431,7 @@ export interface CapMeta {
   home_universities: string[];
   branch_groups: string[];
   categories: string[];
+  cities: string[]; // KCET: cities with colleges
 }
 
 export interface PredictorResult {
