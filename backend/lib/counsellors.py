@@ -37,12 +37,19 @@ async def counsellor_for(lead: dict) -> dict | None:
 
 async def alert_lead(lead: dict, owner_email: bool = True) -> None:
     """New/assigned lead → WhatsApp to the assigned counsellor (else admin number) + email. Never raises."""
-    c = await counsellor_for(lead)
-    await wa.notify_whatsapp(lead, [f"+91{c['phone']}"] if c else None)
+    # Owner email first and isolated, so a WhatsApp / counsellor lookup problem can never stop it.
     if owner_email:
-        await notify_new_lead(lead)
-    if c and c.get("email") and c["email"] != os.environ.get("LEAD_ALERT_EMAIL"):
-        await notify_new_lead(lead, to=c["email"])
+        try:
+            await notify_new_lead(lead)
+        except Exception as exc:  # noqa: BLE001
+            logger.error("Lead %s owner email failed: %s", lead.get("id"), exc)
+    try:
+        c = await counsellor_for(lead)
+        await wa.notify_whatsapp(lead, [f"+91{c['phone']}"] if c else None)
+        if c and c.get("email") and c["email"] != os.environ.get("LEAD_ALERT_EMAIL"):
+            await notify_new_lead(lead, to=c["email"])
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Lead %s WhatsApp / counsellor alert failed: %s", lead.get("id"), exc)
 
 
 def _age(created: datetime, now: datetime) -> str:
