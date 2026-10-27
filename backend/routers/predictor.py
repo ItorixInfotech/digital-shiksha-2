@@ -24,7 +24,7 @@ from routers.admin import require_admin
 
 router = APIRouter()
 
-EXAMS = {
+_EXAMS = {
     "MHT CET": PredictorExam(name="MHT CET", metric="percentile", min=0, max=100, label="MHT CET percentile", hint="e.g. 97.5 — official CAP Round I–IV cut-offs, 380+ Maharashtra engineering colleges",
                             fee=razorpay.PAID_EXAMS["MHT CET"][0] // 100, payment_link=razorpay.PAID_EXAMS["MHT CET"][1]),
     "MHT CET Pharmacy": PredictorExam(name="MHT CET Pharmacy", metric="percentile", min=0, max=100, label="MHT CET percentile (PCB / PCM)", hint="e.g. 92 — official B.Pharm & Pharm.D CAP Round I–IV cut-offs, 520+ Maharashtra colleges",
@@ -42,6 +42,8 @@ EXAMS = {
                           rank_note="Enter your KCET engineering rank — the predictor applies your category seats itself.",
                           fee=razorpay.PAID_EXAMS["KCET"][0] // 100, payment_link=razorpay.PAID_EXAMS["KCET"][1]),
 }
+# Display order of the exam drop-down (and the exam chips elsewhere).
+EXAMS = {k: _EXAMS[k] for k in ("MHT CET", "JEE Main", "JEE Advanced", "KCET", "MAH MBA CET", "NEET UG", "MHT CET Pharmacy")}
 
 # Reserved-category closing cutoffs are estimated from the General Open value (approx. historical gaps).
 # percentile: gap to 100 widens by factor; score: points lower; rank: category-rank closing as share of GEN closing.
