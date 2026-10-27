@@ -95,7 +95,7 @@ def chance_for(metric: str, score: float, closing: float) -> str | None:
 @router.get("/predictor/exams", response_model=List[PredictorExam])
 async def predictor_exams():
     auto = razorpay.configured()
-    return [e.model_copy(update={"payment_auto_check": auto, "fee": await razorpay.exam_fee(e.name) // 100}) if e.fee else e
+    return [e.model_copy(update={"payment_auto_check": auto, "fee": razorpay.exam_fee_cached(e.name) // 100}) if e.fee else e
             for e in EXAMS.values()]
 
 

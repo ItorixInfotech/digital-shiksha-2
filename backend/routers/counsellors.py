@@ -7,6 +7,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 
 from lib import counsellors as cs
 from lib.cron import accept_cron
+from lib.lead_digest import send_lead_digest
 from lib import whatsapp as wa
 from lib.db import db
 from models.content import Lead
@@ -119,4 +120,20 @@ async def cron_morning_reminders(request: Request, background: BackgroundTasks):
             await cs.send_reminders(groups, "8 AM schedule")
 
     background.add_task(job)
+    return {"ok": True}
+
+
+@router.post("/cron/lead-digest", status_code=202)
+async def cron_lead_digest(request: Request, background: BackgroundTasks):
+    # Cron endpoints must ack 2xx immediately; enqueue/background the actual work.
+    early = await accept_cron(request, "lead-digest")
+    if early is not None:
+        return early
+    background.add_task(send_lead_digest, "8 PM schedule")
+    return {"ok": True}
+
+
+@router.post("/admin/lead-digest/send", status_code=202)
+async def send_lead_digest_now(background: BackgroundTasks, _: str = Depends(require_admin)):
+    background.add_task(send_lead_digest, "manual")
     return {"ok": True}

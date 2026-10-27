@@ -4,6 +4,7 @@ Students pay on the static Razorpay Payment Page (PAID_EXAMS link); we then conf
 through the Razorpay REST API (RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET, basic auth) — by payment ID, or by
 finding a recent ₹1500 captured payment made from the student's mobile number.
 """
+import asyncio
 import logging
 import os
 import re
@@ -37,7 +38,7 @@ async def exam_fee(exam: str) -> int:
         return hit[1]
     fee = fallback
     try:
-        async with httpx.AsyncClient(timeout=8, follow_redirects=True) as c:
+        async with httpx.AsyncClient(timeout=5, follow_redirects=True) as c:
             r = await c.get(link)
         amounts = {int(a) for a in re.findall(r'"amount":(\d+)', r.text)} if r.status_code == 200 else set()
         if len(amounts) == 1 and (a := amounts.pop()) >= 100:
@@ -48,6 +49,30 @@ async def exam_fee(exam: str) -> int:
         logger.warning("Razorpay page fetch failed for %s: %s — using %s", exam, exc, fallback)
     _FEE_CACHE[exam] = (time.time(), fee)
     return fee
+
+
+_REFRESHING: set[str] = set()
+
+
+def exam_fee_cached(exam: str) -> int:
+    """Non-blocking price for listings: cached (or PAID_EXAMS) value now; a stale entry refreshes in the background."""
+    hit = _FEE_CACHE.get(exam)
+    if (not hit or time.time() - hit[0] >= _FEE_TTL) and exam not in _REFRESHING:
+        _REFRESHING.add(exam)
+
+        async def refresh() -> None:
+            try:
+                _FEE_CACHE.pop(exam, None)
+                await exam_fee(exam)
+            finally:
+                _REFRESHING.discard(exam)
+        asyncio.get_running_loop().create_task(refresh())
+    return hit[1] if hit else PAID_EXAMS[exam][0]
+
+
+async def warm_fees() -> None:
+    """Startup: read every Payment Page price in parallel so the first visitors already see live prices."""
+    await asyncio.gather(*(exam_fee(e) for e in PAID_EXAMS), return_exceptions=True)
 
 
 class PaymentError(Exception):

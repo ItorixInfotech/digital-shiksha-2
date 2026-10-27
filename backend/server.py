@@ -18,6 +18,7 @@ from lib.year_rollover import run_year_rollover
 from lib.articles_2027 import ensure_2027_guides
 from lib.college_import import run_college_import
 from lib.college_enrich import run_college_enrich
+from lib import razorpay
 from lib.kcet import load_kcet_data
 from lib.comedk import load_comedk_data
 from lib.comedk_exam import ensure_comedk_exam
@@ -32,6 +33,7 @@ async def lifespan(app: FastAPI):
     cap_task = app.state.cap_task = asyncio.create_task(load_cap_data())  # official CAP cut-offs; reloads only when the data file version changes
     app.state.rollover_task = asyncio.create_task(run_year_rollover())  # one-time 2026 -> 2027 content rollover
     app.state.guides_task = asyncio.create_task(ensure_2027_guides())  # 2027 admission guides, inserted once
+    app.state.fees_task = asyncio.create_task(razorpay.warm_fees())  # live Payment Page prices, fetched in parallel
     rollover_task = app.state.rollover_task
 
     async def comedk_exam_after_rollover() -> None:  # the rollover must not touch the COMEDK page's 2026 dates
