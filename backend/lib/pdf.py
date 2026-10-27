@@ -78,7 +78,8 @@ def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | N
     header.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0), ("RIGHTPADDING", (0, 0), (-1, -1), 0)]))
 
     official = bool(out.results and out.results[0].official)
-    kcet = out.exam == "KCET"
+    kcet = out.exam in ("KCET", "COMEDK")
+    comedk = out.exam == "COMEDK"
     where = " & ".join(cities) if cities else ("All Karnataka" if kcet else "All India")
     counts = {k: sum(r.chance == k for r in out.results) for k in CHANCE_LABEL}
     generated = datetime.now(timezone.utc).strftime("%d %b %Y")
@@ -114,7 +115,7 @@ def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | N
     story += [summary, Spacer(1, 4 * mm), notice, Spacer(1, 5 * mm)]
 
     if out.results:
-        rows = [[Paragraph(h, S["head"]) for h in ("#", "College", "Course / Branch", ("KCET 2025 Round I closing rank" if kcet else "Round I cutoff (official CAP)" if official else "Cutoff" + (" (est.)" if out.category != "General" else "")), "Chance", "Fees / yr")]]
+        rows = [[Paragraph(h, S["head"]) for h in ("#", "College", "Course / Branch", ("COMEDK 2025 Round 1 closing rank" if comedk else "KCET 2025 Round I closing rank" if kcet else "Round I cutoff (official CAP)" if official else "Cutoff" + (" (est.)" if out.category != "General" else "")), "Chance", "Fees / yr")]]
         for i, r in enumerate(out.results[:120], 1):
             rows.append([
                 Paragraph(str(i), S["cell"]),
@@ -138,13 +139,15 @@ def build_prediction_pdf(out: PredictorOut, cities: List[str], receipt: dict | N
     cta = Table([[Paragraph(f"<font color='white'><b>Want help with your option form?</b><br/>Book a free counselling session with Digital Shiksha - call or WhatsApp {CONTACT['phone']}.</font>", S["sub"])]], colWidths=[width])
     cta.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), RED), ("TOPPADDING", (0, 0), (-1, -1), 8), ("BOTTOMPADDING", (0, 0), (-1, -1), 8), ("LEFTPADDING", (0, 0), (-1, -1), 10)]))
     story += [Spacer(1, 6 * mm), cta, Spacer(1, 4 * mm), Paragraph(
-        ("Source: official KEA UGCET 2025 First Round allotment closing ranks, cetonline.karnataka.gov.in/kea. Chance is judged on the closing rank "
+        ("Source: official COMEDK UGET 2025 Engineering cut-off ranks after Round 1 allotment, comedk.org. Chance is judged on the closing rank "
+         "of the most lenient seat you are eligible for (GM, plus KKR if selected). " if comedk else
+         "Source: official KEA UGCET 2025 First Round allotment closing ranks, cetonline.karnataka.gov.in/kea. Chance is judged on the closing rank "
          "of the most lenient seat type you are eligible for (General Merit + your category, Kannada / Rural if selected). " if kcet else
          "Source: official State CET Cell CAP cut-offs (Rounds I-IV, Maharashtra seats), cetcell.mahacet.org. Chance is judged on the Round I "
          "closing percentile of the most lenient seat type you are eligible for. " if official else "") +
         "Disclaimer: this is just a predictor based on previous years' cut-offs - not a guarantee of admission. For more details, contact your counsellor. "
         "Predictions use approximate previous-year closing cutoffs. Where an official category cutoff is not available, the category cutoff is "
         "estimated from the Open cutoff. Cutoffs change every year and differ for home-university, ladies, minority and other quotas. Please verify with the "
-        "State CET Cell / KEA / MCC / JoSAA and the respective institute.", S["small"])]
+        "State CET Cell / KEA / COMEDK / MCC / JoSAA and the respective institute.", S["small"])]
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
     return buf.getvalue()

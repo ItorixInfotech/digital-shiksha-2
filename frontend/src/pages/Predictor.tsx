@@ -25,13 +25,15 @@ const CITY_LIST: Record<string, string[]> = { both: ["Pune", "Mumbai"], Pune: ["
 // Extra Maharashtra regions — only meaningful for MHT CET (official CAP data covers 380+ colleges statewide).
 const MH_REGIONS = ["Navi Mumbai", "Thane", "Nagpur", "Nashik", "Aurangabad", "Kolhapur", "Solapur", "Amravati", "Sangli", "Satara", "Jalgaon"];
 MH_REGIONS.forEach((c) => { CITIES[c] = `${c} only`; CITY_LIST[c] = [c]; });
-// KCET (Karnataka) locations — only shown for KCET; any other location key means all of Karnataka.
+// Karnataka (KCET / COMEDK) locations — only shown for those exams; any other location key means all of Karnataka.
 const KA_CITIES = ["Bengaluru", "Mysuru", "Mangaluru", "Hubballi", "Dharwad", "Belagavi", "Davanagere", "Tumakuru", "Shivamogga", "Kalaburagi", "Hassan", "Mandya"];
 const KA_ALL = "karnataka";
 CITIES[KA_ALL] = "All Karnataka"; CITY_LIST[KA_ALL] = [];
 KA_CITIES.forEach((c) => { CITIES[c] = `${c} only`; CITY_LIST[c] = [c]; });
 const KA_KEYS = [KA_ALL, ...KA_CITIES];
 const KCET = "KCET";
+const COMEDK = "COMEDK";
+const isKa = (exam: string) => exam === KCET || exam === COMEDK;
 const CATEGORIES: { value: PredictorCategory; label: string }[] = [
   { value: "General", label: "General / Open" }, { value: "OBC", label: "OBC (NCL)" }, { value: "EWS", label: "EWS" }, { value: "SC", label: "SC" }, { value: "ST", label: "ST" },
   { value: "VJ", label: "VJ / DT (A)" }, { value: "NT1", label: "NT 1 (B)" }, { value: "NT2", label: "NT 2 (C)" }, { value: "NT3", label: "NT 3 (D)" }, { value: "SEBC", label: "SEBC" }, { value: "TFWS", label: "TFWS (fee waiver)" },
@@ -40,15 +42,16 @@ const KCET_CATEGORIES: { value: PredictorCategory; label: string }[] = [
   { value: "General", label: "General Merit (GM)" }, { value: "1", label: "Category 1" }, { value: "2A", label: "Category 2A" }, { value: "2B", label: "Category 2B" },
   { value: "3A", label: "Category 3A" }, { value: "3B", label: "Category 3B" }, { value: "SC", label: "SC" }, { value: "ST", label: "ST" },
 ];
-const categoriesFor = (exam: string) => (exam === KCET ? KCET_CATEGORIES : CATEGORIES);
+const COMEDK_CATEGORIES: { value: PredictorCategory; label: string }[] = [{ value: "General", label: "General Merit (GM) — all India" }];
+const categoriesFor = (exam: string) => (exam === KCET ? KCET_CATEGORIES : exam === COMEDK ? COMEDK_CATEGORIES : CATEGORIES);
 const categoryLabel = (exam: string, v: string) => categoriesFor(exam).find((c) => c.value === v)?.label ?? v;
-const citiesFor = (exam: string, key: string) => (exam === KCET ? (KA_KEYS.includes(key) ? CITY_LIST[key] : []) : KA_KEYS.includes(key) ? [] : CITY_LIST[key]);
+const citiesFor = (exam: string, key: string) => (isKa(exam) ? (KA_KEYS.includes(key) ? CITY_LIST[key] : []) : KA_KEYS.includes(key) ? [] : CITY_LIST[key]);
 const ANY_HU = "any";
 // Display names in the exam drop-down (the exam key stays "MHT CET" for links, payments and stored data).
 const EXAM_LABEL: Record<string, string> = { "MHT CET": "MHT CET (Engineering)", "MHT CET Pharmacy": "MHT CET (Pharmacy)" };
 const examLabel = (name: string) => EXAM_LABEL[name] ?? name;
 // Exams backed by official CET Cell CAP cut-offs → program key for /predictor/cap-meta
-const CAP_PROGRAM: Record<string, string> = { "MHT CET": "engineering", "MHT CET Pharmacy": "pharmacy", [KCET]: "kcet" };
+const CAP_PROGRAM: Record<string, string> = { "MHT CET": "engineering", "MHT CET Pharmacy": "pharmacy", [KCET]: "kcet", [COMEDK]: "comedk" };
 const ALL_BRANCHES = "all";
 const CHANCE: Record<PredictorChance, { label: string; cls: string; desc: string }> = {
   High: { label: "High chance", cls: "bg-green-50 text-green-800 ring-green-200", desc: "Your score is at or above last year's closing cutoff." },
@@ -84,9 +87,10 @@ export default function Predictor() {
   const urlBranch = sp.get("branch") ?? "";
   const urlKannada = sp.get("kannada") === "1";
   const urlRural = sp.get("rural") === "1";
+  const urlKkr = sp.get("kkr") === "1";
   const [exam, setExam] = useState(urlExam || "MHT CET");
   const [score, setScore] = useState(urlScore);
-  const [city, setCity] = useState(urlExam === KCET && !KA_KEYS.includes(urlCity) ? KA_ALL : urlCity);
+  const [city, setCity] = useState(isKa(urlExam) && !KA_KEYS.includes(urlCity) ? KA_ALL : urlCity);
   const [category, setCategory] = useState<PredictorCategory>(urlCategory);
   const [chanceFilter, setChanceFilter] = useState<PredictorChance | "all">("all");
   const [ladies, setLadies] = useState(urlLadies);
@@ -94,7 +98,10 @@ export default function Predictor() {
   const [branch, setBranch] = useState(urlBranch || ALL_BRANCHES);
   const [kannada, setKannada] = useState(urlKannada);
   const [rural, setRural] = useState(urlRural);
+  const [kkr, setKkr] = useState(urlKkr);
   const isKcet = exam === KCET;
+  const isComedk = exam === COMEDK;
+  const ka = isKcet || isComedk;
   const program = CAP_PROGRAM[exam];
   const capMeta = useQuery({ queryKey: ["predictor", "cap-meta", program], queryFn: () => apiGet<CapMeta>(`/predictor/cap-meta?program=${program}`), staleTime: 10 * 60_000, enabled: !!program });
   const isCap = !!program && !!capMeta.data?.available;
@@ -106,8 +113,9 @@ export default function Predictor() {
   const body: PredictorIn | null = urlExam && urlScore && !Number.isNaN(Number(urlScore))
     ? { exam: urlExam, score: Number(urlScore), category: urlCategory, cities: citiesFor(urlExam, urlCity),
         ...(urlExam === KCET ? { branch_group: urlBranch, kannada: urlKannada, rural: urlRural }
+          : urlExam === COMEDK ? { branch_group: urlBranch, kkr: urlKkr }
           : CAP_PROGRAM[urlExam] ? { ladies: urlLadies, home_university: urlHu, branch_group: urlBranch } : {}) } : null;
-  const urlWhere = urlExam === KCET && !KA_KEYS.includes(urlCity) ? CITIES[KA_ALL] : CITIES[urlCity];
+  const urlWhere = isKa(urlExam) && !KA_KEYS.includes(urlCity) ? CITIES[KA_ALL] : CITIES[urlCity];
   // Lead gate: the first prediction on a device needs name/mobile/city/role/college (saved as an enquiry).
   const [unlocked, setUnlocked] = useState(() => localStorage.getItem(GATE_KEY) === "1");
   const [gateDismissed, setGateDismissed] = useState(false);
@@ -160,9 +168,10 @@ export default function Predictor() {
     setGateDismissed(false);
     setPayDismissed(false);
     const qs: Record<string, string> = { exam, score: String(n), category, city };
-    if (isKcet) {
-      if (kannada) qs.kannada = "1";
-      if (rural) qs.rural = "1";
+    if (ka) {
+      if (isKcet && kannada) qs.kannada = "1";
+      if (isKcet && rural) qs.rural = "1";
+      if (isComedk && kkr) qs.kkr = "1";
       if (branch !== ALL_BRANCHES) qs.branch = branch;
     } else if (CAP_PROGRAM[exam]) {
       if (ladies) qs.ladies = "1";
@@ -176,7 +185,7 @@ export default function Predictor() {
   const shareUrl = `${window.location.origin}/predictor?${shareQs}`;
   const pdfHref = body ? `/api/predictor/pdf?${new URLSearchParams({ exam: body.exam, score: String(body.score), category: body.category, cities: body.cities.join(","),
     ...(body.ladies ? { ladies: "true" } : {}), ...(body.home_university ? { home_university: body.home_university } : {}), ...(body.branch_group ? { branch_group: body.branch_group } : {}),
-    ...(body.kannada ? { kannada: "true" } : {}), ...(body.rural ? { rural: "true" } : {}) }).toString()}` : "";
+    ...(body.kannada ? { kannada: "true" } : {}), ...(body.rural ? { rural: "true" } : {}), ...(body.kkr ? { kkr: "true" } : {}) }).toString()}` : "";
   const waText = body ? `My ${body.exam} college prediction (${body.score}, ${body.category}) from Digital Shiksha: ${shareUrl}` : "";
   const copyLink = async () => {
     try { await navigator.clipboard.writeText(shareUrl); toast.success("Link copied"); } catch { toast.error("Couldn't copy — please copy from the address bar"); }
@@ -185,15 +194,15 @@ export default function Predictor() {
   const data = predict.data;
   const shown = useMemo(() => (data?.results ?? []).filter((r) => chanceFilter === "all" || r.chance === chanceFilter), [data, chanceFilter]);
   const counts = useMemo(() => (["High", "Medium", "Reach"] as const).map((c) => [c, data?.results.filter((r) => r.chance === c).length ?? 0] as const), [data]);
-  const cityOptions = useMemo(() => Object.entries(CITIES).filter(([k]) => (isKcet ? KA_KEYS.includes(k) : !KA_KEYS.includes(k) && (!!CAP_PROGRAM[exam] || !MH_REGIONS.includes(k)))), [exam, isKcet]);
+  const cityOptions = useMemo(() => Object.entries(CITIES).filter(([k]) => (ka ? KA_KEYS.includes(k) : !KA_KEYS.includes(k) && (!!CAP_PROGRAM[exam] || !MH_REGIONS.includes(k)))), [exam, ka]);
   const categoryOptions = categoriesFor(exam);
   const changeExam = (v: string) => {
     setExam(v);
     setScore("");
-    const kc = v === KCET;
+    const kc = isKa(v);
     if (!categoriesFor(v).some((c) => c.value === category)) setCategory("General");
     if (kc !== KA_KEYS.includes(city)) setCity(kc ? KA_ALL : "both");
-    if (kc !== isKcet) setBranch(ALL_BRANCHES);
+    if (kc !== ka) setBranch(ALL_BRANCHES);
   };
   const colleges = new Set(data?.results.map((r) => r.college_name)).size;
   const official = !!data?.results[0]?.official || !!data?.source;
@@ -202,7 +211,7 @@ export default function Predictor() {
     <div data-testid="predictor-page">
       <PageSeo page="predictor" />
       <PageHeader crumbs={[{ label: "Home", to: "/" }, { label: "College Predictor" }]} title={<>College <span className="text-brand-leaf-soft">Predictor</span></>}
-        subtitle="Enter your MHT CET, KCET, JEE Main, NEET or MBA CET score and see which colleges you can likely get. MHT CET uses the official CAP cut-offs for 380+ engineering and 520+ pharmacy colleges in Maharashtra; KCET uses the official KEA closing ranks for 220+ Karnataka colleges." testid="predictor-header">
+        subtitle="Enter your MHT CET, KCET, COMEDK, JEE Main, NEET or MBA CET score and see which colleges you can likely get. MHT CET uses the official CAP cut-offs for 380+ engineering and 520+ pharmacy colleges in Maharashtra; KCET and COMEDK use the official KEA / COMEDK closing ranks for Karnataka colleges." testid="predictor-header">
         <form onSubmit={submit} className="mt-8 grid max-w-4xl gap-4 rounded-2xl bg-white p-5 text-slate-900 shadow-2xl sm:grid-cols-12 sm:items-end" data-testid="predictor-form">
           <div className="grid gap-1.5 sm:col-span-3">
             <Label>Entrance exam</Label>
@@ -236,7 +245,11 @@ export default function Predictor() {
           </Button>
           {isCap && (
             <div className="grid gap-4 border-t border-slate-100 pt-4 sm:col-span-12 sm:grid-cols-12 sm:items-end animate-fade-up" data-testid="predictor-cap-options">
-              {isKcet ? (
+              {isComedk ? (
+                <label className="flex h-11 items-center gap-2.5 rounded-lg border border-slate-200 px-3 text-sm sm:col-span-5">
+                  <Checkbox checked={kkr} onCheckedChange={(v) => setKkr(Boolean(v))} data-testid="predictor-kkr-checkbox" /> Kalyana-Karnataka (371J) candidate — include KKR seats
+                </label>
+              ) : isKcet ? (
                 <div className="flex flex-col gap-2 sm:col-span-5 sm:flex-row">
                   <label className="flex h-11 flex-1 items-center gap-2.5 rounded-lg border border-slate-200 px-3 text-sm">
                     <Checkbox checked={kannada} onCheckedChange={(v) => setKannada(Boolean(v))} data-testid="predictor-kannada-checkbox" /> Kannada medium (K seats)
@@ -257,7 +270,7 @@ export default function Predictor() {
                 </Select>
               </div>
               )}
-              <div className={cn("grid gap-1.5", isKcet ? "sm:col-span-7" : "sm:col-span-4")}>
+              <div className={cn("grid gap-1.5", ka ? "sm:col-span-7" : "sm:col-span-4")}>
                 <Label>{program === "pharmacy" ? "Course" : "Branch"}</Label>
                 <Select value={branch} onValueChange={(v: string) => setBranch(v)}>
                   <SelectTrigger className="h-11 w-full bg-white" data-testid="predictor-branch-select"><SelectValue>{(v) => (v === ALL_BRANCHES ? (program === "pharmacy" ? "B.Pharm + Pharm.D" : "All branches") : (v as string))}</SelectValue></SelectTrigger>
@@ -267,7 +280,7 @@ export default function Predictor() {
                   </SelectContent>
                 </Select>
               </div>
-              {!isKcet && <label className="flex h-11 items-center gap-2.5 rounded-lg border border-slate-200 px-3 text-sm sm:col-span-3">
+              {!ka && <label className="flex h-11 items-center gap-2.5 rounded-lg border border-slate-200 px-3 text-sm sm:col-span-3">
                 <Checkbox checked={ladies} onCheckedChange={(v) => setLadies(Boolean(v))} data-testid="predictor-ladies-checkbox" />
                 Girl candidate (include Ladies seats)
               </label>}
@@ -320,8 +333,8 @@ export default function Predictor() {
                 <h2 className="text-2xl font-semibold tracking-tight" data-testid="predictor-results-summary">
                   {data.results.length ? <>{colleges} colleges, {data.total > data.results.length ? `top ${data.results.length} of ${data.total}` : data.results.length} course options for {data.exam} {data.metric === "rank" ? `rank ${data.score}` : data.metric === "score" ? `score ${data.score}` : `${data.score} percentile`}</> : "No matching colleges"}
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">{urlWhere} • {categoryLabel(data.exam, data.category)}{body?.ladies ? " • Ladies seats" : ""}{body?.kannada ? " • Kannada medium" : ""}{body?.rural ? " • Rural" : ""}{body?.home_university ? ` • HU: ${body.home_university}` : ""}{body?.branch_group ? ` • ${body.branch_group}` : ""} • most competitive first</p>
-                {official && <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-brand-leaf ring-1 ring-green-200" data-testid="predictor-official-badge"><BadgeCheck className="size-3.5" /> {data.exam === KCET ? "Official KEA closing ranks · KCET 2025 Round I" : "Official CET Cell CAP cut-offs · Rounds I–IV"}</p>}
+                <p className="mt-1 text-sm text-slate-500">{urlWhere} • {categoryLabel(data.exam, data.category)}{body?.ladies ? " • Ladies seats" : ""}{body?.kannada ? " • Kannada medium" : ""}{body?.rural ? " • Rural" : ""}{body?.kkr ? " • KKR seats" : ""}{body?.home_university ? ` • HU: ${body.home_university}` : ""}{body?.branch_group ? ` • ${body.branch_group}` : ""} • most competitive first</p>
+                {official && <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-brand-leaf ring-1 ring-green-200" data-testid="predictor-official-badge"><BadgeCheck className="size-3.5" /> {data.exam === COMEDK ? "Official COMEDK closing ranks · 2025 Round 1" : data.exam === KCET ? "Official KEA closing ranks · KCET 2025 Round I" : "Official CET Cell CAP cut-offs · Rounds I–IV"}</p>}
               </div>
               <div className="flex flex-wrap gap-2" data-testid="predictor-share-actions">
                 <a href={pdfHref} download data-testid="predictor-download-pdf-button" className={cn(buttonVariants({ size: "sm" }), "bg-brand-navy text-white hover:bg-brand-blue")}><Download className="size-4" /> Download PDF</a>
@@ -383,7 +396,7 @@ export default function Predictor() {
               </div>
             )}
             <p className="mt-6 flex items-start gap-2 rounded-xl bg-slate-100 p-4 text-xs leading-relaxed text-slate-600" data-testid="predictor-disclaimer">
-              <Info className="mt-0.5 size-4 shrink-0" /> {data.exam === KCET ? <>Based on the official KEA UGCET 2025 First Round allotment closing ranks (cetonline.karnataka.gov.in/kea). Chance is judged on the closing rank of the most lenient seat you qualify for: General Merit + your category{body?.kannada ? ", Kannada medium" : ""}{body?.rural ? ", Rural" : ""}. Hyderabad-Karnataka (371J), special-category and private/COMEDK seats are not included. Ranks change every year. Call {"+91 8149 68 9468"} for a personalised option-entry plan.</> : official ? <>Based on the official State CET Cell CAP cut-offs (Rounds I–IV, Maharashtra & minority seats) from cetcell.mahacet.org. Chance is judged on the Round I closing percentile of the most lenient seat type you qualify for (Open + your category, Home-University / Other-than-HU / State level{body?.ladies ? ", Ladies" : ""}). Later rounds are shown for reference. Defence, PWD, orphan and minority-specific seats are not included. Call {"+91 8149 68 9468"} for a personalised option-form plan.</> : <>Predictions use approximate previous-year closing cutoffs for the General Open category (Maharashtra state quota / All-India quota where noted). For OBC, EWS, SC and ST we estimate the category cutoff from typical historical gaps — actual category, home-university, ladies and minority quota cutoffs vary by college and change every year. Call {"+91 8149 68 9468"} for a personalised option-form plan.</>}
+              <Info className="mt-0.5 size-4 shrink-0" /> {data.exam === COMEDK ? <>Based on the official COMEDK UGET 2025 Engineering cut-off ranks after Round 1 allotment (comedk.org). COMEDK seats are open to students from every state. Chance is judged on the GM closing rank{body?.kkr ? " or the KKR closing rank, whichever is more lenient" : ""}. Later rounds usually close at higher ranks. Ranks change every year. Call {"+91 8149 68 9468"} for a personalised option-entry plan.</> : data.exam === KCET ? <>Based on the official KEA UGCET 2025 First Round allotment closing ranks (cetonline.karnataka.gov.in/kea). Chance is judged on the closing rank of the most lenient seat you qualify for: General Merit + your category{body?.kannada ? ", Kannada medium" : ""}{body?.rural ? ", Rural" : ""}. Hyderabad-Karnataka (371J), special-category and private/COMEDK seats are not included. Ranks change every year. Call {"+91 8149 68 9468"} for a personalised option-entry plan.</> : official ? <>Based on the official State CET Cell CAP cut-offs (Rounds I–IV, Maharashtra & minority seats) from cetcell.mahacet.org. Chance is judged on the Round I closing percentile of the most lenient seat type you qualify for (Open + your category, Home-University / Other-than-HU / State level{body?.ladies ? ", Ladies" : ""}). Later rounds are shown for reference. Defence, PWD, orphan and minority-specific seats are not included. Call {"+91 8149 68 9468"} for a personalised option-form plan.</> : <>Predictions use approximate previous-year closing cutoffs for the General Open category (Maharashtra state quota / All-India quota where noted). For OBC, EWS, SC and ST we estimate the category cutoff from typical historical gaps — actual category, home-university, ladies and minority quota cutoffs vary by college and change every year. Call {"+91 8149 68 9468"} for a personalised option-form plan.</>}
             </p>
           </div>
         )}

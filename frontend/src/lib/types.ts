@@ -377,6 +377,7 @@ export interface PredictorIn {
   branch_group?: string;
   kannada?: boolean; // KCET only
   rural?: boolean; // KCET only
+  kkr?: boolean; // COMEDK only: Kalyana-Karnataka (371J) candidate
 }
 
 export interface UnlockIn {

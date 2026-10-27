@@ -35,6 +35,8 @@ class PredictorIn(BaseModel):
     # KCET (official KEA data) only:
     kannada: bool = False  # Kannada-medium candidate -> also K seats
     rural: bool = False  # rural candidate -> also R seats
+    # COMEDK only:
+    kkr: bool = False  # Kalyana-Karnataka (371J) candidate -> also KKR seats
 
 
 class RazorpayStatus(BaseModel):

@@ -20,6 +20,7 @@ PAID_EXAMS = {
     "JEE Advanced": (299900, "https://rzp.io/rzp/Yf8GaPJK"),      # ₹2999
     "NEET UG": (349900, "https://rzp.io/rzp/C5otnMZx"),           # ₹3499
     "KCET": (199900, "https://rzp.io/rzp/f201wv0"),               # ₹1999
+    "COMEDK": (249900, "https://rzp.io/rzp/1j37Vrq"),             # ₹2499
 }
 API = "https://api.razorpay.com/v1"
 logger = logging.getLogger(__name__)

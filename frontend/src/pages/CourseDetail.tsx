@@ -13,7 +13,7 @@ import ExamPredictorBox from "@/components/ExamPredictorBox";
 
 /** Course slug -> predictor exams offered on that course page (B.Pharm uses the Pharmacy predictor, not engineering MHT CET). */
 const COURSE_PREDICTORS: Record<string, string[]> = {
-  btech: ["MHT CET", "KCET", "JEE Main", "JEE Advanced"],
+  btech: ["MHT CET", "KCET", "COMEDK", "JEE Main", "JEE Advanced"],
   mba: ["MAH MBA CET"],
   mbbs: ["NEET UG"],
   bpharm: ["MHT CET Pharmacy"],
