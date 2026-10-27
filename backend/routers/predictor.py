@@ -39,7 +39,8 @@ EXAMS = {
                                   rank_note="Enter your category rank (e.g. OBC-NCL rank) if you selected a reserved category.",
                                   fee=razorpay.PAID_EXAMS["JEE Advanced"][0] // 100, payment_link=razorpay.PAID_EXAMS["JEE Advanced"][1]),
     "KCET": PredictorExam(name="KCET", metric="rank", min=1, max=300000, label="KCET engineering rank", hint="e.g. 15000 — official KEA 2025 Round I closing ranks, 220+ Karnataka engineering colleges",
-                          rank_note="Enter your KCET engineering rank — the predictor applies your category seats itself."),
+                          rank_note="Enter your KCET engineering rank — the predictor applies your category seats itself.",
+                          fee=razorpay.PAID_EXAMS["KCET"][0] // 100, payment_link=razorpay.PAID_EXAMS["KCET"][1]),
 }
 
 # Reserved-category closing cutoffs are estimated from the General Open value (approx. historical gaps).
