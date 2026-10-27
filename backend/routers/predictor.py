@@ -153,7 +153,7 @@ async def run_cap_prediction(exam: PredictorExam, body: PredictorIn) -> Predicto
         c = site.get(r.get("college_slug") or "", {})
         results.append(PredictorResult(
             college_slug=r.get("college_slug") or "", college_name=r["college_name"], short_name=c.get("short_name") or r["college_name"],
-            city=r["city"], type=r.get("status", ""), image=c.get("image", ""), course=r["branch"],
+            city=r["city"], type=r.get("status", ""), image=c.get("image", ""), logo=c.get("logo", ""), course=r["branch"],
             cutoff=f"R{first.round} {first.percentile:.2f} percentile ({first.seat})", cutoff_value=first.percentile,
             general_cutoff="—", estimated=False, chance=ch, fees_min=c.get("fees_min", 0), fees_max=c.get("fees_max", 0),
             avg_package=c.get("avg_package", 0), rounds=rounds, seat=first.seat, official=True, course_code=r["course_code"],
@@ -190,7 +190,7 @@ async def run_kcet_prediction(exam: PredictorExam, body: PredictorIn) -> Predict
         c = site.get(r.get("college_slug") or "", {})
         results.append(PredictorResult(
             college_slug=r.get("college_slug") or "", college_name=r.get("display_name") or r["college_name"], short_name=c.get("short_name") or r.get("display_name") or r["college_name"],
-            city=r["city"], type=r.get("type", ""), image=c.get("logo") or c.get("image", ""), course=r["branch"],
+            city=r["city"], type=r.get("type", ""), image=c.get("image", ""), logo=c.get("logo", ""), course=r["branch"],
             cutoff=f"Closing rank {closing:,} ({seat})", cutoff_value=float(closing), general_cutoff=f"{r['ranks']['GM']:,}" if "GM" in r["ranks"] else "—",
             estimated=False, chance=ch, fees_min=c.get("fees_min", 0), fees_max=c.get("fees_max", 0), avg_package=c.get("avg_package", 0),
             seat=seat, official=True, course_code=r["course_code"],
@@ -237,7 +237,7 @@ async def run_prediction(body: PredictorIn) -> PredictorOut:
             label = fmt(exam.metric, closing)
             results.append(PredictorResult(
                 college_slug=c["slug"], college_name=c["name"], short_name=c.get("short_name") or c["name"],
-                city=c["city"], type=c.get("type", ""), image=c.get("image", ""), course=branch,
+                city=c["city"], type=c.get("type", ""), image=c.get("image", ""), logo=c.get("logo", ""), course=branch,
                 cutoff=(f"≈ {label} ({body.category})" if est else label),
                 cutoff_value=closing, general_cutoff=gen["cutoff"] if gen else "—", estimated=est, chance=ch,
                 fees_min=c.get("fees_min", 0), fees_max=c.get("fees_max", 0), avg_package=c.get("avg_package", 0),

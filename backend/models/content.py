@@ -247,3 +247,11 @@ class CutoffImportResult(BaseModel):
 
 
 AdminStats.model_rebuild()
+
+
+class MediaOut(BaseModel):
+    """Uploaded admin image (mirrored in frontend/src/lib/types.ts)."""
+    id: str
+    url: str  # /api/media/{id}
+    width: int
+    height: int

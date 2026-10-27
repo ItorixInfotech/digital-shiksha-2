@@ -119,6 +119,7 @@ class PredictorResult(BaseModel):
     city: str
     type: str
     image: str
+    logo: str = ""  # college logo (shown instead of the photo when set)
     course: str
     cutoff: str
     cutoff_value: float

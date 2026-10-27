@@ -441,6 +441,7 @@ export interface PredictorResult {
   city: string;
   type: string;
   image: string;
+  logo: string; // college logo, shown instead of the photo when set
   course: string;
   cutoff: string;
   cutoff_value: number;
@@ -625,4 +626,12 @@ export interface RedirectIn {
 export interface Redirect extends RedirectIn {
   id: string;
   created_at: string;
+}
+
+/** Uploaded admin image — mirrors backend models/content.py MediaOut. */
+export interface MediaOut {
+  id: string;
+  url: string; // /api/media/{id}
+  width: number;
+  height: number;
 }

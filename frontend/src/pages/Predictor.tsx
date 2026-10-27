@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BadgeCheck, Building2, Download, Info, Link2, Loader2, MapPin, MessageCircle, Sparkles, Target, TrendingUp } from "lucide-react";
+import { BadgeCheck, Download, Info, Link2, Loader2, MapPin, MessageCircle, Sparkles, Target, TrendingUp } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import PredictorGate from "@/components/PredictorGate";
 import PredictorPayment from "@/components/PredictorPayment";
@@ -55,6 +55,9 @@ const CHANCE: Record<PredictorChance, { label: string; cls: string; desc: string
   Medium: { label: "Good chance", cls: "bg-amber-50 text-amber-800 ring-amber-200", desc: "Slightly below last year's cutoff — possible in later rounds." },
   Reach: { label: "Reach", cls: "bg-red-50 text-red-700 ring-red-200", desc: "Below the cutoff — needs luck in spot/institute rounds." },
 };
+
+/** Monogram for colleges without a page/logo, e.g. "Ramaiah Institute of Technology" -> "RIT". */
+const initials = (name: string) => name.replace(/\(.*?\)/g, " ").split(/[\s,.-]+/).filter((w) => /^[A-Z]/.test(w) && !["Of", "And", "The", "For"].includes(w)).map((w) => w[0]).join("").slice(0, 4) || name.slice(0, 2).toUpperCase();
 
 export default function Predictor() {
   const { openEnquiry } = useSite();
@@ -342,8 +345,9 @@ export default function Predictor() {
                 {shown.map((r, i) => (
                   <div key={r.course_code || `${r.college_slug}-${r.course}`} data-testid={r.course_code ? `predictor-result-cap-${r.course_code}` : `predictor-result-${r.college_slug}-${slugify(r.course)}`} style={{ animationDelay: `${Math.min(i, 10) * 30}ms` }}
                     className="flex flex-col gap-4 rounded-2xl border bg-white p-4 hover:shadow-md transition-shadow animate-fade-up sm:flex-row sm:items-center">
-                    {r.image ? <img src={r.image} alt="" loading="lazy" className={cn("h-20 w-full rounded-xl sm:w-32", r.image.startsWith("/logos/") ? "bg-white object-contain p-2 ring-1 ring-slate-100" : "object-cover")} />
-                      : <span className="hidden h-20 w-32 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-400 sm:grid"><Building2 className="size-7" /></span>}
+                    {r.logo ? <img src={r.logo} alt={`${r.short_name} logo`} loading="lazy" className="h-20 w-full rounded-xl bg-white object-contain p-2 ring-1 ring-slate-100 sm:w-32" data-testid="predictor-result-logo" />
+                      : r.image ? <img src={r.image} alt="" loading="lazy" className="h-20 w-full rounded-xl object-cover sm:w-32" />
+                      : <span className="hidden h-20 w-32 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 text-lg font-bold tracking-tight text-brand-navy ring-1 ring-slate-200 sm:grid" data-testid="predictor-result-initials">{initials(r.college_name)}</span>}
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1", CHANCE[r.chance].cls)} title={CHANCE[r.chance].desc}>{CHANCE[r.chance].label}</span>

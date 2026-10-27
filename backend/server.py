@@ -21,7 +21,7 @@ from lib.college_enrich import run_college_enrich
 from lib.kcet import load_kcet_data
 from lib.college_logos import apply_college_logos
 from lib.karnataka_pages import setup_karnataka_pages
-from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export, redirects
+from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export, redirects, media
 
 
 @asynccontextmanager
@@ -65,6 +65,7 @@ api_router.include_router(landing.router)
 api_router.include_router(seo_tools.router)
 api_router.include_router(export.router)
 api_router.include_router(redirects.router)
+api_router.include_router(media.router)
 
 app.add_middleware(
     CORSMiddleware,
