@@ -3,7 +3,8 @@ import uuid
 from datetime import datetime, timezone
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel, Field, EmailStr
+from email_validator import EmailNotValidError, validate_email
+from pydantic import BaseModel, Field, model_validator
 
 
 def _id() -> str:
@@ -151,7 +152,7 @@ class PredictionContext(BaseModel):
 class LeadIn(BaseModel):
     name: str = Field(min_length=2, max_length=80)
     phone: str = Field(pattern=r"^[6-9]\d{9}$")
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None  # optional: a mistyped email never blocks the enquiry (see _lenient_email)
     city: str = ""
     course_interest: str = ""
     college: str = ""
@@ -161,6 +162,20 @@ class LeadIn(BaseModel):
     prediction: Optional[PredictionContext] = None
     whatsapp_opt_in: bool = False
     role: Optional[Literal["Student", "Parent"]] = None  # "Are you" on the predictor form
+
+    @model_validator(mode="after")
+    def _lenient_email(self):
+        """Keep the lead even if the optional email is invalid: drop it and note what was typed in the message."""
+        raw = (self.email or "").strip()
+        if not raw:
+            self.email = None
+            return self
+        try:
+            self.email = validate_email(raw, check_deliverability=False).normalized
+        except EmailNotValidError:
+            self.email = None
+            self.message = (self.message + f"\n(Email entered, invalid: {raw[:100]})").strip()
+        return self
 
 
 class Lead(LeadIn):

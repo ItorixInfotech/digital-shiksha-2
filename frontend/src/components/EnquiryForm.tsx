@@ -33,6 +33,9 @@ export default function EnquiryForm({ prefill, testid = "enquiry", showMessage =
 
   const m = useMutation({
     mutationFn: (body: LeadIn) => apiPost<Lead>("/enquiries", body),
+    // A brief server hiccup (5xx / network) retries automatically; the API de-duplicates alerts for the same phone.
+    retry: (count, err) => count < 2 && !(err instanceof ApiError && err.status < 500),
+    retryDelay: 1500,
     onSuccess: () => {
       setDone(true);
       setF({ ...empty });
@@ -40,7 +43,11 @@ export default function EnquiryForm({ prefill, testid = "enquiry", showMessage =
       onDone?.();
     },
     onError: (err) => {
-      const msg = err instanceof ApiError && err.status === 422 ? "Please check your name and 10-digit mobile number." : "Could not submit. Please call +91 8149 68 9468.";
+      const detail = err instanceof ApiError && err.status === 422 && err.body && typeof err.body === "object" && "detail" in err.body ? (err.body as { detail: unknown }).detail : null;
+      const field = Array.isArray(detail) ? String((detail[0] as { loc?: unknown[] })?.loc?.slice(-1)[0] ?? "") : "";
+      const msg = err instanceof ApiError && err.status === 422
+        ? field === "phone" ? "Please enter a valid 10-digit Indian mobile number." : field === "name" ? "Please enter your full name." : "Please check the details and try again."
+        : "Could not submit right now. Please try again in a moment, or call +91 8149 68 9468.";
       toast.error(msg);
     },
   });
@@ -50,6 +57,7 @@ export default function EnquiryForm({ prefill, testid = "enquiry", showMessage =
     const phone = f.phone.replace(/\D/g, "").replace(/^91(?=\d{10}$)/, "");
     if (f.name.trim().length < 2) return toast.error("Please enter your full name");
     if (!/^[6-9]\d{9}$/.test(phone)) return toast.error("Please enter a valid 10-digit Indian mobile number");
+    if (f.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.trim())) return toast.error("Please check your email (e.g. name@gmail.com), or leave it blank");
     m.mutate({
       name: f.name.trim(),
       phone,

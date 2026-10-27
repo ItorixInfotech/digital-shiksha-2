@@ -41,6 +41,8 @@ export default function PredictorGate({ open, onOpenChange, onUnlocked, predicti
       message: `College Predictor: ${role} — ${prediction ? `${prediction.exam} ${prediction.score} (${prediction.category})` : ""}`.trim(),
       source: "predictor-gate", prediction, whatsapp_opt_in: false, role,
     } satisfies LeadIn),
+    retry: (count, err) => count < 2 && !(err instanceof ApiError && err.status < 500),
+    retryDelay: 1500,
     onSuccess: () => {
       localStorage.setItem(GATE_KEY, "1");
       saveContact({ name: f.name.trim(), phone });
