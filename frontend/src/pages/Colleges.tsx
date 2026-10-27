@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { PageSeo } from "@/components/Seo";
 import { breadcrumbLd } from "@/lib/seo";
 
+const PAGE = 24;
+
 const FEES = [["", "Any budget"], ["100000", "Under ₹1 Lakh"], ["300000", "Under ₹3 Lakh"], ["1000000", "Under ₹10 Lakh"]] as const;
 const SORTS: Record<string, string> = { rank: "NIRF Rank", rating: "Rating", package: "Highest avg package", fees: "Lowest fees" };
 const FILTER_KEYS = ["stream", "city", "state", "type", "max_fees", "q"] as const;
@@ -60,7 +62,11 @@ export default function Colleges() {
   qs.set("sort", sort);
 
   const meta = useQuery({ queryKey: ["meta"], queryFn: () => apiGet<Meta>("/meta") });
-  const list = useQuery({ queryKey: ["colleges", "list", qs.toString()], queryFn: () => apiGet<College[]>(`/colleges?${qs.toString()}`) });
+  const list = useQuery({ queryKey: ["colleges", "list", qs.toString()], queryFn: () => apiGet<College[]>(`/colleges?${qs.toString()}${qs.toString() ? "&" : ""}limit=500`) }); // all matches; the page shows 24 at a time
+  // Show 24 cards at a time; any filter / sort change starts again from the first 24.
+  const [paging, setPaging] = useState({ key: "", n: PAGE });
+  const shown = paging.key === qs.toString() ? paging.n : PAGE;
+  const total = list.data?.length ?? 0;
   const active = FILTER_KEYS.filter((k) => get(k));
 
   const filters = (
@@ -141,7 +147,18 @@ export default function Colleges() {
           <div className="grid gap-5">
             {list.isLoading ? <div className="grid gap-5 md:grid-cols-2"><CardSkeleton count={4} /></div>
               : list.isError ? <EmptyState title="Colleges are unavailable right now" body="Please try again shortly or call +91 8149 68 9468." testid="colleges-error" />
-              : list.data && list.data.length ? list.data.map((c) => <CollegeCard key={c.id} c={c} layout="row" />)
+              : list.data && list.data.length ? <>
+                {list.data.slice(0, shown).map((c) => <CollegeCard key={c.id} c={c} layout="row" />)}
+                {total > shown && (
+                  <div className="flex flex-col items-center gap-2 pt-2" data-testid="colleges-load-more-wrap">
+                    <p className="text-sm text-slate-500" data-testid="colleges-shown-count">Showing {shown} of {total} colleges</p>
+                    <Button variant="outline" size="lg" className="w-full transition-colors sm:w-auto sm:min-w-64" data-testid="colleges-load-more-button"
+                      onClick={() => setPaging({ key: qs.toString(), n: shown + PAGE })}>
+                      Load {Math.min(PAGE, total - shown)} more colleges
+                    </Button>
+                  </div>
+                )}
+              </>
               : <EmptyState title="No colleges match these filters" body="Try removing a filter or searching a different city." testid="colleges-empty" />}
           </div>
         </div>
