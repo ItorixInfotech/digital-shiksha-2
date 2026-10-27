@@ -228,11 +228,18 @@ export interface LeadIn {
   role?: LeadRole | null; // server default null
 }
 export type LeadRole = "Student" | "Parent";
+/** Owner alert email outcome; "" = lead saved before tracking existed. */
+export type AlertEmailStatus = "" | "pending" | "sent" | "failed" | "duplicate" | "off";
+
 export interface Lead extends LeadIn {
   id: string;
   status: LeadStatus;
   counsellor_id: string | null;
   created_at: string;
+  alert_email: AlertEmailStatus;
+  alert_email_id: string;
+  alert_email_at: string | null;
+  alert_email_error: string;
 }
 
 export interface CounsellorIn {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock, Users, SearchCheck, MapPinned, Wrench, Signpost } from "lucide-react";
+import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock, Users, SearchCheck, MapPinned, Wrench, Signpost, RotateCw } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,6 +92,37 @@ const leadSummary = (l: Lead) =>
   [`New Digital Shiksha enquiry`, `Name: ${l.name}`, `Mobile: +91 ${l.phone}`, l.email && `Email: ${l.email}`, l.city && `City: ${l.city}`,
     l.course_interest && `Course: ${l.course_interest}`, l.college && `College: ${l.college}`, l.message && `Message: ${l.message}`].filter(Boolean).join("\n");
 
+/** Owner alert email state for a lead; "pending" for over 5 minutes means the send never completed. */
+function alertLabel(l: Lead): { label: string; cls: string; hint: string } {
+  const at = l.alert_email_at ? new Date(l.alert_email_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "";
+  switch (l.alert_email) {
+    case "sent": return { label: "Sent", cls: "bg-emerald-50 text-emerald-700 ring-emerald-200", hint: `Accepted by the email service ${at}${l.alert_email_id ? ` · id ${l.alert_email_id}` : ""}. Not in your inbox? Check Spam / Quarantine.` };
+    case "failed": return { label: "Failed", cls: "bg-red-50 text-red-700 ring-red-200", hint: `${l.alert_email_error || "Email service error"} ${at}` };
+    case "duplicate": return { label: "Skipped (repeat)", cls: "bg-slate-100 text-slate-600 ring-slate-200", hint: "Same mobile number enquired within 10 minutes, so no second alert was sent." };
+    case "off": return { label: "Not set up", cls: "bg-amber-50 text-amber-700 ring-amber-200", hint: "No alert email address is configured." };
+    case "pending": return Date.now() - new Date(l.created_at).getTime() > 5 * 60_000
+      ? { label: "Not sent", cls: "bg-red-50 text-red-700 ring-red-200", hint: "The alert never completed (server restarted?). Use resend." }
+      : { label: "Sending…", cls: "bg-sky-50 text-sky-700 ring-sky-200", hint: "Alert email is being sent." };
+    default: return { label: "—", cls: "bg-slate-50 text-slate-400 ring-slate-200", hint: "Enquiry received before alert tracking was added." };
+  }
+}
+
+function AlertEmailCell({ lead, onResend, busy }: { lead: Lead; onResend: () => void; busy: boolean }) {
+  const a = alertLabel(lead);
+  const canResend = lead.alert_email !== "sent" && lead.alert_email !== "off";
+  return (
+    <div className="flex items-center gap-1.5">
+      <span title={a.hint} className={cn("inline-flex whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1", a.cls)} data-testid={`admin-lead-alert-${lead.id}`}>{a.label}</span>
+      {(canResend || lead.alert_email === "sent") && (
+        <Button size="icon-sm" variant="ghost" disabled={busy} onClick={onResend} title={canResend ? "Send alert email now" : "Send alert email again"} aria-label="Resend alert email"
+          className="text-slate-500 transition-colors hover:text-brand-navy" data-testid={`admin-lead-alert-resend-${lead.id}`}>
+          {busy ? <Loader2 className="size-3.5 animate-spin" /> : <RotateCw className="size-3.5" />}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: WhatsAppStatus | null | undefined }) {
   const qc = useQueryClient();
   const [q, setQ] = useState("");
@@ -103,6 +134,11 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
   const inval = () => { qc.invalidateQueries({ queryKey: ["admin", "leads"] }); qc.invalidateQueries({ queryKey: ["admin", "stats"] }); };
   const upd = useMutation({ mutationFn: ({ id, s }: { id: string; s: LeadStatus }) => apiPatch<Lead>(`/admin/leads/${id}`, { status: s }), onSuccess: () => { toast.success("Status updated"); inval(); }, onError: () => toast.error("Update failed") });
   const del = useMutation({ mutationFn: (id: string) => apiDelete(`/admin/leads/${id}`), onSuccess: () => { toast.success("Lead deleted"); inval(); } });
+  const resend = useMutation({
+    mutationFn: (id: string) => apiPost<Lead>(`/admin/leads/${id}/resend-alert`, {}),
+    onSuccess: (l) => { if (l.alert_email === "sent") toast.success("Alert email sent again"); else toast.error(l.alert_email_error || "Alert email could not be sent"); inval(); },
+    onError: () => toast.error("Could not resend the alert"),
+  });
   const assign = useMutation({
     mutationFn: ({ id, cid }: { id: string; cid: string | null }) => apiPatch<Lead>(`/admin/leads/${id}/assign`, { counsellor_id: cid, notify: true } satisfies LeadAssignIn),
     onSuccess: (l) => { toast.success(l.counsellor_id ? `Assigned to ${byId.get(l.counsellor_id)?.name ?? "counsellor"} — WhatsApp & email alert queued` : "Lead unassigned"); inval(); qc.invalidateQueries({ queryKey: ["admin", "counsellors"] }); },
@@ -112,9 +148,9 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
   const rows = (leads.data ?? []).filter((l) => (status === "all" || l.status === status) && (owner === "all" || (owner === "none" ? !l.counsellor_id : l.counsellor_id === owner)) && (!q || `${l.name} ${l.phone} ${l.city} ${l.course_interest} ${l.college}`.toLowerCase().includes(q.toLowerCase())));
 
   const exportCsv = () => {
-    const head = ["Date", "Name", "Phone", "Email", "City", "Course", "College", "Budget", "Message", "Source", "Status", "Counsellor"];
+    const head = ["Date", "Name", "Phone", "Email", "City", "Course", "College", "Budget", "Message", "Source", "Alert email", "Status", "Counsellor"];
     const esc = (v: string) => `"${(v ?? "").replace(/"/g, '""')}"`;
-    const lines = rows.map((l) => [new Date(l.created_at).toLocaleString("en-IN"), l.name, l.phone, l.email ?? "", l.city, l.course_interest, l.college, l.budget, l.message, l.source, l.status, (l.counsellor_id && byId.get(l.counsellor_id)?.name) || ""].map(esc).join(","));
+    const lines = rows.map((l) => [new Date(l.created_at).toLocaleString("en-IN"), l.name, l.phone, l.email ?? "", l.city, l.course_interest, l.college, l.budget, l.message, l.source, alertLabel(l).label, l.status, (l.counsellor_id && byId.get(l.counsellor_id)?.name) || ""].map(esc).join(","));
     const blob = new Blob([[head.join(","), ...lines].join("\n")], { type: "text/csv" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -160,9 +196,9 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
       )}
       <div className="mt-4 rounded-2xl border bg-white">
         <Table data-testid="admin-leads-table">
-          <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Student</TableHead><TableHead>Interest</TableHead><TableHead>Source</TableHead><TableHead>Counsellor</TableHead><TableHead>Status</TableHead><TableHead /></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Student</TableHead><TableHead>Interest</TableHead><TableHead>Source</TableHead><TableHead>Alert email</TableHead><TableHead>Counsellor</TableHead><TableHead>Status</TableHead><TableHead /></TableRow></TableHeader>
           <TableBody>
-            {leads.isLoading && <TableRow><TableCell colSpan={7} className="text-slate-500">Loading…</TableCell></TableRow>}
+            {leads.isLoading && <TableRow><TableCell colSpan={8} className="text-slate-500">Loading…</TableCell></TableRow>}
             {rows.map((l) => (
               <TableRow key={l.id} data-testid={`admin-lead-row-${l.id}`}>
                 <TableCell className="whitespace-nowrap text-xs text-slate-500">{new Date(l.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</TableCell>
@@ -179,6 +215,7 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
                   {l.message && <p className="mt-1 text-xs italic text-slate-500">“{l.message}”</p>}
                 </TableCell>
                 <TableCell className="text-xs text-slate-500">{l.source}</TableCell>
+                <TableCell><AlertEmailCell lead={l} onResend={() => resend.mutate(l.id)} busy={resend.isPending && resend.variables === l.id} /></TableCell>
                 <TableCell>
                   <Select value={l.counsellor_id ?? "none"} onValueChange={(v: string) => assign.mutate({ id: l.id, cid: v === "none" ? null : v })}>
                     <SelectTrigger size="sm" className={cn("w-40", !l.counsellor_id && "text-slate-400")} data-testid={`admin-lead-assign-${l.id}`}><SelectValue>{(v) => (v === "none" ? "Unassigned" : byId.get(v as string)?.name ?? "Removed")}</SelectValue></SelectTrigger>
@@ -200,7 +237,7 @@ function LeadsPanel({ whatsappOn, wa }: { whatsappOn: boolean | undefined; wa: W
                 <Button size="icon-sm" variant="ghost" aria-label="Delete lead" data-testid={`admin-lead-delete-${l.id}`} onClick={() => { if (window.confirm(`Delete lead from ${l.name}?`)) del.mutate(l.id); }} className="text-red-600"><Trash2 className="size-4" /></Button></TableCell>
               </TableRow>
             ))}
-            {!leads.isLoading && !rows.length && <TableRow><TableCell colSpan={7} className="py-8 text-center text-slate-500">No enquiries yet.</TableCell></TableRow>}
+            {!leads.isLoading && !rows.length && <TableRow><TableCell colSpan={8} className="py-8 text-center text-slate-500">No enquiries yet.</TableCell></TableRow>}
           </TableBody>
         </Table>
       </div>

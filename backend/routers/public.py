@@ -204,6 +204,7 @@ async def create_enquiry(body: LeadIn, background: BackgroundTasks):
     if not recent and (await get_settings()).get("auto_assign"):
         c = await next_counsellor()
         lead.counsellor_id = c["id"] if c else None
+    lead.alert_email = "duplicate" if recent else "pending"
     await db.leads.insert_one(lead.model_dump())
     if send_list:
         background.add_task(_student_list, lead.model_dump())

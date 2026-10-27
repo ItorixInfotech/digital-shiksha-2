@@ -35,14 +35,26 @@ async def counsellor_for(lead: dict) -> dict | None:
     return await db.counsellors.find_one({"id": lead["counsellor_id"]}, {"_id": 0})
 
 
+async def record_owner_alert(lead: dict) -> dict:
+    """Send the owner alert email and store the outcome on the lead (Admin → Leads "Alert email" column). Never raises."""
+    try:
+        email_id, error = await notify_new_lead(lead)
+    except Exception as exc:  # noqa: BLE001
+        email_id, error = None, str(exc)[:200]
+    upd = {"alert_email": "sent" if email_id else ("off" if error.startswith("No alert email") else "failed"),
+           "alert_email_id": email_id or "", "alert_email_at": datetime.now(timezone.utc), "alert_email_error": error}
+    try:
+        await db.leads.update_one({"id": lead["id"]}, {"$set": upd})
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Lead %s alert status not saved: %s", lead.get("id"), exc)
+    return upd
+
+
 async def alert_lead(lead: dict, owner_email: bool = True) -> None:
     """New/assigned lead → WhatsApp to the assigned counsellor (else admin number) + email. Never raises."""
     # Owner email first and isolated, so a WhatsApp / counsellor lookup problem can never stop it.
     if owner_email:
-        try:
-            await notify_new_lead(lead)
-        except Exception as exc:  # noqa: BLE001
-            logger.error("Lead %s owner email failed: %s", lead.get("id"), exc)
+        await record_owner_alert(lead)
     try:
         c = await counsellor_for(lead)
         await wa.notify_whatsapp(lead, [f"+91{c['phone']}"] if c else None)

@@ -137,3 +137,16 @@ async def cron_lead_digest(request: Request, background: BackgroundTasks):
 async def send_lead_digest_now(background: BackgroundTasks, _: str = Depends(require_admin)):
     background.add_task(send_lead_digest, "manual")
     return {"ok": True}
+
+
+@router.post("/admin/leads/{id}/resend-alert", response_model=Lead)
+async def resend_lead_alert(id: str, _: str = Depends(require_admin)):
+    """Send the owner alert email again (e.g. after a failure or a duplicate skip) and return the updated lead."""
+    lead = await db.leads.find_one({"id": id}, {"_id": 0})
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    lead.update(await cs.record_owner_alert(lead))
+    for k in ("created_at", "alert_email_at"):
+        if lead.get(k) and lead[k].tzinfo is None:
+            lead[k] = lead[k].replace(tzinfo=timezone.utc)
+    return lead

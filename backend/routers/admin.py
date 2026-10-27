@@ -108,8 +108,9 @@ async def stats(_: str = Depends(require_admin)):
 async def list_leads(_: str = Depends(require_admin)):
     docs = await db.leads.find({}, {"_id": 0}).sort("created_at", -1).to_list(2000)
     for d in docs:
-        if d.get("created_at") and d["created_at"].tzinfo is None:
-            d["created_at"] = d["created_at"].replace(tzinfo=timezone.utc)
+        for k in ("created_at", "alert_email_at"):  # Mongo returns naive UTC datetimes
+            if d.get(k) and d[k].tzinfo is None:
+                d[k] = d[k].replace(tzinfo=timezone.utc)
     return docs
 
 

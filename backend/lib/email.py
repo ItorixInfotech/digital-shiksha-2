@@ -164,17 +164,19 @@ def lead_alert_html(lead: dict) -> str:
     )
 
 
-async def notify_new_lead(lead: dict, to: str | None = None) -> None:
-    """Owner inbox by default (or a counsellor's email). Background task: never raises."""
+async def notify_new_lead(lead: dict, to: str | None = None) -> tuple[str | None, str]:
+    """Owner inbox by default (or a counsellor's email). Never raises. Returns (message id or None, error text)."""
     to = to or os.environ.get("LEAD_ALERT_EMAIL")
     if not to:
-        return
+        return None, "No alert email address configured"
     try:
         subject = f"New enquiry: {lead['name']}" + (f" – {lead['course_interest']}" if lead.get("course_interest") else "")
         email_id = await send_email(to=to, subject=subject[:150], html=lead_alert_html(lead), internal=True)
         logger.info("Lead alert for %s sent: %s", lead["id"], email_id)
+        return email_id, "" if email_id else "Email service did not accept the message (see server log)"
     except Exception as exc:  # noqa: BLE001
         logger.error("Lead alert failed for %s: %s", lead.get("id"), exc)
+        return None, str(exc)[:200]
 
 
 # ---- Student confirmation (fixed server-side template; only a sanitised first name is interpolated)

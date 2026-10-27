@@ -178,11 +178,19 @@ class LeadIn(BaseModel):
         return self
 
 
+AlertEmailStatus = Literal["", "pending", "sent", "failed", "duplicate", "off"]  # "" = lead saved before tracking existed
+
+
 class Lead(LeadIn):
     id: str = Field(default_factory=_id)
     status: LeadStatus = "New"
     counsellor_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    # Owner alert email (LEAD_ALERT_EMAIL) outcome, shown in Admin → Leads
+    alert_email: AlertEmailStatus = ""
+    alert_email_id: str = ""  # email-service message id when accepted
+    alert_email_at: Optional[datetime] = None
+    alert_email_error: str = ""
 
 
 class LeadStatusUpdate(BaseModel):
