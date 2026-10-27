@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { SlidersHorizontal, X, Search } from "lucide-react";
 import CollegeCard from "@/components/CollegeCard";
+import ShortlistSheet from "@/components/ShortlistSheet";
 import { CardSkeleton, EmptyState, PageHeader } from "@/components/Common";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -160,6 +161,7 @@ export default function Colleges() {
                 {filters}
               </SheetContent>
             </Sheet>
+            <ShortlistSheet className="hidden lg:inline-flex" />
             <div className="ml-auto flex items-center gap-2 text-sm">
               <span className="text-slate-500">Sort by</span>
               <Select value={sort} onValueChange={(v: string) => set("sort", v)}>
@@ -174,7 +176,8 @@ export default function Colleges() {
           {/* Mobile: stream / city / fees stay pinned under the site header while scrolling the list */}
           <div className="sticky z-30 -mx-4 border-b border-slate-200 bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:-mx-6 sm:px-6 lg:hidden"
             style={{ top: headerH }} data-testid="mobile-sticky-filters">
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="flex items-center gap-1.5">
+            <div className="grid min-w-0 flex-1 grid-cols-4 gap-1.5">
               <QuickSelect label="Stream" value={get("stream")} options={(meta.data?.streams ?? []).map((f) => [f.name, f.name])} onPick={(v) => set("stream", v)} testid="sticky-filter-stream" />
               <QuickSelect label="City" value={get("city")} options={(meta.data?.cities ?? []).map((f) => [f.name, f.name])} onPick={(v) => set("city", v)} testid="sticky-filter-city" />
               <QuickSelect label="Fees" value={get("max_fees")} options={FEES.filter(([v]) => v).map(([v, l]) => [v, l])} onPick={(v) => set("max_fees", v)} testid="sticky-filter-fees" />
@@ -186,6 +189,8 @@ export default function Colleges() {
                   {Object.entries(SORTS).map(([k, l]) => <SelectItem key={k} value={k} data-testid={`sticky-sort-${k}`}>{l}</SelectItem>)}
                 </SelectContent>
               </Select>
+            </div>
+            <ShortlistSheet compact />
             </div>
           </div>
 

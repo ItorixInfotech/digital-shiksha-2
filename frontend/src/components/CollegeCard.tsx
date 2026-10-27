@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { sizedImg } from "@/lib/img";
-import { MapPin, Star, Trophy, IndianRupee, TrendingUp } from "lucide-react";
+import { Heart, MapPin, Star, Trophy, IndianRupee, TrendingUp } from "lucide-react";
+import { toast } from "sonner";
+import { useShortlist } from "@/lib/shortlist";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import type { College } from "@/lib/types";
@@ -11,13 +13,16 @@ export default function CollegeCard({ c, layout = "grid" }: { c: College; layout
   const { compare, toggleCompare, openEnquiry } = useSite();
   const checked = compare.includes(c.slug);
   const row = layout === "row";
+  const { has, toggle } = useShortlist();
+  const saved = has(c.slug);
 
   return (
     <article
       data-testid={`college-card-${c.slug}`}
       className={`group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg transition-[transform,box-shadow,border-color] duration-200 ${row ? "sm:flex" : "flex flex-col"}`}
     >
-      <Link to={`/colleges/${c.slug}`} className={`relative block shrink-0 overflow-hidden ${row ? "h-44 sm:h-auto sm:w-60" : "h-40"}`} data-testid={`college-card-image-link-${c.slug}`}>
+      <div className={`relative shrink-0 ${row ? "h-44 sm:h-auto sm:w-60" : "h-40"}`}>
+      <Link to={`/colleges/${c.slug}`} className="relative block h-full overflow-hidden" data-testid={`college-card-image-link-${c.slug}`}>
         {c.logo ? (
           <div className="grid h-full w-full place-items-center bg-gradient-to-br from-slate-50 to-slate-100 p-6">
             <img src={c.logo} alt={`${c.name} logo`} loading="lazy" className="max-h-24 max-w-[70%] object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105" data-testid={`college-card-logo-${c.slug}`} />
@@ -35,6 +40,12 @@ export default function CollegeCard({ c, layout = "grid" }: { c: College; layout
         ) : null}
         <span className="absolute bottom-3 left-3 rounded-md bg-brand-navy/85 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">{c.type}</span>
       </Link>
+        <button type="button" onClick={() => { const on = toggle(c); toast.success(on ? `Saved ${c.short_name || c.name} to your shortlist` : "Removed from your shortlist"); }}
+          aria-label={saved ? `Remove ${c.name} from shortlist` : `Save ${c.name} to shortlist`} aria-pressed={saved} data-testid={`college-card-save-${c.slug}`}
+          className={`absolute right-3 top-3 grid size-9 place-items-center rounded-full bg-white/95 shadow ring-1 ring-slate-200 transition-[transform,color] duration-150 hover:scale-110 active:scale-95 ${saved ? "text-brand-red" : "text-slate-400 hover:text-brand-red"}`}>
+          <Heart className={`size-4 ${saved ? "fill-current" : ""}`} />
+        </button>
+      </div>
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
