@@ -12,6 +12,9 @@ import { apiDelete, apiGet, apiPost, apiPut, ApiError } from "@/lib/api";
 import { CANONICAL_ORIGIN, DESC_MAX, TITLE_MAX } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SiteSchemaPanel from "@/components/admin/SiteSchemaPanel";
+import TitleFixer from "@/components/admin/TitleFixer";
 import type { PageOverride, PageOverrideIn, PageOverrideSaveOut, SchemaBlock, SchemaValidateOut, SitePage } from "@/lib/types";
 
 const KINDS: [string, string][] = [["all", "All pages"], ["static", "Main pages"], ["landing", "City pages"], ["colleges", "Colleges"], ["courses", "Courses"], ["exams", "Exams"], ["articles", "News"], ["custom", "Other URLs"]];
@@ -45,6 +48,22 @@ function template(type: string, path: string, title: string): string {
 const EMPTY = (path: string): PageOverrideIn => ({ path, h1: "", meta_title: "", meta_description: "", keywords: [], canonical_url: "", og_image: "", noindex: false, schemas: [], replace_auto_schema: true });
 
 export default function PageManager() {
+  const [view, setView] = useState("pages");
+  return (
+    <Tabs value={view} onValueChange={(v) => setView(String(v))} className="gap-4" data-testid="page-manager-tabs">
+      <TabsList className="flex-wrap">
+        <TabsTrigger value="pages" data-testid="page-manager-tab-pages">Pages</TabsTrigger>
+        <TabsTrigger value="fixer" data-testid="page-manager-tab-fixer">Bulk title fixer</TabsTrigger>
+        <TabsTrigger value="site" data-testid="page-manager-tab-site">Site-wide schema</TabsTrigger>
+      </TabsList>
+      <TabsContent value="pages"><PageList /></TabsContent>
+      <TabsContent value="fixer"><TitleFixer /></TabsContent>
+      <TabsContent value="site"><SiteSchemaPanel /></TabsContent>
+    </Tabs>
+  );
+}
+
+function PageList() {
   const [kind, setKind] = useState("all");
   const [q, setQ] = useState("");
   const [path, setPath] = useState<string | null>(null);
@@ -176,7 +195,7 @@ function PageEditor({ path, page }: { path: string; page?: SitePage }) {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="font-semibold">Schema markup (JSON-LD)</h3>
-            <p className="text-xs text-slate-500">The page already outputs automatic schema (e.g. Organization, BreadcrumbList, FAQPage, Article). A custom block replaces the automatic one of the same type, so nothing is duplicated.</p>
+            <p className="text-xs text-slate-500">The page already outputs automatic schema (site-wide Organization + LocalBusiness from the Site-wide schema tab, plus BreadcrumbList, FAQPage, Article). A custom block replaces the automatic one of the same type, so nothing is duplicated.</p>
           </div>
           <Select value="" onValueChange={(t: string) => set({ schemas: [...f.schemas, { type: t, json_text: template(t, path, label), enabled: true }] })}>
             <SelectTrigger size="sm" className="w-48" data-testid="page-editor-add-schema"><SelectValue>{() => "+ Add schema block"}</SelectValue></SelectTrigger>

@@ -1,6 +1,6 @@
 import { toPlain } from "@/lib/richtext";
 import { EXAM_YEAR, SITE } from "@/lib/site";
-import type { FaqItem, SeoMeta } from "@/lib/types";
+import type { FaqItem, SeoMeta, SiteSchema } from "@/lib/types";
 
 export type SeoKind = "colleges" | "courses" | "exams" | "articles";
 export const EMPTY_SEO: SeoMeta = { meta_title: "", meta_description: "", keywords: [], canonical_url: "", og_image: "", noindex: false };
@@ -67,12 +67,21 @@ export function breadcrumbLd(items: [string, string][]) {
 
 const publisher = () => ({ "@type": "Organization", name: SITE.name, logo: { "@type": "ImageObject", url: absUrl(SITE.logo) } });
 
-export function organizationLd() {
-  return {
-    "@context": "https://schema.org", "@type": "EducationalOrganization", name: SITE.name, url: origin(), logo: absUrl(SITE.logo),
-    telephone: "+918149689468", email: SITE.email, sameAs: [SITE.facebook, SITE.instagram],
-    address: { "@type": "PostalAddress", addressLocality: "Pune", addressRegion: "Maharashtra", addressCountry: "IN" },
-  };
+/** Site-wide Organization + LocalBusiness JSON-LD from Admin → Pages & Schema → Site-wide schema (added to every indexable page). */
+export function siteLd(s: SiteSchema): object[] {
+  const home = origin() || CANONICAL_ORIGIN;
+  const sameAs = [...new Set([s.facebook, s.instagram, s.youtube, s.linkedin, s.twitter].filter(Boolean))];
+  const address = { "@type": "PostalAddress", streetAddress: s.street_address || undefined, addressLocality: s.locality || undefined,
+    addressRegion: s.region || undefined, postalCode: s.postal_code || undefined, addressCountry: s.country };
+  const common = { name: s.name, url: home, telephone: s.phone || undefined, email: s.email || undefined, address, sameAs: sameAs.length ? sameAs : undefined };
+  const out: object[] = [];
+  if (s.apply_organization) out.push({ "@context": "https://schema.org", "@type": s.org_type, "@id": `${home}/#organization`, ...common,
+    legalName: s.legal_name || undefined, description: s.description || undefined, logo: s.logo || undefined });
+  if (s.apply_local_business) out.push({ "@context": "https://schema.org", "@type": "LocalBusiness", "@id": `${home}/#localbusiness`, ...common,
+    image: s.logo || undefined, priceRange: s.price_range || undefined, openingHours: s.opening_hours.length ? s.opening_hours : undefined,
+    geo: s.latitude !== null && s.longitude !== null ? { "@type": "GeoCoordinates", latitude: s.latitude, longitude: s.longitude } : undefined,
+    ...(s.apply_organization ? { parentOrganization: { "@id": `${home}/#organization` } } : {}) });
+  return out;
 }
 
 /** Page schema + breadcrumbs for a detail page. */

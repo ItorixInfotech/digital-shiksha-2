@@ -3,10 +3,12 @@ import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
 import { SITE } from "@/lib/site";
-import { absUrl, breadcrumbLd, clip, defaultSeo, DESC_MAX, entityLd, TITLE_MAX, type SeoKind } from "@/lib/seo";
-import type { PageOverride, SeoMeta, SeoPages } from "@/lib/types";
+import { absUrl, breadcrumbLd, clip, defaultSeo, DESC_MAX, entityLd, siteLd, TITLE_MAX, type SeoKind } from "@/lib/seo";
+import type { PageOverride, SeoMeta, SeoPages, SiteSchema } from "@/lib/types";
 
 export const useSeoPages = () => useQuery({ queryKey: ["seo", "pages"], queryFn: () => apiGet<SeoPages>("/seo/pages"), staleTime: 5 * 60_000 });
+export const useSiteSchema = () => useQuery({ queryKey: ["site-schema"], queryFn: () => apiGet<SiteSchema>("/site-schema"), staleTime: 10 * 60_000 });
+const SITE_TYPES = new Set(["Organization", "LocalBusiness"]);
 const fallbackYear = () => new Date().getFullYear(); // only until /seo/pages (server date) has loaded
 
 interface SeoProps {
@@ -47,19 +49,23 @@ const fitTitle = (t: string) => {
   const main = t.endsWith(suffix) ? t.slice(0, -suffix.length) : t;
   return main.length <= TITLE_MAX ? main : clip(main, TITLE_MAX);
 };
-const ldType = (o: object) => String((o as { "@type"?: unknown })["@type"] ?? "");
+const ldType = (o: object) => { const t = String((o as { "@type"?: unknown })["@type"] ?? ""); return t === "EducationalOrganization" ? "Organization" : t; }; // one org block, never two
 
 /** Writes title, meta, Open Graph, canonical and JSON-LD into <head> (Google renders JS, so these are indexed).
  *  Any field set in Admin → Pages & Schema for this URL wins; custom schema blocks replace auto blocks of the same type. */
 export function Seo(props: SeoProps) {
   const { pathname } = useLocation();
   const o = usePageOverride();
+  const site = useSiteSchema().data;
   const custom: object[] = [];
   for (const b of o?.schemas ?? []) {
     if (!b.enabled) continue;
     try { custom.push(JSON.parse(b.json_text) as object); } catch { /* validated on save */ }
   }
-  const auto = props.jsonLd ?? [];
+  const noindex = Boolean(o?.noindex || props.noindex);
+  // Site-wide Organization/LocalBusiness replace any page-level block of those types; a custom page block still wins over them.
+  const siteBlocks = site && !noindex ? siteLd(site) : [];
+  const auto = [...(siteBlocks.length ? (props.jsonLd ?? []).filter((x) => !SITE_TYPES.has(ldType(x))) : props.jsonLd ?? []), ...siteBlocks];
   const types = new Set(custom.map(ldType));
   const jsonLd = [...(o?.replace_auto_schema === false ? auto : auto.filter((x) => !types.has(ldType(x)))), ...custom];
   const title = o?.meta_title || fitTitle(props.title);
@@ -67,7 +73,6 @@ export function Seo(props: SeoProps) {
   const keywords = o?.keywords.length ? o.keywords : props.keywords ?? [];
   const canonical = o?.canonical_url || props.canonical;
   const image = o?.og_image || props.image;
-  const noindex = Boolean(o?.noindex || props.noindex);
   const type = props.type ?? "website";
   const ld = JSON.stringify(jsonLd);
   const kw = keywords.join(", ");

@@ -688,3 +688,59 @@ export interface PageOverrideSaveOut {
   page: PageOverride;
   warnings: string[];
 }
+
+/* ---- Site-wide schema defaults + bulk title fixer (mirror backend models/seo.py) ---- */
+export interface SiteSchema {
+  apply_organization: boolean;
+  apply_local_business: boolean;
+  org_type: "Organization" | "EducationalOrganization";
+  name: string;
+  legal_name: string;
+  description: string;
+  logo: string;
+  phone: string;
+  email: string;
+  street_address: string;
+  locality: string;
+  region: string;
+  postal_code: string;
+  country: string;
+  latitude: number | null;
+  longitude: number | null;
+  opening_hours: string[];
+  price_range: string;
+  facebook: string;
+  instagram: string;
+  youtube: string;
+  linkedin: string;
+  twitter: string;
+  updated_at: string;
+}
+
+export interface SiteSchemaSaveOut {
+  site: SiteSchema;
+  warnings: string[];
+}
+
+export type TitleIssue = "title_missing" | "title_long" | "title_short" | "title_duplicate" | "desc_missing" | "desc_long" | "desc_short";
+
+export interface TitleAuditRow {
+  path: string;
+  label: string;
+  kind: SitePage["kind"];
+  title: string;
+  description: string;
+  title_custom: string;
+  description_custom: string;
+  issues: TitleIssue[];
+}
+
+export interface BulkSeoItem {
+  path: string;
+  meta_title: string;
+  meta_description: string;
+}
+
+export interface BulkSeoOut {
+  saved: number;
+}

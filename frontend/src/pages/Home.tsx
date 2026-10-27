@@ -15,7 +15,6 @@ import type { Article, College, Course, Exam, Meta } from "@/lib/types";
 import { SITE, STATS, STREAMS, slugify, EXAM_YEAR } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
 import { PageSeo, usePageOverride } from "@/components/Seo";
-import { organizationLd } from "@/lib/seo";
 
 const HERO_IMG = "https://images.unsplash.com/photo-1687709348710-05314eea5476?crop=entropy&cs=srgb&auto=format&q=70&w=1600";
 const QUICK = [["College Predictor", "/predictor"], ["B.Tech", "/courses/btech"], ["MBA", "/courses/mba"], ["MBBS", "/courses/mbbs"], ["BBA", "/courses/bba"], ["BA LLB", "/courses/ba-llb"], ["MHT CET", "/exams/mht-cet"], ["NEET UG", "/exams/neet-ug"]];
@@ -46,7 +45,7 @@ export default function Home() {
 
   return (
     <div data-testid="home-page">
-      <PageSeo page="home" jsonLd={[organizationLd(), { "@context": "https://schema.org", "@type": "WebSite", name: "Digital Shiksha", url: window.location.origin }]} />
+      <PageSeo page="home" jsonLd={[{ "@context": "https://schema.org", "@type": "WebSite", name: "Digital Shiksha", url: window.location.origin }]} />
       <PredictorBanner />
       {/* HERO */}
       <section className="relative overflow-hidden bg-brand-ink text-white" data-testid="home-hero">
