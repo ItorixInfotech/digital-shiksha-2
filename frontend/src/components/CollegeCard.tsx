@@ -17,8 +17,16 @@ export default function CollegeCard({ c, layout = "grid" }: { c: College; layout
       className={`group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg transition-[transform,box-shadow,border-color] duration-200 ${row ? "sm:flex" : "flex flex-col"}`}
     >
       <Link to={`/colleges/${c.slug}`} className={`relative block shrink-0 overflow-hidden ${row ? "h-44 sm:h-auto sm:w-60" : "h-40"}`} data-testid={`college-card-image-link-${c.slug}`}>
-        <img src={c.image} alt={c.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        {c.logo ? (
+          <div className="grid h-full w-full place-items-center bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+            <img src={c.logo} alt={`${c.name} logo`} loading="lazy" className="max-h-24 max-w-[70%] object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105" data-testid={`college-card-logo-${c.slug}`} />
+          </div>
+        ) : (
+          <>
+            <img src={c.image} alt={c.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+          </>
+        )}
         {c.nirf_rank ? (
           <span className="absolute left-3 top-3 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-xs font-bold text-brand-navy shadow">
             <Trophy className="size-3.5 text-amber-500" /> NIRF #{c.nirf_rank}

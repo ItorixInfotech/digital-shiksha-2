@@ -119,6 +119,7 @@ export interface CollegeIn {
   approvals: string[];
   exams_accepted: string[];
   image: string;
+  logo: string;
   overview: string;
   admission: string;
   courses: CollegeCourse[];

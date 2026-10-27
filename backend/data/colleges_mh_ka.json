@@ -1,0 +1,3626 @@
+[
+ {
+  "slug": "iit-bombay",
+  "match": true,
+  "rank": 1,
+  "name": "IIT Bombay",
+  "short_name": "IIT Bombay",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 4.4,
+  "fees_total": 1195800,
+  "fees_per_year": 299000,
+  "logo": "/logos/iit-bombay.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "vnit-nagpur",
+  "match": false,
+  "rank": 2,
+  "name": "VNIT Nagpur",
+  "short_name": "VNIT Nagpur",
+  "city": "Nagpur",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 4.1,
+  "fees_total": 1926000,
+  "fees_per_year": 482000,
+  "logo": "/logos/vnit-nagpur.jpeg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "coep-pune",
+  "match": true,
+  "rank": 3,
+  "name": "COEP Pune",
+  "short_name": "COEP Pune",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 4.2,
+  "fees_total": 1154000,
+  "fees_per_year": 288000,
+  "logo": "/logos/coep-pune.jpeg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "vit-pune",
+  "match": true,
+  "rank": 4,
+  "name": "VIT Pune",
+  "short_name": "VIT Pune",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 844000,
+  "fees_per_year": 211000,
+  "logo": "/logos/vit-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sit-nagpur",
+  "match": false,
+  "rank": 5,
+  "name": "SIT Nagpur",
+  "short_name": "SIT Nagpur",
+  "city": "Nagpur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.5,
+  "fees_total": 1590000,
+  "fees_per_year": 398000,
+  "logo": "",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "symbiosis-pune",
+  "match": true,
+  "rank": 6,
+  "name": "SIU Pune",
+  "short_name": "SIU Pune",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 4080000,
+  "fees_per_year": 1020000,
+  "logo": "/logos/symbiosis-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "iiit-pune",
+  "match": false,
+  "rank": 7,
+  "name": "IIIT Pune",
+  "short_name": "IIIT Pune",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 3.9,
+  "fees_total": 1200000,
+  "fees_per_year": 300000,
+  "logo": "/logos/iiit-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "cummins-pune",
+  "match": true,
+  "rank": 8,
+  "name": "CCEW Pune",
+  "short_name": "CCEW Pune",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 780000,
+  "fees_per_year": 195000,
+  "logo": "/logos/cummins-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "djsce-mumbai",
+  "match": true,
+  "rank": 9,
+  "name": "DJSCE Mumbai",
+  "short_name": "DJSCE Mumbai",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 916000,
+  "fees_per_year": 229000,
+  "logo": "/logos/djsce-mumbai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "nmims-mumbai",
+  "match": true,
+  "rank": 10,
+  "name": "NMIMS Mumbai",
+  "short_name": "NMIMS Mumbai",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 6700000,
+  "fees_per_year": 1675000,
+  "logo": "/logos/nmims-mumbai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "i2it-pune",
+  "match": false,
+  "rank": 11,
+  "name": "I2IT Pune",
+  "short_name": "I2IT Pune",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 1051000,
+  "fees_per_year": 263000,
+  "logo": "/logos/i2it-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "dypcoe-akurdi",
+  "match": true,
+  "rank": 12,
+  "name": "D.Y. Patil COE Pune",
+  "short_name": "D.Y. Patil COE Pune",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 582000,
+  "fees_per_year": 146000,
+  "logo": "/logos/dypcoe-akurdi.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pict-pune",
+  "match": true,
+  "rank": 13,
+  "name": "PICT Pune",
+  "short_name": "PICT Pune",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 492000,
+  "fees_per_year": 123000,
+  "logo": "/logos/pict-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "spit-mumbai",
+  "match": true,
+  "rank": 14,
+  "name": "SPIT Mumbai",
+  "short_name": "SPIT Mumbai",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 848000,
+  "fees_per_year": 212000,
+  "logo": "/logos/spit-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "wce-sangli",
+  "match": false,
+  "rank": 15,
+  "name": "WCE Sangli",
+  "short_name": "WCE Sangli",
+  "city": "Sangli",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 4.1,
+  "fees_total": 317000,
+  "fees_per_year": 79000,
+  "logo": "/logos/wce-sangli.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pccoe-pune",
+  "match": true,
+  "rank": 16,
+  "name": "PCCOE Pune",
+  "short_name": "PCCOE Pune",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 772000,
+  "fees_per_year": 193000,
+  "logo": "/logos/pccoe-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pvgcoet-pune",
+  "match": false,
+  "rank": 17,
+  "name": "Pune Vidhyarthi Griha's College of Engineering and Technology",
+  "short_name": "PVGCOET",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 0.0,
+  "fees_total": 675201,
+  "fees_per_year": 169000,
+  "logo": "/logos/pvgcoet-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bharati-vidyapeeth-college-of-engineering-for-women-pune",
+  "match": false,
+  "rank": 18,
+  "name": "Bharati Vidyapeeth College of Engineering For Women",
+  "short_name": "",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 0.0,
+  "fees_total": 608000,
+  "fees_per_year": 152000,
+  "logo": "/logos/bharati-vidyapeeth-college-of-engineering-for-women-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mitaoe-pune",
+  "match": true,
+  "rank": 19,
+  "name": "MIT Academy of Engineering",
+  "short_name": "MITAOE",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 0.0,
+  "fees_total": 876598,
+  "fees_per_year": 219000,
+  "logo": "/logos/mitaoe-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mcoe-pune",
+  "match": false,
+  "rank": 20,
+  "name": "Progressive Education Society's Modern College of Engineering",
+  "short_name": "MCOE",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 0.0,
+  "fees_total": 404000,
+  "fees_per_year": 101000,
+  "logo": "/logos/mcoe-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sies-gst-navi-mumbai",
+  "match": false,
+  "rank": 21,
+  "name": "SIES Graduate School of Technology",
+  "short_name": "SIES-GST",
+  "city": "Navi Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 0.0,
+  "fees_total": 512000,
+  "fees_per_year": 128000,
+  "logo": "/logos/sies-gst-navi-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "geca-aurangabad",
+  "match": false,
+  "rank": 22,
+  "name": "Government College of Engineering",
+  "short_name": "GECA",
+  "city": "Aurangabad",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 0.0,
+  "fees_total": 323501,
+  "fees_per_year": 81000,
+  "logo": "/logos/geca-aurangabad.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "ghrce-nagpur",
+  "match": false,
+  "rank": 23,
+  "name": "GH Raisoni College of Engineering , Nagpur",
+  "short_name": "GHRCE",
+  "city": "Nagpur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 0.0,
+  "fees_total": 592000,
+  "fees_per_year": 148000,
+  "logo": "/logos/ghrce-nagpur.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pccoer-pune",
+  "match": false,
+  "rank": 24,
+  "name": "Pimpri Chinchwad College of Engineering and Research Ravet",
+  "short_name": "PCCOER",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 0.0,
+  "fees_total": 572000,
+  "fees_per_year": 143000,
+  "logo": "/logos/pccoer-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "xie-mumbai",
+  "match": false,
+  "rank": 25,
+  "name": "Xavier Institute of Engineering",
+  "short_name": "XIE",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 0.0,
+  "fees_total": 772000,
+  "fees_per_year": 193000,
+  "logo": "/logos/xie-mumbai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sfit-mumbai",
+  "match": false,
+  "rank": 26,
+  "name": "St. Francis Institute of Technology",
+  "short_name": "SFIT",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 0.0,
+  "fees_total": 612000,
+  "fees_per_year": 153000,
+  "logo": "/logos/sfit-mumbai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "vit-mumbai",
+  "match": false,
+  "rank": 27,
+  "name": "Vidyalankar Institute of Technology",
+  "short_name": "VIT",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.2,
+  "fees_total": 8120000,
+  "fees_per_year": 2030000,
+  "logo": "/logos/vit-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sggsie-t-nanded",
+  "match": false,
+  "rank": 28,
+  "name": "Shri Guru Gobind Singhji Institute of Engineering and Technology",
+  "short_name": "SGGSIE&T",
+  "city": "Nanded",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 352308,
+  "fees_per_year": 88000,
+  "logo": "/logos/sggsie-t-nanded.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "kit-s-college-of-engineering-kolhapur",
+  "match": false,
+  "rank": 29,
+  "name": "KIT's College of Engineering",
+  "short_name": "KIT's College of Engineering",
+  "city": "Kolhapur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.2,
+  "fees_total": 496300,
+  "fees_per_year": 124000,
+  "logo": "/logos/kit-s-college-of-engineering-kolhapur.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sakec-mumbai",
+  "match": false,
+  "rank": 30,
+  "name": "Shah and Anchor Kutchhi Engineering College",
+  "short_name": "SAKEC",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 724000,
+  "fees_per_year": 181000,
+  "logo": "/logos/sakec-mumbai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "kjsieit-mumbai",
+  "match": false,
+  "rank": 31,
+  "name": "KJ Somaiya Institute of Engineering and Information Technology",
+  "short_name": "KJSIEIT",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 2314800,
+  "fees_per_year": 579000,
+  "logo": "/logos/kjsieit-mumbai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "k-e-society-s-rajarambapu-institute-of-technology-rajaramnagar-sangli",
+  "match": false,
+  "rank": 32,
+  "name": "K.E.Society's Rajarambapu Institute of Technology, Rajaramnagar",
+  "short_name": "",
+  "city": "Sangli",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 672000,
+  "fees_per_year": 168000,
+  "logo": "/logos/k-e-society-s-rajarambapu-institute-of-technology-rajaramnagar-sangli.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "jscoe-pune",
+  "match": false,
+  "rank": 33,
+  "name": "Jayawantrao Sawant College of Engineering",
+  "short_name": "JSCOE",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.3,
+  "fees_total": 556000,
+  "fees_per_year": 139000,
+  "logo": "/logos/jscoe-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "nielit-aurangabad",
+  "match": false,
+  "rank": 34,
+  "name": "National Institute of Electronics and Information Technology",
+  "short_name": "NIELIT",
+  "city": "Aurangabad",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 3.8,
+  "fees_total": 430000,
+  "fees_per_year": 108000,
+  "logo": "/logos/nielit-aurangabad.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "meswcoe-pune",
+  "match": false,
+  "rank": 35,
+  "name": "Modern Education Society's Wadia College of Engineering",
+  "short_name": "MESWCOE",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 584000,
+  "fees_per_year": 146000,
+  "logo": "/logos/meswcoe-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "atharva-college-of-engineering-mumbai",
+  "match": false,
+  "rank": 36,
+  "name": "Atharva College of Engineering",
+  "short_name": "",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 466000,
+  "fees_per_year": 116000,
+  "logo": "/logos/atharva-college-of-engineering-mumbai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "gcoen-nagpur",
+  "match": false,
+  "rank": 37,
+  "name": "Government College of Engineering",
+  "short_name": "GCOEN",
+  "city": "Nagpur",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 3.8,
+  "fees_total": 259279,
+  "fees_per_year": 65000,
+  "logo": "/logos/gcoen-nagpur.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "scoe-pune",
+  "match": true,
+  "rank": 38,
+  "name": "Sinhgad College of Engineering Vadgaon Ambegaon",
+  "short_name": "SCOE",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 582000,
+  "fees_per_year": 146000,
+  "logo": "/logos/scoe-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "nmiet-pune",
+  "match": false,
+  "rank": 39,
+  "name": "Nutan Maharashtra Institute of Engineering and Technology Talegaon",
+  "short_name": "NMIET",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 552020,
+  "fees_per_year": 138000,
+  "logo": "/logos/nmiet-pune.jpeg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "tcet-mumbai",
+  "match": false,
+  "rank": 40,
+  "name": "Thakur College of Engineering and Technology",
+  "short_name": "TCET",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 940400,
+  "fees_per_year": 235000,
+  "logo": "/logos/tcet-mumbai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "gcoea-amravati",
+  "match": false,
+  "rank": 41,
+  "name": "Government College of Engineering",
+  "short_name": "GCOEA",
+  "city": "Amravati",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 3.7,
+  "fees_total": 267230,
+  "fees_per_year": 67000,
+  "logo": "/logos/gcoea-amravati.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "gcek-satara",
+  "match": false,
+  "rank": 42,
+  "name": "Government College of Engineering",
+  "short_name": "GCEK",
+  "city": "Satara",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 3.9,
+  "fees_total": 335800,
+  "fees_per_year": 84000,
+  "logo": "/logos/gcek-satara.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "dkte-kolhapur",
+  "match": false,
+  "rank": 43,
+  "name": "DKTE Society's Textile and Engineering Institute",
+  "short_name": "DKTE",
+  "city": "Kolhapur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 542000,
+  "fees_per_year": 136000,
+  "logo": "/logos/dkte-kolhapur.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "vpkbiet-pune",
+  "match": false,
+  "rank": 44,
+  "name": "Vidya Pratishthan's Kamalnayan Bajaj Institute of Engineering and Technology Baramati",
+  "short_name": "VPKBIET",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 441140,
+  "fees_per_year": 110000,
+  "logo": "/logos/vpkbiet-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "ghrcem-pune",
+  "match": false,
+  "rank": 45,
+  "name": "G H Raisoni College of Engineering and Management",
+  "short_name": "GHRCEM",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 524000,
+  "fees_per_year": 131000,
+  "logo": "/logos/ghrcem-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "avcoe-ahmednagar",
+  "match": false,
+  "rank": 46,
+  "name": "Amrutvahini College of Engineering",
+  "short_name": "AVCOE",
+  "city": "Ahmednagar",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.2,
+  "fees_total": 679230,
+  "fees_per_year": 170000,
+  "logo": "/logos/avcoe-ahmednagar.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "government-college-of-engineering-and-research-pune",
+  "match": false,
+  "rank": 47,
+  "name": "Government College of Engineering and Research",
+  "short_name": "",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 3.6,
+  "fees_total": 96621,
+  "fees_per_year": 24000,
+  "logo": "/logos/government-college-of-engineering-and-research-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bsitor-pune",
+  "match": false,
+  "rank": 48,
+  "name": "Bhivarabai Sawant Institute of Technolgy and Research Wagholi",
+  "short_name": "BSITOR",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 494000,
+  "fees_per_year": 124000,
+  "logo": "/logos/bsitor-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "dbit-mumbai",
+  "match": false,
+  "rank": 49,
+  "name": "Don Bosco Institute of Technology",
+  "short_name": "DBIT",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 692000,
+  "fees_per_year": 173000,
+  "logo": "/logos/dbit-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mvps-s-karmaveer-adv-baburao-ganpatrao-thakare-college-of-engineering-nashik",
+  "match": false,
+  "rank": 50,
+  "name": "MVPS's Karmaveer Adv. Baburao Ganpatrao Thakare College of Engineering",
+  "short_name": "",
+  "city": "Nashik",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 574898,
+  "fees_per_year": 144000,
+  "logo": "/logos/mvps-s-karmaveer-adv-baburao-ganpatrao-thakare-college-of-engineering-nashik.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pillai-college-of-engineering-mumbai",
+  "match": false,
+  "rank": 51,
+  "name": "Pillai College of Engineering",
+  "short_name": "",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 1400000,
+  "fees_per_year": 350000,
+  "logo": "/logos/pillai-college-of-engineering-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "kkwieer-nashik",
+  "match": false,
+  "rank": 52,
+  "name": "K.K. Wagh Institute of Engineering Education & Research",
+  "short_name": "KKWIEER",
+  "city": "Nashik",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 652000,
+  "fees_per_year": 163000,
+  "logo": "/logos/kkwieer-nashik.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "ssgmce-shegaon",
+  "match": false,
+  "rank": 53,
+  "name": "Shri Sant Gajanan Maharaj College of Engineering",
+  "short_name": "SSGMCE",
+  "city": "Shegaon",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 568000,
+  "fees_per_year": 142000,
+  "logo": "/logos/ssgmce-shegaon.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "ltce-navi-mumbai",
+  "match": false,
+  "rank": 54,
+  "name": "Lokmanya Tilak College of Engineering",
+  "short_name": "LTCE",
+  "city": "Navi Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.5,
+  "fees_total": 680000,
+  "fees_per_year": 170000,
+  "logo": "/logos/ltce-navi-mumbai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "vasantdada-patil-pratishtan-s-college-of-engineering-visual-arts-mumbai",
+  "match": false,
+  "rank": 55,
+  "name": "Vasantdada Patil Pratishtan's College of Engineering & Visual Arts",
+  "short_name": "",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 581300,
+  "fees_per_year": 145000,
+  "logo": "/logos/vasantdada-patil-pratishtan-s-college-of-engineering-visual-arts-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "adcet-sangli",
+  "match": false,
+  "rank": 56,
+  "name": "Annasaheb Dange College of Engineering & Technology",
+  "short_name": "ADCET",
+  "city": "Sangli",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 522000,
+  "fees_per_year": 130000,
+  "logo": "/logos/adcet-sangli.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "adypu-pune",
+  "match": false,
+  "rank": 57,
+  "name": "Ajeenkya DY Patil University",
+  "short_name": "ADYPU",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 1240500,
+  "fees_per_year": 310000,
+  "logo": "/logos/adypu-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "wit-solapur",
+  "match": false,
+  "rank": 58,
+  "name": "Walchand Institute of Technology",
+  "short_name": "WIT",
+  "city": "Solapur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 560000,
+  "fees_per_year": 140000,
+  "logo": "/logos/wit-solapur.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "skncoe-pune",
+  "match": false,
+  "rank": 59,
+  "name": "Smt Kashibai Navale College of Engineering Vadgaon",
+  "short_name": "SKNCOE",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 432000,
+  "fees_per_year": 108000,
+  "logo": "/logos/skncoe-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "jspm-ntc-pune",
+  "match": false,
+  "rank": 60,
+  "name": "JSPM Narhe Technical Campus Narhe",
+  "short_name": "JSPM NTC",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 470000,
+  "fees_per_year": 118000,
+  "logo": "/logos/jspm-ntc-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "nbnssoe-pune",
+  "match": false,
+  "rank": 61,
+  "name": "NBN Sinhgad School of Engineering ,Ambegaon",
+  "short_name": "NBNSSOE",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 412000,
+  "fees_per_year": 103000,
+  "logo": "/logos/nbnssoe-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "isb-m-college-of-engineering-pune",
+  "match": false,
+  "rank": 62,
+  "name": "ISB&M College of Engineering",
+  "short_name": "ISB&M College of Engineering",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 354300,
+  "fees_per_year": 89000,
+  "logo": "/logos/isb-m-college-of-engineering-pune.jpeg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "rgit-mumbai",
+  "match": false,
+  "rank": 63,
+  "name": "Rajiv Gandhi Institute of Technology",
+  "short_name": "RGIT",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 524000,
+  "fees_per_year": 131000,
+  "logo": "/logos/rgit-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "cummins-college-of-engineering-for-women-autonomous-nagpur",
+  "match": false,
+  "rank": 64,
+  "name": "Cummins College Of Engineering For Women (Autonomous)",
+  "short_name": "",
+  "city": "Nagpur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.2,
+  "fees_total": 578000,
+  "fees_per_year": 144000,
+  "logo": "/logos/cummins-college-of-engineering-for-women-autonomous-nagpur.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "zcoer-pune",
+  "match": false,
+  "rank": 65,
+  "name": "Zeal Education Society's Zeal College of Engineering and Research",
+  "short_name": "ZCOER",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 607000,
+  "fees_per_year": 152000,
+  "logo": "/logos/zcoer-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bvcoe-pune",
+  "match": false,
+  "rank": 66,
+  "name": "Bharati Vidyapeeth's College of Engineering Lavale",
+  "short_name": "BVCOE",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 468000,
+  "fees_per_year": 117000,
+  "logo": "/logos/bvcoe-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mmit-pune",
+  "match": false,
+  "rank": 67,
+  "name": "Marathwada Mitramandal's Institute of Technology Lohgaon",
+  "short_name": "MMIT",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 507351,
+  "fees_per_year": 127000,
+  "logo": "/logos/mmit-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "umit-mumbai",
+  "match": false,
+  "rank": 68,
+  "name": "Usha Mittal Institute of Technology",
+  "short_name": "UMIT",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 792000,
+  "fees_per_year": 198000,
+  "logo": "/logos/umit-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "lit-nagpur",
+  "match": false,
+  "rank": 69,
+  "name": "Laxminarayan Institute of Technology",
+  "short_name": "LIT",
+  "city": "Nagpur",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 3.8,
+  "fees_total": 496000,
+  "fees_per_year": 124000,
+  "logo": "/logos/lit-nagpur.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pce-nagpur",
+  "match": false,
+  "rank": 70,
+  "name": "Priyadarshini College of Engineering",
+  "short_name": "PCE",
+  "city": "Nagpur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 604000,
+  "fees_per_year": 151000,
+  "logo": "/logos/pce-nagpur.jpeg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sipna-s-college-of-engineering-and-technology-amravati",
+  "match": false,
+  "rank": 71,
+  "name": "Sipna's College of Engineering and Technology",
+  "short_name": "",
+  "city": "Amravati",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 480000,
+  "fees_per_year": 120000,
+  "logo": "/logos/sipna-s-college-of-engineering-and-technology-amravati.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "scoe-navi-mumbai",
+  "match": false,
+  "rank": 72,
+  "name": "Saraswati College of Engineering",
+  "short_name": "SCOE",
+  "city": "Navi Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 446636,
+  "fees_per_year": 112000,
+  "logo": "/logos/scoe-navi-mumbai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "apcoer-pune",
+  "match": false,
+  "rank": 73,
+  "name": "ABMSP's Anantrao Pawar College of Engineering & Research",
+  "short_name": "APCOER",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 350000,
+  "fees_per_year": 88000,
+  "logo": "/logos/apcoer-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "prmitr-amravati",
+  "match": false,
+  "rank": 74,
+  "name": "Prof. Ram Meghe Institute of Technology and Research",
+  "short_name": "PRMITR",
+  "city": "Amravati",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 580000,
+  "fees_per_year": 145000,
+  "logo": "/logos/prmitr-amravati.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "dr-d-y-patil-college-of-engineering-and-innovation-varale-pune",
+  "match": false,
+  "rank": 75,
+  "name": "Dr. D. Y. Patil College of Engineering and Innovation Varale",
+  "short_name": "",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 469867,
+  "fees_per_year": 117000,
+  "logo": "/logos/dr-d-y-patil-college-of-engineering-and-innovation-varale-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sits-pune",
+  "match": false,
+  "rank": 76,
+  "name": "Sinhgad Institute of Technology and Science",
+  "short_name": "SITS",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 478000,
+  "fees_per_year": 120000,
+  "logo": "/logos/sits-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "snjb-s-college-of-engineering-chandwad-nashik",
+  "match": false,
+  "rank": 77,
+  "name": "SNJB's College of Engineering Chandwad",
+  "short_name": "",
+  "city": "Nashik",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 474000,
+  "fees_per_year": 118000,
+  "logo": "/logos/snjb-s-college-of-engineering-chandwad-nashik.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sigce-navi-mumbai",
+  "match": false,
+  "rank": 78,
+  "name": "Smt. Indira Gandhi College of Engineering",
+  "short_name": "SIGCE",
+  "city": "Navi Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.2,
+  "fees_total": 436000,
+  "fees_per_year": 109000,
+  "logo": "/logos/sigce-navi-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "prpcem-amravati",
+  "match": false,
+  "rank": 79,
+  "name": "P. R. Pote Patil College of Engineering and Management",
+  "short_name": "PRPCEM",
+  "city": "Amravati",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 568000,
+  "fees_per_year": 142000,
+  "logo": "/logos/prpcem-amravati.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "government-college-of-engineering-ratnagiri",
+  "match": false,
+  "rank": 80,
+  "name": "Government College of Engineering",
+  "short_name": "",
+  "city": "Ratnagiri",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 3.5,
+  "fees_total": 96955,
+  "fees_per_year": 24000,
+  "logo": "/logos/government-college-of-engineering-ratnagiri.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bvcoe-navi-mumbai",
+  "match": false,
+  "rank": 81,
+  "name": "Bharati Vidyapeeth College of Engineering Navi Mumbai",
+  "short_name": "BVCOE",
+  "city": "Navi Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.5,
+  "fees_total": 512000,
+  "fees_per_year": 128000,
+  "logo": "/logos/bvcoe-navi-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "rbu-nagpur",
+  "match": false,
+  "rank": 82,
+  "name": "Ramdeobaba University",
+  "short_name": "RBU",
+  "city": "Nagpur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 1270000,
+  "fees_per_year": 318000,
+  "logo": "/logos/rbu-nagpur.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pdea-college-of-engineering-manjari-pune",
+  "match": false,
+  "rank": 83,
+  "name": "PDEA College of Engineering Manjari",
+  "short_name": "",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 396000,
+  "fees_per_year": 99000,
+  "logo": "/logos/pdea-college-of-engineering-manjari-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "datta-meghe-college-of-engineering-airoli-navi-mumbai",
+  "match": false,
+  "rank": 84,
+  "name": "Datta Meghe College of Engineering Airoli",
+  "short_name": "",
+  "city": "Navi Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 420000,
+  "fees_per_year": 105000,
+  "logo": "/logos/datta-meghe-college-of-engineering-airoli-navi-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "dpcoe-pune",
+  "match": false,
+  "rank": 85,
+  "name": "Dhole Patil College of Engineering",
+  "short_name": "DPCOE",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 468000,
+  "fees_per_year": 117000,
+  "logo": "/logos/dpcoe-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "prec-ahmednagar",
+  "match": false,
+  "rank": 86,
+  "name": "Pravara Rural Engineering College Loni",
+  "short_name": "PREC",
+  "city": "Ahmednagar",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 508000,
+  "fees_per_year": 127000,
+  "logo": "/logos/prec-ahmednagar.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "skn-sinhgad-college-of-engineering-solapur",
+  "match": false,
+  "rank": 87,
+  "name": "SKN Sinhgad College of Engineering",
+  "short_name": "",
+  "city": "Solapur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 432000,
+  "fees_per_year": 108000,
+  "logo": "/logos/skn-sinhgad-college-of-engineering-solapur.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "slrtce-thane",
+  "match": false,
+  "rank": 88,
+  "name": "Shree L. R. Tiwari College of Engineering",
+  "short_name": "SLRTCE",
+  "city": "Thane",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 522300,
+  "fees_per_year": 131000,
+  "logo": "/logos/slrtce-thane.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "dypcet-kolhapur",
+  "match": false,
+  "rank": 89,
+  "name": "DY Patil College of Engineering and Technology",
+  "short_name": "DYPCET",
+  "city": "Kolhapur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 496000,
+  "fees_per_year": 124000,
+  "logo": "/logos/dypcet-kolhapur.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "trinity-college-of-engineering-and-research-pune",
+  "match": false,
+  "rank": 90,
+  "name": "Trinity College of Engineering and Research",
+  "short_name": "",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 4.2,
+  "fees_total": 408000,
+  "fees_per_year": 102000,
+  "logo": "/logos/trinity-college-of-engineering-and-research-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "keystone-school-of-engineering-pune",
+  "match": false,
+  "rank": 91,
+  "name": "Keystone School Of Engineering",
+  "short_name": "",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 485400,
+  "fees_per_year": 121000,
+  "logo": "/logos/keystone-school-of-engineering-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "svpcet-nagpur",
+  "match": false,
+  "rank": 92,
+  "name": "St Vincent Pallotti College of Engineering and Technology",
+  "short_name": "SVPCET",
+  "city": "Nagpur",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 636000,
+  "fees_per_year": 159000,
+  "logo": "/logos/svpcet-nagpur.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "diems-aurangabad",
+  "match": false,
+  "rank": 93,
+  "name": "Deogiri Institute of Engineering and Management Studies",
+  "short_name": "DIEMS",
+  "city": "Aurangabad",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 404000,
+  "fees_per_year": 101000,
+  "logo": "/logos/diems-aurangabad.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sae-pune",
+  "match": false,
+  "rank": 94,
+  "name": "Sinhgad Academy of Engineering Kondhawa",
+  "short_name": "SAE",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 444000,
+  "fees_per_year": 111000,
+  "logo": "/logos/sae-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "phcet-navi-mumbai",
+  "match": false,
+  "rank": 95,
+  "name": "Pillai HOC College of Engineering and Technology",
+  "short_name": "PHCET",
+  "city": "Navi Mumbai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 724600,
+  "fees_per_year": 181000,
+  "logo": "/logos/phcet-navi-mumbai.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "government-college-of-engineering-yavatmal",
+  "match": false,
+  "rank": 96,
+  "name": "Government College Of Engineering",
+  "short_name": "",
+  "city": "Yavatmal",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 3.1,
+  "fees_total": 98644,
+  "fees_per_year": 25000,
+  "logo": "/logos/government-college-of-engineering-yavatmal.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mit-wpu-pune",
+  "match": true,
+  "rank": 97,
+  "name": "MIT World Peace University",
+  "short_name": "MIT-WPU",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 2650000,
+  "fees_per_year": 662000,
+  "logo": "/logos/mit-wpu-pune.png",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sknsits-pune",
+  "match": false,
+  "rank": 98,
+  "name": "SKN Sinhgad Institute of Technology and Science Lonavala",
+  "short_name": "SKNSITS",
+  "city": "Pune",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 434000,
+  "fees_per_year": 108000,
+  "logo": "/logos/sknsits-pune.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "gcoe-jalgaon",
+  "match": false,
+  "rank": 99,
+  "name": "Government College of Engineering",
+  "short_name": "GCOE",
+  "city": "Jalgaon",
+  "state": "Maharashtra",
+  "type": "Government",
+  "rating": 3.3,
+  "fees_total": 326036,
+  "fees_per_year": 82000,
+  "logo": "/logos/gcoe-jalgaon.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "vcet-vasai",
+  "match": false,
+  "rank": 100,
+  "name": "Vidyavardhini's College of Engineering and Technology",
+  "short_name": "VCET",
+  "city": "Vasai",
+  "state": "Maharashtra",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 564024,
+  "fees_per_year": 141000,
+  "logo": "/logos/vcet-vasai.jpg",
+  "exams": [
+   "MHT CET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "nit-surathkal",
+  "match": false,
+  "rank": 1,
+  "name": "NIT Surathkal",
+  "short_name": "NIT Surathkal",
+  "city": "Surathkal",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 4.2,
+  "fees_total": 675970,
+  "fees_per_year": 169000,
+  "logo": "/logos/nit-surathkal.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "iisc-bangalore",
+  "match": false,
+  "rank": 2,
+  "name": "IISc Bangalore",
+  "short_name": "IISc Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 4.4,
+  "fees_total": 838200,
+  "fees_per_year": 210000,
+  "logo": "/logos/iisc-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "iiit-bangalore",
+  "match": false,
+  "rank": 3,
+  "name": "IIIT Bangalore",
+  "short_name": "IIIT Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 4.2,
+  "fees_total": 3832000,
+  "fees_per_year": 958000,
+  "logo": "/logos/iiit-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "rvce-bangalore",
+  "match": false,
+  "rank": 4,
+  "name": "RVCE Bangalore",
+  "short_name": "RVCE Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 1285833,
+  "fees_per_year": 321000,
+  "logo": "/logos/rvce-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bmsce-bangalore",
+  "match": false,
+  "rank": 5,
+  "name": "BMSCE Bangalore",
+  "short_name": "BMSCE Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/bmsce-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "iit-dharwad",
+  "match": false,
+  "rank": 6,
+  "name": "IIT Dharwad",
+  "short_name": "IIT Dharwad",
+  "city": "Dharwad",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 4.3,
+  "fees_total": 1139500,
+  "fees_per_year": 285000,
+  "logo": "/logos/iit-dharwad.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "rit-bangalore",
+  "match": false,
+  "rank": 7,
+  "name": "RIT Bangalore",
+  "short_name": "RIT Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/rit-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pesu-bangalore",
+  "match": false,
+  "rank": 8,
+  "name": "PESU Bangalore",
+  "short_name": "PESU Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 2290000,
+  "fees_per_year": 572000,
+  "logo": "/logos/pesu-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mahe-manipal",
+  "match": false,
+  "rank": 9,
+  "name": "MAHE Manipal",
+  "short_name": "MAHE Manipal",
+  "city": "Manipal",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.2,
+  "fees_total": 2546500,
+  "fees_per_year": 637000,
+  "logo": "/logos/mahe-manipal.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "cmrit-bangalore",
+  "match": false,
+  "rank": 10,
+  "name": "CMRIT Bangalore",
+  "short_name": "CMRIT Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/cmrit-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sit-tumkur",
+  "match": false,
+  "rank": 11,
+  "name": "SIT Tumkur",
+  "short_name": "SIT Tumkur",
+  "city": "Tumakuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 561280,
+  "fees_per_year": 140000,
+  "logo": "/logos/sit-tumkur.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "dsce-bangalore",
+  "match": false,
+  "rank": 12,
+  "name": "DSCE Bangalore",
+  "short_name": "DSCE Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 501280,
+  "fees_per_year": 125000,
+  "logo": "/logos/dsce-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "iiit-dharwad",
+  "match": false,
+  "rank": 13,
+  "name": "IIIT Dharwad",
+  "short_name": "IIIT Dharwad",
+  "city": "Dharwad",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 3.7,
+  "fees_total": 2172300,
+  "fees_per_year": 543000,
+  "logo": "/logos/iiit-dharwad.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "nmit-bangalore",
+  "match": false,
+  "rank": 14,
+  "name": "NMIT Bangalore",
+  "short_name": "NMIT Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 1400000,
+  "fees_per_year": 350000,
+  "logo": "/logos/nmit-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "nhce-bangalore",
+  "match": false,
+  "rank": 15,
+  "name": "NHCE Bangalore",
+  "short_name": "NHCE Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.2,
+  "fees_total": 1000000,
+  "fees_per_year": 250000,
+  "logo": "/logos/nhce-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "iiit-raichur",
+  "match": false,
+  "rank": 16,
+  "name": "IIIT Raichur",
+  "short_name": "IIIT Raichur",
+  "city": "Raichur",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 4.1,
+  "fees_total": 1921208,
+  "fees_per_year": 480000,
+  "logo": "",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bit-bangalore",
+  "match": false,
+  "rank": 17,
+  "name": "BIT Bangalore",
+  "short_name": "BIT Bangalore",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/bit-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "jssstu-mysore",
+  "match": false,
+  "rank": 18,
+  "name": "JSSSTU Mysore",
+  "short_name": "JSSSTU Mysore",
+  "city": "Mysuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.2,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/jssstu-mysore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "kletu-hubli",
+  "match": false,
+  "rank": 19,
+  "name": "KLETU Hubli",
+  "short_name": "KLETU Hubli",
+  "city": "Hubballi",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.2,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/kletu-hubli.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "nie-mysore",
+  "match": false,
+  "rank": 20,
+  "name": "NIE Mysore",
+  "short_name": "NIE Mysore",
+  "city": "Mysuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 372810,
+  "fees_per_year": 93000,
+  "logo": "/logos/nie-mysore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "vvce-mysore",
+  "match": false,
+  "rank": 21,
+  "name": "Vidyavardhaka College of Engineering",
+  "short_name": "VVCE",
+  "city": "Mysuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 561280,
+  "fees_per_year": 140000,
+  "logo": "/logos/vvce-mysore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "rvu-bangalore",
+  "match": false,
+  "rank": 22,
+  "name": "RV University",
+  "short_name": "RVU",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 2200000,
+  "fees_per_year": 550000,
+  "logo": "/logos/rvu-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pes-institute-of-technology-and-management-bangalore",
+  "match": false,
+  "rank": 23,
+  "name": "PES Institute of Technology and Management",
+  "short_name": "",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 417060,
+  "fees_per_year": 104000,
+  "logo": "/logos/pes-institute-of-technology-and-management-bangalore.jpeg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "amrita-vishwa-vidyapeetham-bengaluru-campus-bangalore",
+  "match": false,
+  "rank": 24,
+  "name": "Amrita Vishwa Vidyapeetham Bengaluru Campus",
+  "short_name": "",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 1810000,
+  "fees_per_year": 452000,
+  "logo": "/logos/amrita-vishwa-vidyapeetham-bengaluru-campus-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "rvitm-bangalore",
+  "match": false,
+  "rank": 25,
+  "name": "RV Institute of Technology and Management",
+  "short_name": "RVITM",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/rvitm-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "dsatm-bangalore",
+  "match": false,
+  "rank": 26,
+  "name": "Dayananda Sagar Academy of Technology and Management",
+  "short_name": "DSATM",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/dsatm-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "dsu-bangalore",
+  "match": false,
+  "rank": 27,
+  "name": "Dayananda Sagar University",
+  "short_name": "DSU",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 1740000,
+  "fees_per_year": 435000,
+  "logo": "/logos/dsu-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sjce-mysore",
+  "match": false,
+  "rank": 28,
+  "name": "Sri Jayachamarajendra College of Engineering",
+  "short_name": "SJCE",
+  "city": "Mysuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/sjce-mysore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "presidency-university-bangalore",
+  "match": false,
+  "rank": 29,
+  "name": "Presidency University",
+  "short_name": "Presidency University",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 1300000,
+  "fees_per_year": 325000,
+  "logo": "/logos/presidency-university-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "ait-bangalore",
+  "match": false,
+  "rank": 30,
+  "name": "Acharya Institute of Technology",
+  "short_name": "AIT",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 1397280,
+  "fees_per_year": 349000,
+  "logo": "/logos/ait-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pesce-mandya",
+  "match": false,
+  "rank": 31,
+  "name": "PES College of Engineering",
+  "short_name": "PESCE",
+  "city": "Mandya",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 852461,
+  "fees_per_year": 213000,
+  "logo": "/logos/pesce-mandya.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "gsssietw-mysore",
+  "match": false,
+  "rank": 32,
+  "name": "GSSS Institute of Engineering and Technology for Women",
+  "short_name": "GSSSIETW",
+  "city": "Mysuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.3,
+  "fees_total": 897560,
+  "fees_per_year": 224000,
+  "logo": "/logos/gsssietw-mysore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "jssate-bangalore",
+  "match": false,
+  "rank": 33,
+  "name": "JSS Academy of Technical Education",
+  "short_name": "JSSATE",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/jssate-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "alliance-university-bangalore",
+  "match": false,
+  "rank": 34,
+  "name": "Alliance University",
+  "short_name": "Alliance University",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 1813000,
+  "fees_per_year": 453000,
+  "logo": "/logos/alliance-university-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "the-oxford-college-of-engineering-bangalore",
+  "match": false,
+  "rank": 35,
+  "name": "The Oxford College of Engineering",
+  "short_name": "",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.3,
+  "fees_total": 1500000,
+  "fees_per_year": 375000,
+  "logo": "/logos/the-oxford-college-of-engineering-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bgs-sjb-group-of-institutions-bangalore",
+  "match": false,
+  "rank": 36,
+  "name": "BGS & SJB Group of Institutions",
+  "short_name": "",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/bgs-sjb-group-of-institutions-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "cmr-university-lakeside-campus-bangalore",
+  "match": false,
+  "rank": 37,
+  "name": "CMR University (Lakeside Campus)",
+  "short_name": "",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 1125000,
+  "fees_per_year": 281000,
+  "logo": "/logos/cmr-university-lakeside-campus-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mit-bangalore",
+  "match": false,
+  "rank": 38,
+  "name": "Manipal Institute of Technology Bengaluru",
+  "short_name": "MIT",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.2,
+  "fees_total": 2430000,
+  "fees_per_year": 608000,
+  "logo": "/logos/mit-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "uom-mysore",
+  "match": false,
+  "rank": 39,
+  "name": "University of Mysore",
+  "short_name": "UOM",
+  "city": "Mysuru",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 3.8,
+  "fees_total": 417000,
+  "fees_per_year": 104000,
+  "logo": "/logos/uom-mysore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sahyadri-college-of-engineering-management-scem-mangalore",
+  "match": false,
+  "rank": 40,
+  "name": "Sahyadri College of Engineering & Management (SCEM)",
+  "short_name": "",
+  "city": "Mangaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/sahyadri-college-of-engineering-management-scem-mangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "epgi-bangalore",
+  "match": false,
+  "rank": 41,
+  "name": "East Point Group of Institutions",
+  "short_name": "EPGI",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/epgi-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "cuk-gulbarga",
+  "match": false,
+  "rank": 42,
+  "name": "Central University of Karnataka",
+  "short_name": "CUK",
+  "city": "Kalaburagi",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 3.9,
+  "fees_total": 319270,
+  "fees_per_year": 80000,
+  "logo": "/logos/cuk-gulbarga.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "ksit-bangalore",
+  "match": false,
+  "rank": 43,
+  "name": "KS Institute of Technology",
+  "short_name": "KSIT",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.5,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/ksit-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "jain-university-bangalore",
+  "match": false,
+  "rank": 44,
+  "name": "Jain University",
+  "short_name": "Jain University",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 2060000,
+  "fees_per_year": 515000,
+  "logo": "/logos/jain-university-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "dbit-bangalore",
+  "match": false,
+  "rank": 45,
+  "name": "Don Bosco Institute of Technology",
+  "short_name": "DBIT",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/dbit-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "atria-institute-of-technology-bangalore",
+  "match": false,
+  "rank": 46,
+  "name": "Atria Institute of Technology",
+  "short_name": "",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/atria-institute-of-technology-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "jnnce-shimoga",
+  "match": false,
+  "rank": 47,
+  "name": "Jawaharlal Nehru National College of Engineering",
+  "short_name": "JNNCE",
+  "city": "Shivamogga",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/jnnce-shimoga.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "government-sri-krishnarajendra-silver-jubilee-technological-institute-bangalore",
+  "match": false,
+  "rank": 48,
+  "name": "Government Sri Krishnarajendra Silver Jubilee Technological Institute",
+  "short_name": "",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 3.6,
+  "fees_total": 417060,
+  "fees_per_year": 104000,
+  "logo": "/logos/government-sri-krishnarajendra-silver-jubilee-technological-institute-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sapthagiri-nps-university-bangalore",
+  "match": false,
+  "rank": 49,
+  "name": "Sapthagiri NPS University",
+  "short_name": "Sapthagiri NPS University",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/sapthagiri-nps-university-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mce-hassan",
+  "match": false,
+  "rank": 50,
+  "name": "Malnad College of Engineering",
+  "short_name": "MCE",
+  "city": "Hassan",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/mce-hassan.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bgscet-bangalore",
+  "match": false,
+  "rank": 51,
+  "name": "BGS College of Engineering and Technology",
+  "short_name": "BGSCET",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.6,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/bgscet-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bec-bagalkot",
+  "match": false,
+  "rank": 52,
+  "name": "Basaveshwar Engineering College",
+  "short_name": "BEC",
+  "city": "Bagalkot",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/bec-bagalkot.jpeg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "amity-university-bangalore",
+  "match": false,
+  "rank": 53,
+  "name": "Amity University",
+  "short_name": "Amity University",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 1680000,
+  "fees_per_year": 420000,
+  "logo": "/logos/amity-university-bangalore.jpeg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mit-mysore",
+  "match": false,
+  "rank": 54,
+  "name": "Maharaja Institute of Technology",
+  "short_name": "MIT",
+  "city": "Mysuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/mit-mysore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "biet-davanagere",
+  "match": false,
+  "rank": 55,
+  "name": "Bapuji Institute of Engineering and Technology",
+  "short_name": "BIET",
+  "city": "Davanagere",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 911280,
+  "fees_per_year": 228000,
+  "logo": "/logos/biet-davanagere.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "citech-bangalore",
+  "match": false,
+  "rank": 56,
+  "name": "Cambridge Institute of Technology",
+  "short_name": "CiTech",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/citech-bangalore.jpeg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mite-mangalore",
+  "match": false,
+  "rank": 57,
+  "name": "Mangalore Institute of Technology and Engineering",
+  "short_name": "MITE",
+  "city": "Mangaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/mite-mangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sjec-mangalore",
+  "match": false,
+  "rank": 58,
+  "name": "St Joseph Engineering College",
+  "short_name": "SJEC",
+  "city": "Mangaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 964580,
+  "fees_per_year": 241000,
+  "logo": "/logos/sjec-mangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bitm-bellary",
+  "match": false,
+  "rank": 59,
+  "name": "Ballari Institute of Technology and Management",
+  "short_name": "BITM",
+  "city": "Ballari",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/bitm-bellary.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mvjce-bangalore",
+  "match": false,
+  "rank": 60,
+  "name": "MVJ College of Engineering",
+  "short_name": "MVJCE",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 327200,
+  "fees_per_year": 82000,
+  "logo": "/logos/mvjce-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "amc-bangalore",
+  "match": false,
+  "rank": 61,
+  "name": "AMC Engineering College",
+  "short_name": "AMC",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 800000,
+  "fees_per_year": 200000,
+  "logo": "/logos/amc-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "rrce-bangalore",
+  "match": false,
+  "rank": 62,
+  "name": "RajaRajeswari College of Engineering",
+  "short_name": "RRCE",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.5,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/rrce-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "cmr-university-city-campus-hrbr-layout-bangalore",
+  "match": false,
+  "rank": 63,
+  "name": "CMR University (City Campus - HRBR Layout)",
+  "short_name": "",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 1450000,
+  "fees_per_year": 362000,
+  "logo": "/logos/cmr-university-city-campus-hrbr-layout-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "svit-bangalore",
+  "match": false,
+  "rank": 64,
+  "name": "Sai Vidya Institute of Technology",
+  "short_name": "SVIT",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.3,
+  "fees_total": 429980,
+  "fees_per_year": 107000,
+  "logo": "/logos/svit-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "gat-bangalore",
+  "match": false,
+  "rank": 65,
+  "name": "Global Academy of Technology",
+  "short_name": "GAT",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/gat-bangalore.jpeg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "gitam-bengaluru-bangalore",
+  "match": false,
+  "rank": 66,
+  "name": "GITAM Bengaluru",
+  "short_name": "GITAM Bengaluru",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 1437600,
+  "fees_per_year": 359000,
+  "logo": "/logos/gitam-bengaluru-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "kle-dr-m-s-sheshgiri-college-of-engineering-technology-belgaum",
+  "match": false,
+  "rank": 67,
+  "name": "KLE Dr. M.S.Sheshgiri College of Engineering & Technology",
+  "short_name": "",
+  "city": "Belagavi",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 1288000,
+  "fees_per_year": 322000,
+  "logo": "/logos/kle-dr-m-s-sheshgiri-college-of-engineering-technology-belgaum.gif",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sjcit-chikkaballapur",
+  "match": false,
+  "rank": 68,
+  "name": "SJC Institute of Technology",
+  "short_name": "SJCIT",
+  "city": "Chikkaballapur",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/sjcit-chikkaballapur.jpeg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "ubdt-college-of-engineering-davanagere",
+  "match": false,
+  "rank": 69,
+  "name": "UBDT College of Engineering",
+  "short_name": "UBDT College of Engineering",
+  "city": "Davanagere",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 3.6,
+  "fees_total": 409640,
+  "fees_per_year": 102000,
+  "logo": "/logos/ubdt-college-of-engineering-davanagere.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "svce-bangalore",
+  "match": false,
+  "rank": 70,
+  "name": "Sri Venkateshwara College of Engineering",
+  "short_name": "SVCE",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/svce-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "acsce-bangalore",
+  "match": false,
+  "rank": 71,
+  "name": "ACS College of Engineering",
+  "short_name": "ACSCE",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 880000,
+  "fees_per_year": 220000,
+  "logo": "/logos/acsce-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "ssit-tumkur",
+  "match": false,
+  "rank": 72,
+  "name": "Sri Siddhartha Institute of Technology",
+  "short_name": "SSIT",
+  "city": "Tumakuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 800000,
+  "fees_per_year": 200000,
+  "logo": "/logos/ssit-tumkur.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "kleit-hubli",
+  "match": false,
+  "rank": 73,
+  "name": "KLE Institute of Technology",
+  "short_name": "KLEIT",
+  "city": "Hubballi",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.6,
+  "fees_total": 1171348,
+  "fees_per_year": 293000,
+  "logo": "/logos/kleit-hubli.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "gm-university-davanagere",
+  "match": false,
+  "rank": 74,
+  "name": "GM University",
+  "short_name": "GM University",
+  "city": "Davanagere",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/gm-university-davanagere.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "ewit-bangalore",
+  "match": false,
+  "rank": 75,
+  "name": "East West Institute of Technology",
+  "short_name": "EWIT",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.5,
+  "fees_total": 902440,
+  "fees_per_year": 226000,
+  "logo": "/logos/ewit-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pesitm-shimoga",
+  "match": false,
+  "rank": 76,
+  "name": "PES Institute of Technology and Management",
+  "short_name": "PESITM",
+  "city": "Shivamogga",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/pesitm-shimoga.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "bldea-s-v-p-dr-p-g-halakatti-college-of-engineering-technology-bijapur",
+  "match": false,
+  "rank": 77,
+  "name": "BLDEA's V.P. Dr.P.G.Halakatti College of Engineering & Technology",
+  "short_name": "",
+  "city": "Vijayapura",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 720000,
+  "fees_per_year": 180000,
+  "logo": "/logos/bldea-s-v-p-dr-p-g-halakatti-college-of-engineering-technology-bijapur.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "cambridge-institute-of-technology-north-campus-bangalore",
+  "match": false,
+  "rank": 78,
+  "name": "Cambridge Institute of Technology North Campus",
+  "short_name": "",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.0,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/cambridge-institute-of-technology-north-campus-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "chanakya-university-bangalore",
+  "match": false,
+  "rank": 79,
+  "name": "Chanakya University",
+  "short_name": "Chanakya University",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.4,
+  "fees_total": 1265000,
+  "fees_per_year": 316000,
+  "logo": "/logos/chanakya-university-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "ncet-bangalore",
+  "match": false,
+  "rank": 80,
+  "name": "Nagarjuna College of Engineering and Technology",
+  "short_name": "NCET",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 1120000,
+  "fees_per_year": 280000,
+  "logo": "/logos/ncet-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "atme-mysore",
+  "match": false,
+  "rank": 81,
+  "name": "Academy for Technical and Management Excellence",
+  "short_name": "ATME",
+  "city": "Mysuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/atme-mysore.jpeg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "rr-group-of-institutions-bangalore",
+  "match": false,
+  "rank": 82,
+  "name": "RR Group of Institutions",
+  "short_name": "RR Group of Institutions",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 480000,
+  "fees_per_year": 120000,
+  "logo": "/logos/rr-group-of-institutions-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "alva-s-institute-of-engineering-and-technology-mangalore",
+  "match": false,
+  "rank": 83,
+  "name": "Alva's Institute of Engineering and Technology",
+  "short_name": "",
+  "city": "Mangaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/alva-s-institute-of-engineering-and-technology-mangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "gcem-bangalore",
+  "match": false,
+  "rank": 84,
+  "name": "Gopalan College of Engineering and Management",
+  "short_name": "GCEM",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/gcem-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "jce-belgaum",
+  "match": false,
+  "rank": 85,
+  "name": "Jain College of Engineering",
+  "short_name": "JCE",
+  "city": "Belagavi",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/jce-belgaum.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "gech-hassan",
+  "match": false,
+  "rank": 86,
+  "name": "Government Engineering College",
+  "short_name": "GECH",
+  "city": "Hassan",
+  "state": "Karnataka",
+  "type": "Government",
+  "rating": 3.9,
+  "fees_total": 163000,
+  "fees_per_year": 41000,
+  "logo": "/logos/gech-hassan.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "cec-mangalore",
+  "match": false,
+  "rank": 87,
+  "name": "Canara Engineering College",
+  "short_name": "CEC",
+  "city": "Mangaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 0,
+  "fees_per_year": 0,
+  "logo": "/logos/cec-mangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "sharnbasva-university-gulbarga",
+  "match": false,
+  "rank": 88,
+  "name": "Sharnbasva University",
+  "short_name": "Sharnbasva University",
+  "city": "Kalaburagi",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 4.1,
+  "fees_total": 361172,
+  "fees_per_year": 90000,
+  "logo": "/logos/sharnbasva-university-gulbarga.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "mitt-mysore",
+  "match": false,
+  "rank": 89,
+  "name": "Maharaja Institute of Technology Thandavapura",
+  "short_name": "MITT",
+  "city": "Mysuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/mitt-mysore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "vemana-institute-of-technology-bangalore",
+  "match": false,
+  "rank": 90,
+  "name": "Vemana Institute of Technology",
+  "short_name": "",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 936000,
+  "fees_per_year": 234000,
+  "logo": "/logos/vemana-institute-of-technology-bangalore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "vdit-haliyal",
+  "match": false,
+  "rank": 91,
+  "name": "KLS Vishwanathrao Deshpande Institute of Technology",
+  "short_name": "VDIT",
+  "city": "Haliyal",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/vdit-haliyal.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "jcer-belagavi",
+  "match": false,
+  "rank": 92,
+  "name": "Jain College of Engineering and Research",
+  "short_name": "JCER",
+  "city": "Belagavi",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 820000,
+  "fees_per_year": 205000,
+  "logo": "/logos/jcer-belagavi.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "vviet-mysore",
+  "match": false,
+  "rank": 93,
+  "name": "Vidya Vikas Institute of Engineering and Technology",
+  "short_name": "VVIET",
+  "city": "Mysuru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.9,
+  "fees_total": 409640,
+  "fees_per_year": 102000,
+  "logo": "/logos/vviet-mysore.png",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "kssem-bangalore",
+  "match": false,
+  "rank": 94,
+  "name": "K.S. School of Engineering and Management",
+  "short_name": "KSSEM",
+  "city": "Bengaluru",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.8,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/kssem-bangalore.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "aiet-gulbarga",
+  "match": false,
+  "rank": 95,
+  "name": "Appa Institute of Engineering and Technology",
+  "short_name": "AIET",
+  "city": "Kalaburagi",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 449640,
+  "fees_per_year": 112000,
+  "logo": "/logos/aiet-gulbarga.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ },
+ {
+  "slug": "pda-college-of-engineering-gulbarga",
+  "match": false,
+  "rank": 96,
+  "name": "PDA College of Engineering",
+  "short_name": "PDA College of Engineering",
+  "city": "Kalaburagi",
+  "state": "Karnataka",
+  "type": "Private",
+  "rating": 3.7,
+  "fees_total": 940000,
+  "fees_per_year": 235000,
+  "logo": "/logos/pda-college-of-engineering-gulbarga.jpg",
+  "exams": [
+   "KCET",
+   "COMEDK UGET",
+   "JEE Main"
+  ]
+ }
+]

@@ -191,3 +191,8 @@ GET /api/admin/predictor-report (admin cookie): totals, last 7 days, predictor l
 
 ## Razorpay connection check (admin)
 - GET /api/admin/razorpay-status (admin) -> RazorpayStatus: key mode live/test (prefix only), API ok, which of the 6 predictor payment pages this account owns (GET /v1/payment_pages), payments in last 48h, captured at predictor prices, with contact, last payment time. Shown as a card at the top of Admin -> Predictor Report with "Check again". No key values or payer details returned.
+
+## MH + KA B.Tech import (Collegedunia)
+- scripts/build_college_import.py turns data/cd_mh.txt + cd_ka.txt (name|city|logo|total fees|rating, from collegedunia.com B.Tech listings) into data/colleges_mh_ka.json (196 colleges) and downloads logos to frontend/public/logos/{slug}.ext.
+- lib/college_import.py runs once at startup (settings flag colleges_cd_import_v1): inserts new colleges (fees_min=fees_max=total/4 per year, course row with total fee, rating, type, exams MHT CET/JEE Main or KCET/COMEDK/JEE Main) and for 14 existing matches sets only logo + fees.
+- College.logo field: cards show the logo tile instead of the photo; college header shows a logo badge and hides the photo background.

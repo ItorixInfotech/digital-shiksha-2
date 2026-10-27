@@ -22,6 +22,7 @@ const COLLEGE_FIELDS: FieldSpec[] = [
   { key: "top_recruiters", label: "Top recruiters", type: "list" },
   { key: "facilities", label: "Facilities", type: "list" },
   { key: "image", label: "Cover image URL", type: "text", full: true },
+  { key: "logo", label: "Logo URL (shown instead of the cover image)", type: "text", full: true },
   { key: "overview", label: "Overview", type: "richtext" },
   { key: "admission", label: "Admission process", type: "richtext" },
   { key: "courses", label: "Courses & fees (JSON)", type: "json", hint: 'e.g. [{"name":"B.Tech","duration":"4 Years","fees":"₹1 L/yr","eligibility":"10+2 PCM","seats":60}]' },

@@ -16,6 +16,7 @@ from lib.cap import load_cap_data
 from lib.db import client, ensure_indexes
 from lib.year_rollover import run_year_rollover
 from lib.articles_2027 import ensure_2027_guides
+from lib.college_import import run_college_import
 from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export, redirects
 
 
@@ -25,6 +26,7 @@ async def lifespan(app: FastAPI):
     app.state.cap_task = asyncio.create_task(load_cap_data())  # official CAP cut-offs; reloads only when the data file version changes
     app.state.rollover_task = asyncio.create_task(run_year_rollover())  # one-time 2026 -> 2027 content rollover
     app.state.guides_task = asyncio.create_task(ensure_2027_guides())  # 2027 admission guides, inserted once
+    app.state.college_import_task = asyncio.create_task(run_college_import())  # MH + KA B.Tech colleges with logos, once
     app.state.redirects_task = asyncio.create_task(redirects.seed_redirects())  # starter /blog -> /news redirect, once
     yield
     client.close()

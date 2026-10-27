@@ -43,7 +43,7 @@ export default function CollegeDetail() {
       <EntitySeo kind="colleges" item={c} />
       <PredictorNudge key={c.slug} collegeName={c.short_name || c.name} />
       <section className="relative overflow-hidden bg-brand-ink text-white">
-        <img src={c.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
+        {!c.logo && <img src={c.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />}
         <div className="absolute inset-0 bg-gradient-to-t from-brand-ink via-brand-ink/80 to-brand-ink/30" />
         <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-16 sm:px-6 lg:px-8 lg:pt-24">
           <p className="text-xs text-slate-400"><Link to="/" className="hover:text-white">Home</Link> / <Link to="/colleges" className="hover:text-white">Colleges</Link> / <span className="text-slate-300">{c.short_name}</span></p>
@@ -51,7 +51,10 @@ export default function CollegeDetail() {
             {c.approvals.map((a) => <span key={a} className="rounded-md bg-white/10 px-2 py-0.5 text-xs font-semibold text-sky-300 ring-1 ring-white/15">{a} Approved</span>)}
             <span className="rounded-md bg-green-500/20 px-2 py-0.5 text-xs font-semibold text-green-300">{c.type}</span>
           </div>
-          <h1 className="mt-3 max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl" data-testid="college-name">{c.name}</h1>
+          <div className="mt-3 flex items-center gap-4 sm:gap-5">
+            {c.logo && <span className="grid size-16 shrink-0 place-items-center rounded-2xl bg-white p-2 shadow-lg ring-1 ring-white/20 sm:size-20"><img src={c.logo} alt={`${c.name} logo`} className="max-h-full max-w-full object-contain" data-testid="college-logo" /></span>}
+            <h1 className="max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl" data-testid="college-name">{c.name}</h1>
+          </div>
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-300">
             <span className="flex items-center gap-1"><MapPin className="size-4" /> {c.city}, {c.state}</span>
             {c.established && <span className="flex items-center gap-1"><CalendarDays className="size-4" /> Estd. {c.established}</span>}

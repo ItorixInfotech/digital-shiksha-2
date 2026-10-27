@@ -60,6 +60,7 @@ class CollegeIn(BaseModel):
     approvals: List[str] = []
     exams_accepted: List[str] = []
     image: str = ""
+    logo: str = ""  # college logo; shown instead of the campus photo when set
     overview: str = ""
     admission: str = ""
     courses: List[CollegeCourse] = []
