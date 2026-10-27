@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { SlidersHorizontal, X, Search } from "lucide-react";
@@ -15,6 +15,36 @@ import { PageSeo } from "@/components/Seo";
 import { breadcrumbLd } from "@/lib/seo";
 
 const PAGE = 24;
+const ANY = "__any";
+
+/** Live height of the sticky site header, so the pinned filter bar sits right under it. */
+function useHeaderHeight() {
+  const [h, setH] = useState(100);
+  useEffect(() => {
+    const el = document.querySelector<HTMLElement>('[data-testid="site-header"]');
+    if (!el) return;
+    const ro = new ResizeObserver(() => setH(el.offsetHeight));
+    ro.observe(el);
+    setH(el.offsetHeight);
+    return () => ro.disconnect();
+  }, []);
+  return h;
+}
+
+function QuickSelect({ label, value, options, onPick, testid }: { label: string; value: string; options: (readonly [string, string])[]; onPick: (v: string) => void; testid: string }) {
+  const current = options.find(([v]) => v === value)?.[1];
+  return (
+    <Select value={value || ANY} onValueChange={(v: string) => onPick(v === ANY ? "" : v)}>
+      <SelectTrigger size="sm" className={cn("w-full min-w-0 bg-white text-xs", value && "border-brand-navy font-semibold text-brand-navy")} data-testid={testid}>
+        <SelectValue>{() => <span className="truncate">{current ?? label}</span>}</SelectValue>
+      </SelectTrigger>
+      <SelectContent className="max-h-72">
+        <SelectItem value={ANY} data-testid={`${testid}-any`}>Any {label.toLowerCase()}</SelectItem>
+        {options.map(([v, l]) => <SelectItem key={v} value={v} data-testid={`${testid}-${slugify(v)}`}>{l}</SelectItem>)}
+      </SelectContent>
+    </Select>
+  );
+}
 
 const FEES = [["", "Any budget"], ["100000", "Under ₹1 Lakh"], ["300000", "Under ₹3 Lakh"], ["1000000", "Under ₹10 Lakh"]] as const;
 const SORTS: Record<string, string> = { rank: "NIRF Rank", rating: "Rating", package: "Highest avg package", fees: "Lowest fees" };
@@ -68,6 +98,7 @@ export default function Colleges() {
   const shown = paging.key === qs.toString() ? paging.n : PAGE;
   const total = list.data?.length ?? 0;
   const active = FILTER_KEYS.filter((k) => get(k));
+  const headerH = useHeaderHeight();
 
   const filters = (
     <div className="space-y-6" data-testid="college-filters">
@@ -131,6 +162,16 @@ export default function Colleges() {
                   {Object.entries(SORTS).map(([k, l]) => <SelectItem key={k} value={k} data-testid={`colleges-sort-${k}`}>{l}</SelectItem>)}
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          {/* Mobile: stream / city / fees stay pinned under the site header while scrolling the list */}
+          <div className="sticky z-30 -mx-4 border-b border-slate-200 bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:-mx-6 sm:px-6 lg:hidden"
+            style={{ top: headerH }} data-testid="mobile-sticky-filters">
+            <div className="grid grid-cols-3 gap-2">
+              <QuickSelect label="Stream" value={get("stream")} options={(meta.data?.streams ?? []).map((f) => [f.name, f.name])} onPick={(v) => set("stream", v)} testid="sticky-filter-stream" />
+              <QuickSelect label="City" value={get("city")} options={(meta.data?.cities ?? []).map((f) => [f.name, f.name])} onPick={(v) => set("city", v)} testid="sticky-filter-city" />
+              <QuickSelect label="Fees" value={get("max_fees")} options={FEES.filter(([v]) => v).map(([v, l]) => [v, l])} onPick={(v) => set("max_fees", v)} testid="sticky-filter-fees" />
             </div>
           </div>
 

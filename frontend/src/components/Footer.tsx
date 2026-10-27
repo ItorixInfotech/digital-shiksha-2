@@ -4,11 +4,19 @@ import { SITE } from "@/lib/site";
 
 const COLS = [
   { title: "Top Colleges", links: [["Engineering Colleges", "/colleges?stream=Engineering"], ["MBA Colleges", "/colleges?stream=Management"], ["Medical Colleges", "/colleges?stream=Medical"], ["Law Colleges", "/colleges?stream=Law"], ["Colleges in Pune", "/colleges?city=Pune"], ["Colleges in Mumbai", "/colleges?city=Mumbai"]] },
-  { title: "Popular Searches", links: [["Engineering Colleges in Pune", "/engineering-colleges-in-pune"], ["Engineering Colleges in Mumbai", "/engineering-colleges-in-mumbai"], ["MBA Colleges in Pune", "/mba-colleges-in-pune"], ["MBA Colleges in Mumbai", "/mba-colleges-in-mumbai"], ["Medical Colleges in Pune", "/medical-colleges-in-pune"], ["Law Colleges in Pune", "/law-colleges-in-pune"], ["Engineering Colleges in Bengaluru", "/engineering-colleges-in-bengaluru"], ["Engineering Colleges in Mysuru", "/engineering-colleges-in-mysuru"], ["Engineering Colleges in Mangaluru", "/engineering-colleges-in-mangaluru"], ["KCET College Predictor", "/predictor?exam=KCET"], ["COMEDK UGET 2026", "/exams/comedk"]] },
   { title: "Top Courses", links: [["B.Tech", "/courses/btech"], ["MBA", "/courses/mba"], ["MBBS", "/courses/mbbs"], ["BBA", "/courses/bba"], ["BA LLB", "/courses/ba-llb"], ["All Courses", "/courses"]] },
   { title: "Top Exams", links: [["JEE Main", "/exams/jee-main"], ["NEET UG", "/exams/neet-ug"], ["MHT CET", "/exams/mht-cet"], ["CAT", "/exams/cat"], ["CLAT", "/exams/clat"], ["All Exams", "/exams"]] },
   { title: "Digital Shiksha", links: [["Free Counselling", "/consultation"], ["College Predictor", "/predictor"], ["Compare Colleges", "/compare"], ["News & Articles", "/news"], ["Admin Login", "/admin/login"]] },
 ] as const;
+
+// Long SEO link list, grouped and shown as compact pills in its own band (instead of one very tall column).
+const POPULAR = [
+  { title: "Pune & Mumbai", links: [["Engineering Colleges in Pune", "/engineering-colleges-in-pune"], ["Engineering Colleges in Mumbai", "/engineering-colleges-in-mumbai"], ["MBA Colleges in Pune", "/mba-colleges-in-pune"], ["MBA Colleges in Mumbai", "/mba-colleges-in-mumbai"], ["Medical Colleges in Pune", "/medical-colleges-in-pune"], ["Law Colleges in Pune", "/law-colleges-in-pune"]] },
+  { title: "Karnataka", links: [["Engineering Colleges in Bengaluru", "/engineering-colleges-in-bengaluru"], ["Engineering Colleges in Mysuru", "/engineering-colleges-in-mysuru"], ["Engineering Colleges in Mangaluru", "/engineering-colleges-in-mangaluru"]] },
+  { title: "Predictors & Exams", links: [["KCET College Predictor", "/predictor?exam=KCET"], ["COMEDK College Predictor", "/predictor?exam=COMEDK"], ["MHT CET College Predictor", "/predictor?exam=MHT%20CET"], ["COMEDK UGET 2026", "/exams/comedk"]] },
+] as const;
+
+const linkId = (label: string) => `footer-link-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
 export default function Footer() {
   return (
@@ -29,20 +37,38 @@ export default function Footer() {
               <a href={SITE.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" data-testid="footer-instagram-link" className="grid size-9 place-items-center rounded-full bg-white/10 hover:bg-brand-red transition-colors"><Instagram className="size-4" /></a>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 xl:grid-cols-5 lg:col-span-8">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-8">
             {COLS.map((c) => (
               <div key={c.title}>
                 <h4 className="text-sm font-semibold text-white">{c.title}</h4>
                 <ul className="mt-4 space-y-2.5 text-sm">
                   {c.links.map(([label, to]) => (
-                    <li key={label}><Link to={to} className="text-slate-400 hover:text-white transition-colors" data-testid={`footer-link-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{label}</Link></li>
+                    <li key={label}><Link to={to} className="text-slate-400 hover:text-white transition-colors" data-testid={linkId(label)}>{label}</Link></li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
         </div>
-        <div className="mt-12 border-t border-white/10 pt-6 text-xs leading-relaxed text-slate-500">
+        <div className="mt-12 border-t border-white/10 pt-8" data-testid="footer-popular-searches">
+          <h4 className="text-sm font-semibold text-white">Popular Searches</h4>
+          <div className="mt-4 grid gap-6 md:grid-cols-3">
+            {POPULAR.map((g) => (
+              <div key={g.title}>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{g.title}</p>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {g.links.map(([label, to]) => (
+                    <li key={label}>
+                      <Link to={to} data-testid={linkId(label)}
+                        className="inline-block rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:border-white/30 hover:bg-white/10 hover:text-white">{label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-10 border-t border-white/10 pt-6 text-xs leading-relaxed text-slate-500">
           <p>DISCLAIMER – Published in good faith and for general information purposes only. Fees, cutoffs and dates are indicative; please verify with the respective institute or exam authority.</p>
           <p className="mt-3 text-slate-400">© Digital Shiksha – All Rights Reserved.</p>
         </div>
