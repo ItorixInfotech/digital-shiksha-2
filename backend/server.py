@@ -19,6 +19,7 @@ from lib.articles_2027 import ensure_2027_guides
 from lib.college_import import run_college_import
 from lib.college_enrich import run_college_enrich
 from lib.kcet import load_kcet_data
+from lib.college_logos import apply_college_logos
 from lib.karnataka_pages import setup_karnataka_pages
 from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export, redirects
 
@@ -32,6 +33,7 @@ async def lifespan(app: FastAPI):
 
     async def colleges_chain() -> None:  # order matters: colleges -> cut-off data (maps to college pages) -> placements/cut-offs
         await run_college_import()  # MH + KA B.Tech colleges with logos, once
+        await apply_college_logos()  # logos for the remaining engineering colleges, once
         await cap_task
         await load_kcet_data()  # official KEA KCET closing ranks; reloads only when the data file version changes
         await run_college_enrich()  # top new MH + KA colleges: packages + cut-offs, once
