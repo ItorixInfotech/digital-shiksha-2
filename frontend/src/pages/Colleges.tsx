@@ -35,7 +35,7 @@ function QuickSelect({ label, value, options, onPick, testid }: { label: string;
   const current = options.find(([v]) => v === value)?.[1];
   return (
     <Select value={value || ANY} onValueChange={(v: string) => onPick(v === ANY ? "" : v)}>
-      <SelectTrigger size="sm" className={cn("w-full min-w-0 bg-white text-xs", value && "border-brand-navy font-semibold text-brand-navy")} data-testid={testid}>
+      <SelectTrigger size="sm" className={cn("w-full min-w-0 gap-1 bg-white px-2 text-xs", value && "border-brand-navy font-semibold text-brand-navy")} data-testid={testid}>
         <SelectValue>{() => <span className="truncate">{current ?? label}</span>}</SelectValue>
       </SelectTrigger>
       <SelectContent className="max-h-72">
@@ -48,6 +48,7 @@ function QuickSelect({ label, value, options, onPick, testid }: { label: string;
 
 const FEES = [["", "Any budget"], ["100000", "Under ₹1 Lakh"], ["300000", "Under ₹3 Lakh"], ["1000000", "Under ₹10 Lakh"]] as const;
 const SORTS: Record<string, string> = { rank: "NIRF Rank", rating: "Rating", package: "Highest avg package", fees: "Lowest fees" };
+const SHORT_SORTS: Record<string, string> = { rank: "NIRF", rating: "Rating", package: "Package", fees: "Low fees" };
 const FILTER_KEYS = ["stream", "city", "state", "type", "max_fees", "q"] as const;
 
 function FacetGroup({ title, param, items, value, onPick }: { title: string; param: string; items: FacetCount[]; value: string; onPick: (k: string, v: string) => void }) {
@@ -99,6 +100,11 @@ export default function Colleges() {
   const total = list.data?.length ?? 0;
   const active = FILTER_KEYS.filter((k) => get(k));
   const headerH = useHeaderHeight();
+  // After a sort change from the pinned bar, jump back to the first result so students see the new order.
+  const toListTop = () => {
+    const el = document.querySelector<HTMLElement>('[data-testid="colleges-result-count"]');
+    if (el && el.getBoundingClientRect().top < 0) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - headerH - 12, behavior: "smooth" });
+  };
 
   const filters = (
     <div className="space-y-6" data-testid="college-filters">
@@ -168,10 +174,18 @@ export default function Colleges() {
           {/* Mobile: stream / city / fees stay pinned under the site header while scrolling the list */}
           <div className="sticky z-30 -mx-4 border-b border-slate-200 bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:-mx-6 sm:px-6 lg:hidden"
             style={{ top: headerH }} data-testid="mobile-sticky-filters">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-1.5">
               <QuickSelect label="Stream" value={get("stream")} options={(meta.data?.streams ?? []).map((f) => [f.name, f.name])} onPick={(v) => set("stream", v)} testid="sticky-filter-stream" />
               <QuickSelect label="City" value={get("city")} options={(meta.data?.cities ?? []).map((f) => [f.name, f.name])} onPick={(v) => set("city", v)} testid="sticky-filter-city" />
               <QuickSelect label="Fees" value={get("max_fees")} options={FEES.filter(([v]) => v).map(([v, l]) => [v, l])} onPick={(v) => set("max_fees", v)} testid="sticky-filter-fees" />
+              <Select value={sort} onValueChange={(v: string) => { set("sort", v); toListTop(); }}>
+                <SelectTrigger size="sm" className={cn("w-full min-w-0 gap-1 bg-white px-2 text-xs", sort !== "rank" && "border-brand-navy font-semibold text-brand-navy")} data-testid="sticky-sort-select">
+                  <SelectValue>{(v) => <span className="truncate">{sort === "rank" ? "Sort" : SHORT_SORTS[v as string]}</span>}</SelectValue>
+                </SelectTrigger>
+                <SelectContent align="end">
+                  {Object.entries(SORTS).map(([k, l]) => <SelectItem key={k} value={k} data-testid={`sticky-sort-${k}`}>{l}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
