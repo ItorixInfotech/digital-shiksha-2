@@ -79,10 +79,15 @@ api_router.include_router(redirects.router)
 api_router.include_router(media.router)
 api_router.include_router(page_seo.router)
 
+# Only our own sites may call the API from a browser on another origin. "*" in CORS_ORIGINS is ignored on purpose;
+# extra origins (comma separated) can still be added there. Same-origin calls (the site itself, preview) never need CORS.
+OWN_ORIGINS = ["https://www.digitalshiksha.in", "https://digitalshiksha.in", "https://www.digitalshikshaonline.com", "https://digitalshikshaonline.com"]
+ALLOWED_ORIGINS = list(dict.fromkeys(OWN_ORIGINS + [o.strip().rstrip("/") for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip() and o.strip() != "*"]))
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_methods=["*"],
     allow_headers=["*"],
 )

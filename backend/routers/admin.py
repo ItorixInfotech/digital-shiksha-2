@@ -7,7 +7,7 @@ import jwt
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 
-from lib import admin_auth
+from lib import admin_auth, login_guard
 from lib.db import db
 from lib.email import send_admin_reset
 from lib.whatsapp import whatsapp_configured, whatsapp_status
@@ -38,11 +38,15 @@ async def require_admin(request: Request) -> str:
 
 
 @router.post("/auth/login", response_model=AdminMe)
-async def login(body: LoginIn, response: Response):
+async def login(body: LoginIn, request: Request, response: Response):
+    ip = login_guard.client_ip(request)
+    await login_guard.check_locked(ip)  # 429 while locked, even for the right password
     ok_user = secrets.compare_digest(body.username, os.environ["ADMIN_USERNAME"])
     ok_pass = await admin_auth.password_ok(body.password)
     if not (ok_user and ok_pass):
+        await login_guard.record_failure(ip, ok_user)
         raise HTTPException(status_code=401, detail="Invalid username or password")
+    await login_guard.record_success(ip)
     token = jwt.encode(
         {"sub": body.username, "pv": await admin_auth.session_version(), "exp": datetime.now(timezone.utc) + timedelta(days=7)},
         _secret(), algorithm="HS256"

@@ -57,7 +57,8 @@ export function AdminLogin() {
   const login = useMutation({
     mutationFn: () => apiPost<AdminMe>("/auth/login", { username: u.trim(), password: p }),
     onSuccess: () => { beginSession(); nav("/admin", { replace: true }); },
-    onError: (e) => toast.error(e instanceof ApiError && e.status === 401 ? "Invalid username or password" : "Login failed"),
+    onError: (e) => toast.error(e instanceof ApiError && e.status === 401 ? "Invalid username or password"
+      : e instanceof ApiError && e.status === 429 && typeof (e.body as { detail?: unknown })?.detail === "string" ? (e.body as { detail: string }).detail : "Login failed"),
   });
   const forgot = useMutation({
     mutationFn: () => apiPost<ForgotOut>("/auth/forgot", {}),
