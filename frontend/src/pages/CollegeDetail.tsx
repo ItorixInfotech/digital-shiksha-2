@@ -1,4 +1,5 @@
 import RichText from "@/components/RichText";
+import { sizedImg } from "@/lib/img";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -43,7 +44,7 @@ export default function CollegeDetail() {
       <EntitySeo kind="colleges" item={c} />
       <PredictorNudge key={c.slug} collegeName={c.short_name || c.name} />
       <section className="relative overflow-hidden bg-brand-ink text-white">
-        {!c.logo && <img src={c.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />}
+        {!c.logo && <img src={sizedImg(c.image, 1600)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />}
         <div className="absolute inset-0 bg-gradient-to-t from-brand-ink via-brand-ink/80 to-brand-ink/30" />
         <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-16 sm:px-6 lg:px-8 lg:pt-24">
           <p className="text-xs text-slate-400"><Link to="/" className="hover:text-white">Home</Link> / <Link to="/colleges" className="hover:text-white">Colleges</Link> / <span className="text-slate-300">{c.short_name}</span></p>

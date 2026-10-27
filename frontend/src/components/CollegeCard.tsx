@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { sizedImg } from "@/lib/img";
 import { MapPin, Star, Trophy, IndianRupee, TrendingUp } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ export default function CollegeCard({ c, layout = "grid" }: { c: College; layout
           </div>
         ) : (
           <>
-            <img src={c.image} alt={c.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <img src={sizedImg(c.image, 640)} alt={c.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
           </>
         )}

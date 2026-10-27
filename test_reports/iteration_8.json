@@ -1,0 +1,74 @@
+{
+  "iteration": 8,
+  "passed": 8,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [
+    "Pre-existing, out-of-scope backend test failures (unrelated to this iteration's briefing, present before this iteration too): test_tscheck_mhtcet_predictor.py, test_tscheck_pharmacy_cap_predictor.py, test_tscheck_predictor_paywall.py, test_tscheck_unlock_matches_real_shaped_1499_payment.py fail on a 'RuntimeError: Event loop is closed' inside motor/asyncio when the FULL suite runs under pytest-xdist (a shared-event-loop/xdist parallelism issue noted in iteration_7 too); test_tscheck_health_probe_and_no_regression.py::test_admin_login_and_stats uses a stale admin password (per seed_facts, never touch db.admin_auth / password logins); test_tscheck_weekly_seo_report_cron.py and test_tscheck_duplicate_enquiry_round_robin.py error only under xdist. None of these touch colleges/list-slimming/lazy-loading/performance, so they are out of scope for this iteration and were left untouched per the 'fix no application code' rule."
+  ],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Colleges list still complete after slimming the list API (payload <200KB, every item keeps slug/name/city/logo/fees_min, heavy fields emptied) -- API",
+      "name": "test_tscheck_colleges_list_slimmed_payload.py",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/colleges?stream=Engineering -> 200, payload ~145KB (<200KB); 200 items, all with non-empty slug/name/city/logo/fees_min; overview/admission/courses/cutoffs/seo/faqs/facilities present but emptied (e.g. seo={meta_title:'',...}, courses=[], cutoffs=[]); >=100 Engineering colleges (210). GET /api/colleges/coep-pune -> 200 with full overview (450 chars), 4 courses, 5 cutoffs -- detail endpoint unaffected by the slimming."
+    },
+    {
+      "criterion": "User report: clicking Engineering/course/stream links must render quickly",
+      "name": "home-engineering-link-navigates-fast",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Clicked 'Engineering' link on home -> navigated to /colleges?stream=Engineering -> first college-card-{slug} visible in 1328ms total (well under the ~3s target, previously reported ~30s)."
+    },
+    {
+      "criterion": "Colleges list still complete after slimming (filters/sort work; cards show logo/name/city/fees/rating) -- UI",
+      "name": "colleges-list-cards-and-filters",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "/colleges?stream=Engineering: college-card-{slug} rendered with logo/name/fees visible; sort-by 'Lowest fees' re-rendered cards; stream filter 'Management' click updated colleges-result-count -- filters and sort both functional."
+    },
+    {
+      "criterion": "College detail page still shows full content",
+      "name": "college-detail-shows-full-content",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "/colleges/coep-pune rendered logo image, 'Overview' heading, and body text containing both 'course' and 'cut-off' sections."
+    },
+    {
+      "criterion": "Lazy-loaded pages work (/predictor, /compare, /admin/login render; navbar nav to /predictor works)",
+      "name": "lazy-pages-load-and-navbar-navigation",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Set ds_predictor_details_v1='1' (skip lead popup), clicked navbar 'Predictor' link -> /predictor rendered 'predict' text; goto /compare rendered 'compare' text; goto /admin/login rendered the login page -- all three lazy chunks loaded with only a brief spinner."
+    },
+    {
+      "criterion": "Other key pages load fast and correctly (/, /courses, /exams, /exams/comedk, /news, both landing pages); images render",
+      "name": "key-pages-render-fast",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "All 7 pages rendered expected text within domcontentloaded + 6s timeout, actual times: / 839ms, /courses 292ms, /exams 189ms, /exams/comedk 270ms, /news 250ms, /engineering-colleges-in-bengaluru 549ms, /engineering-colleges-in-pune 330ms. Landing page /engineering-colleges-in-pune showed college-card-{slug}; document.images scan found 0 broken (naturalWidth===0) images."
+    },
+    {
+      "criterion": "Compare and course pages that use the college list still work",
+      "name": "compare-and-course-pages-use-college-list",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "/courses/btech showed college-card-{slug} top-colleges list; on /colleges?stream=Engineering checked 2 compare-checkbox-{slug} boxes, navigated to /compare, page body contained fee info for the selected colleges."
+    },
+    {
+      "criterion": "smoke: preview ingress reachability (cross-check lane)",
+      "name": "home-page-loads",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Re-ran existing check against https://digital-shiksha-2.preview.emergentagent.com -> homepage rendered, passed."
+    }
+  ],
+  "notes": [
+    "Matrix had 6 acceptance criteria; produced 8 artifacts: criterion 2 (slimmed list API, API-backed UI) -> 1 backend test + 1 browser check; criteria 1,3,4,5,6 (UI-only / performance-only) -> 1 browser check each; plus the mandatory re-run of an existing browser check through the public preview URL.",
+    "Verified via curl that GET /api/colleges?stream=Engineering is 148,945 bytes (<200KB) and returns in 0.036s locally; GET /api/colleges/coep-pune and rvce-bangalore both still carry full overview/courses/cutoffs (detail endpoint untouched by the list slimming).",
+    "Confirmed in frontend source (src/App.tsx) that Compare, Predictor, Admin, AdminLogin and AdminReset are code-split via React.lazy()+Suspense, matching the 'lazy-loaded pages' criterion's implementation.",
+    "No fixture rows were created or mutated; all checks read existing seeded colleges/courses/exams data via GET navigation and UI filter/sort/compare-checkbox interactions only."
+  ]
+}

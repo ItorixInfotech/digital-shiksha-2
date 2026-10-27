@@ -1,4 +1,5 @@
 import RichText from "@/components/RichText";
+import { sizedImg } from "@/lib/img";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, UserRound } from "lucide-react";
@@ -33,7 +34,7 @@ export function News() {
           : (
             <>
               <Link to={`/news/${lead.slug}`} data-testid={`news-article-${lead.slug}`} className="group mt-8 grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-2">
-                <img src={lead.image} alt="" className="h-64 w-full object-cover lg:h-full" />
+                <img src={sizedImg(lead.image, 1200)} alt="" className="h-64 w-full object-cover lg:h-full" />
                 <div className="p-6 lg:p-10">
                   <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf">{lead.category}</p>
                   <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 group-hover:text-brand-leaf transition-colors sm:text-3xl">{lead.title}</h2>
@@ -44,7 +45,7 @@ export function News() {
               <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {rest.map((a) => (
                   <Link key={a.id} to={`/news/${a.slug}`} data-testid={`news-article-${a.slug}`} className="group overflow-hidden rounded-2xl border bg-white hover:-translate-y-0.5 hover:shadow-lg transition-[transform,box-shadow]">
-                    <img src={a.image} alt="" loading="lazy" className="h-44 w-full object-cover" />
+                    <img src={sizedImg(a.image, 640)} alt="" loading="lazy" className="h-44 w-full object-cover" />
                     <div className="p-5">
                       <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf">{a.category}</p>
                       <h3 className="mt-2 line-clamp-2 font-semibold text-slate-900 group-hover:text-brand-leaf transition-colors">{a.title}</h3>
@@ -81,7 +82,7 @@ export function ArticleDetail() {
       </PageHeader>
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-12 lg:px-8">
         <article className="lg:col-span-8">
-          {a.image && <img src={a.image} alt="" className="h-72 w-full rounded-2xl object-cover sm:h-96" />}
+          {a.image && <img src={sizedImg(a.image, 1400)} alt="" className="h-72 w-full rounded-2xl object-cover sm:h-96" />}
           <p className="mt-8 text-lg font-medium leading-relaxed text-slate-800">{a.excerpt}</p>
           <RichText value={a.content} className="mt-6 text-[17px]" testid="article-content" />
           <div className="mt-8 flex flex-wrap gap-2">{a.tags.map((t) => <span key={t} className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-600">#{t}</span>)}</div>

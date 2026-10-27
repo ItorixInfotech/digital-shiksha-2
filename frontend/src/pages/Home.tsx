@@ -1,4 +1,5 @@
 import DeadlineBadge from "@/components/DeadlineBadge";
+import { sizedImg } from "@/lib/img";
 import PredictorBanner from "@/components/PredictorBanner";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -16,7 +17,7 @@ import { useSite } from "@/lib/site-context";
 import { PageSeo } from "@/components/Seo";
 import { organizationLd } from "@/lib/seo";
 
-const HERO_IMG = "https://images.unsplash.com/photo-1687709348710-05314eea5476?crop=entropy&cs=srgb&fm=jpg&q=80&w=1600";
+const HERO_IMG = "https://images.unsplash.com/photo-1687709348710-05314eea5476?crop=entropy&cs=srgb&auto=format&q=70&w=1600";
 const QUICK = [["College Predictor", "/predictor"], ["B.Tech", "/courses/btech"], ["MBA", "/courses/mba"], ["MBBS", "/courses/mbbs"], ["BBA", "/courses/bba"], ["BA LLB", "/courses/ba-llb"], ["MHT CET", "/exams/mht-cet"], ["NEET UG", "/exams/neet-ug"]];
 const TOP_TABS = ["Engineering", "Management", "Medical", "Law", "Design"];
 const CITIES = ["Pune", "Mumbai", "New Delhi", "Bengaluru", "Chennai", "Ahmedabad", "Vellore", "Pilani"];
@@ -230,7 +231,7 @@ export default function Home() {
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           {(articles.data ?? []).slice(0, 3).map((a) => (
             <Link key={a.id} to={`/news/${a.slug}`} data-testid={`home-article-${a.slug}`} className="group overflow-hidden rounded-2xl border bg-white hover:-translate-y-0.5 hover:shadow-lg transition-[transform,box-shadow]">
-              <img src={a.image} alt="" loading="lazy" className="h-44 w-full object-cover" />
+              <img src={sizedImg(a.image, 640)} alt="" loading="lazy" className="h-44 w-full object-cover" />
               <div className="p-5">
                 <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf">{a.category}</p>
                 <h3 className="mt-2 line-clamp-2 font-semibold text-slate-900 group-hover:text-brand-leaf transition-colors">{a.title}</h3>

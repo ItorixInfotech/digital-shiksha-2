@@ -48,6 +48,9 @@ async def _one(coll: str, slug: str) -> dict:
     return doc
 
 
+LIST_PROJECTION = {"_id": 0, "overview": 0, "admission": 0, "courses": 0, "cutoffs": 0, "seo": 0, "faqs": 0, "facilities": 0}
+
+
 @router.get("/colleges", response_model=List[College])
 async def list_colleges(
     q: Optional[str] = None,
@@ -75,7 +78,8 @@ async def list_colleges(
         f["fees_min"] = {"$lte": max_fees}
     if featured is not None:
         f["featured"] = featured
-    docs = await db.colleges.find(f, {"_id": 0}).to_list(limit)
+    # Listing payload = card fields only; the heavy page content comes from GET /colleges/{slug} (≈5x smaller, much faster on mobile).
+    docs = await db.colleges.find(f, LIST_PROJECTION).to_list(limit)
     key = {
         "rank": lambda d: d.get("nirf_rank") or 9999,
         "fees": lambda d: d.get("fees_min") or 0,
@@ -149,7 +153,7 @@ async def search(q: str = Query(..., min_length=1)):
         hits.append(SearchHit(kind="course", slug=d["slug"], title=d["name"], subtitle=d.get("full_name") or d["stream"]))
     for d in await db.exams.find({"$or": [{"name": _rx(q)}, {"full_name": _rx(q)}]}, {"_id": 0}).to_list(5):
         hits.append(SearchHit(kind="exam", slug=d["slug"], title=d["name"], subtitle=d.get("full_name") or d["stream"]))
-    for d in await db.colleges.find({"$or": [{"name": _rx(q)}, {"short_name": _rx(q)}]}, {"_id": 0}).to_list(6):
+    for d in await db.colleges.find({"$or": [{"name": _rx(q)}, {"short_name": _rx(q)}]}, {"_id": 0, "slug": 1, "name": 1, "city": 1, "state": 1}).to_list(6):
         hits.append(SearchHit(kind="college", slug=d["slug"], title=d["name"], subtitle=f"{d['city']}, {d['state']}"))
     return hits
 

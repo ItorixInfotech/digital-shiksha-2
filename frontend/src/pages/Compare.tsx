@@ -1,4 +1,5 @@
 import { Link, useSearchParams } from "react-router-dom";
+import { sizedImg } from "@/lib/img";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Plus, X } from "lucide-react";
@@ -76,7 +77,7 @@ export default function Compare() {
                   {selected.map((c) => (
                     <th key={c.slug} className="p-4 text-left align-top" data-testid={`compare-col-${c.slug}`}>
                       <div className="relative">
-                        <img src={c.image} alt="" className="h-24 w-full rounded-lg object-cover" />
+                        <img src={sizedImg(c.image, 320)} alt="" className="h-24 w-full rounded-lg object-cover" />
                         <button type="button" aria-label="Remove" onClick={() => toggleCompare(c.slug)} data-testid={`compare-remove-${c.slug}`} className="absolute right-2 top-2 grid size-7 place-items-center rounded-full bg-white/95 text-slate-700 shadow hover:text-brand-leaf"><X className="size-4" /></button>
                       </div>
                       <Link to={`/colleges/${c.slug}`} className="mt-3 block font-semibold text-slate-900 hover:text-brand-leaf">{c.name}</Link>

@@ -6,6 +6,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 
 from lib import kcet
+from routers.public import LIST_PROJECTION
 from lib.dates import today_iso
 from lib.year_rollover import ADMISSION_YEAR
 from lib.db import db
@@ -103,7 +104,7 @@ async def get_landing(slug: str):
         raise HTTPException(status_code=404, detail="Page not found")
     year = _year()
     lab = LABEL.get(summary.stream, summary.stream)
-    cols = await db.colleges.find({"streams": summary.stream, "city": summary.city}, {"_id": 0}).to_list(500)
+    cols = await db.colleges.find({"streams": summary.stream, "city": summary.city}, LIST_PROJECTION).to_list(500)  # card fields only
     cols.sort(key=lambda c: (c.get("nirf_rank") or 9999, -(c.get("rating") or 0)))
     fees = [c["fees_min"] for c in cols if c.get("fees_min")]
     pk = [c["avg_package"] for c in cols if c.get("avg_package")]
