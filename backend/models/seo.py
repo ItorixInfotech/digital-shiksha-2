@@ -136,15 +136,16 @@ class SiteSchema(BaseModel):
     logo: str = Field(default="https://www.digitalshiksha.in/logo.png", max_length=500)
     phone: str = Field(default="+91-8149689468", max_length=40)
     email: str = Field(default="enquiry@digitalshiksha.in", max_length=120)
-    street_address: str = Field(default="", max_length=200)
+    street_address: str = Field(default="SAUDAMINI COMMERCIAL COMPLEX, C1 - 203, Paud Road, Right Bhusari Colony, Kothrud", max_length=200)
     locality: str = Field(default="Pune", max_length=80)
     region: str = Field(default="Maharashtra", max_length=80)
-    postal_code: str = Field(default="", max_length=12)
+    postal_code: str = Field(default="411038", max_length=12)
     country: str = Field(default="IN", max_length=2)
-    latitude: Optional[float] = 18.5204
-    longitude: Optional[float] = 73.8567
-    opening_hours: List[str] = ["Mo-Sa 10:00-19:00"]  # schema.org openingHours format
+    latitude: Optional[float] = 18.5105442  # Google Maps pin of the Kothrud office
+    longitude: Optional[float] = 73.7903393
+    opening_hours: List[str] = ["Mo-Su 09:00-20:00"]  # schema.org openingHours format
     price_range: str = Field(default="", max_length=20)
+    map_url: str = Field(default="https://www.google.com/maps/place/?cid=10762443031543330436", max_length=600)  # Google Maps listing (hasMap)
     facebook: str = Field(default="https://www.facebook.com/DigitalShikshaOfficial", max_length=300)
     instagram: str = Field(default="https://www.instagram.com/digitalshikshaoffical/", max_length=300)
     youtube: str = Field(default="", max_length=300)

@@ -114,6 +114,8 @@ def _check_site(s: SiteSchema) -> tuple[list[str], list[str]]:
     for h in s.opening_hours:
         if not _HOURS.match(h):
             errors.append(f'Opening hours "{h}" must look like "Mo-Sa 10:00-19:00".')
+    if s.map_url and not re.match(r"^https://(www\.)?(google\.[a-z.]+/maps|maps\.google\.[a-z.]+|maps\.app\.goo\.gl|goo\.gl/maps)", s.map_url):
+        errors.append("Map link must be a Google Maps address (https://www.google.com/maps/… or https://maps.app.goo.gl/…).")
     links = {}
     for field, host in SOCIAL.items():
         url = getattr(s, field)
@@ -146,7 +148,7 @@ async def get_site_schema():
 async def save_site_schema(body: SiteSchema, _: str = Depends(require_admin)):
     body.opening_hours = [h.strip() for h in body.opening_hours if h.strip()]
     for f in ("name", "legal_name", "description", "logo", "phone", "email", "street_address", "locality", "region", "postal_code",
-              "price_range", *SOCIAL):
+              "price_range", "map_url", *SOCIAL):
         setattr(body, f, getattr(body, f).strip())
     body.country = body.country.strip().upper()
     errors, warnings = _check_site(body)

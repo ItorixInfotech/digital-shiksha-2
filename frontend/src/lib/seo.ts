@@ -78,7 +78,7 @@ export function siteLd(s: SiteSchema): object[] {
   if (s.apply_organization) out.push({ "@context": "https://schema.org", "@type": s.org_type, "@id": `${home}/#organization`, ...common,
     legalName: s.legal_name || undefined, description: s.description || undefined, logo: s.logo || undefined });
   if (s.apply_local_business) out.push({ "@context": "https://schema.org", "@type": "LocalBusiness", "@id": `${home}/#localbusiness`, ...common,
-    image: s.logo || undefined, priceRange: s.price_range || undefined, openingHours: s.opening_hours.length ? s.opening_hours : undefined,
+    image: s.logo || undefined, hasMap: s.map_url || undefined, priceRange: s.price_range || undefined, openingHours: s.opening_hours.length ? s.opening_hours : undefined,
     geo: s.latitude !== null && s.longitude !== null ? { "@type": "GeoCoordinates", latitude: s.latitude, longitude: s.longitude } : undefined,
     ...(s.apply_organization ? { parentOrganization: { "@id": `${home}/#organization` } } : {}) });
   return out;

@@ -709,6 +709,7 @@ export interface SiteSchema {
   longitude: number | null;
   opening_hours: string[];
   price_range: string;
+  map_url: string;
   facebook: string;
   instagram: string;
   youtube: string;

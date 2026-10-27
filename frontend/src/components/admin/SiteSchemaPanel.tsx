@@ -13,7 +13,7 @@ import { apiPut, ApiError } from "@/lib/api";
 import { siteLd } from "@/lib/seo";
 import type { SiteSchema, SiteSchemaSaveOut } from "@/lib/types";
 
-type TextKey = "name" | "legal_name" | "logo" | "phone" | "email" | "street_address" | "locality" | "region" | "postal_code" | "country" | "price_range"
+type TextKey = "name" | "legal_name" | "logo" | "phone" | "email" | "street_address" | "locality" | "region" | "postal_code" | "country" | "price_range" | "map_url"
   | "facebook" | "instagram" | "youtube" | "linkedin" | "twitter";
 
 export default function SiteSchemaPanel() {
@@ -93,6 +93,10 @@ export default function SiteSchemaPanel() {
           {text("country", "Country code", "IN")}
           {num("latitude", "Latitude (map pin)")}
           {num("longitude", "Longitude (map pin)")}
+          {text("map_url", "Google Maps listing link", "https://www.google.com/maps/place/…", true)}
+          {s.latitude !== null && s.longitude !== null && (
+            <a className="text-xs text-brand-leaf hover:underline sm:col-span-2" href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`} target="_blank" rel="noreferrer" data-testid="site-schema-check-pin">Check the map pin on Google Maps ↗</a>
+          )}
         </Group>
 
         <Group title="Opening hours">
