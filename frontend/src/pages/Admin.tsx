@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock, Users, SearchCheck, MapPinned, Wrench, Signpost, RotateCw } from "lucide-react";
+import { BarChart3, Download, FileSpreadsheet, MessageCircle, Send, FileText, GraduationCap, Inbox, Loader2, LogOut, School, Newspaper, Trash2, Lock, Users, SearchCheck, MapPinned, Wrench, Signpost, RotateCw, FileCode2 } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import CounsellorsPanel from "@/components/admin/CounsellorsPanel";
 import SeoPagesPanel from "@/components/admin/SeoPagesPanel";
 import LandingManager from "@/components/admin/LandingManager";
 import RedirectsPanel from "@/components/admin/RedirectsPanel";
+import PageManager from "@/components/admin/PageManager";
 import { Seo } from "@/components/Seo";
 import { RESOURCES } from "@/components/admin/resources";
 import SeoDashboard from "@/components/admin/SeoDashboard";
@@ -44,6 +45,7 @@ const TABS = [
   { key: "landing", label: "City Pages", icon: MapPinned },
   { key: "seo-fix", label: "SEO Fix List", icon: Wrench },
   { key: "seo", label: "SEO → Pages", icon: SearchCheck },
+  { key: "pages", label: "Pages & Schema", icon: FileCode2 },
   { key: "redirects", label: "Redirects", icon: Signpost },
 ] as const;
 type TabKey = (typeof TABS)[number]["key"];
@@ -303,6 +305,7 @@ export default function Admin() {
           {tab === "counsellors" && <CounsellorsPanel />}
           {tab === "seo" && <SeoPagesPanel />}
           {tab === "redirects" && <RedirectsPanel />}
+          {tab === "pages" && <PageManager />}
           {tab === "landing" && <LandingManager />}
           {tab === "seo-fix" && <SeoDashboard />}
           {tab === "predictor" && <PredictorReportPanel />}

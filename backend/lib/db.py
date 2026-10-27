@@ -72,6 +72,7 @@ INDEXES: dict[str, list[IndexModel]] = {
         IndexModel([("created_at", DESCENDING)], name="created_desc"),
     ],
     "settings": [IndexModel([("key", ASCENDING)], name="key")],
+    "page_overrides": [IndexModel([("path", ASCENDING)], name="path", unique=True)],
     "media": [IndexModel([("id", ASCENDING)], name="id", unique=True)],
     "kcet_cutoffs": [IndexModel([("city", ASCENDING)], name="city"), IndexModel([("college_slug", ASCENDING)], name="college_slug")],
     "comedk_cutoffs": [IndexModel([("city", ASCENDING)], name="city")],

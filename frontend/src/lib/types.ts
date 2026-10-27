@@ -643,3 +643,48 @@ export interface MediaOut {
   width: number;
   height: number;
 }
+
+/* ---- Page Manager (mirrors backend models/seo.py) ---- */
+export interface SchemaBlock {
+  type: string; // schema.org @type
+  json_text: string;
+  enabled: boolean;
+}
+
+export interface PageOverrideIn {
+  path: string;
+  h1: string;
+  meta_title: string;
+  meta_description: string;
+  keywords: string[];
+  canonical_url: string;
+  og_image: string;
+  noindex: boolean;
+  schemas: SchemaBlock[];
+  replace_auto_schema: boolean;
+}
+
+export interface PageOverride extends PageOverrideIn {
+  updated_at: string;
+}
+
+export interface SitePage {
+  path: string;
+  label: string;
+  kind: "static" | "landing" | "colleges" | "courses" | "exams" | "articles" | "custom";
+  default_title: string;
+  has_override: boolean;
+  override_fields: string[];
+}
+
+export interface SchemaValidateOut {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+  formatted: string;
+}
+
+export interface PageOverrideSaveOut {
+  page: PageOverride;
+  warnings: string[];
+}

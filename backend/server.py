@@ -24,7 +24,7 @@ from lib.comedk import load_comedk_data
 from lib.comedk_exam import ensure_comedk_exam
 from lib.college_logos import apply_college_logos
 from lib.karnataka_pages import setup_karnataka_pages
-from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export, redirects, media
+from routers import public, admin, predictor, cutoffs, whatsapp_admin, counsellors, seo, landing, seo_tools, export, redirects, media, page_seo
 
 
 @asynccontextmanager
@@ -77,6 +77,7 @@ api_router.include_router(seo_tools.router)
 api_router.include_router(export.router)
 api_router.include_router(redirects.router)
 api_router.include_router(media.router)
+api_router.include_router(page_seo.router)
 
 app.add_middleware(
     CORSMiddleware,

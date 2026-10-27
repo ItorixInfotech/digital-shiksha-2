@@ -57,7 +57,7 @@ function FacetGroup({ title, param, items, value, onPick }: { title: string; par
   const shown = all ? items : items.slice(0, 7);
   return (
     <div>
-      <h4 className="text-sm font-semibold text-slate-900">{title}</h4>
+      <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
       <div className="mt-2 grid gap-0.5">
         {shown.map((f) => {
           const active = value === f.name;
@@ -114,7 +114,7 @@ export default function Colleges() {
       <FacetGroup title="State" param="state" items={meta.data?.states ?? []} value={get("state")} onPick={set} />
       <FacetGroup title="Ownership" param="type" items={meta.data?.types ?? []} value={get("type")} onPick={set} />
       <div>
-        <h4 className="text-sm font-semibold text-slate-900">Fees (starting)</h4>
+        <h2 className="text-sm font-semibold text-slate-900">Fees (starting)</h2>
         <div className="mt-2 grid gap-0.5">
           {FEES.map(([v, l]) => (
             <button key={l} type="button" data-testid={`filter-fees-${v || "any"}`} onClick={() => set("max_fees", v)}

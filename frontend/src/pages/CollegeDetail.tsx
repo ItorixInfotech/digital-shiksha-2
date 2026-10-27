@@ -15,12 +15,13 @@ import { apiGet } from "@/lib/api";
 import type { College } from "@/lib/types";
 import { SITE, feeRange } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
-import { EntitySeo } from "@/components/Seo";
+import { EntitySeo, usePageOverride } from "@/components/Seo";
 import PredictorNudge from "@/components/PredictorNudge";
 
 const TABS = ["Overview", "Courses & Fees", "Admission 2027", "Cutoff", "Placements", "Facilities"];
 
 export default function CollegeDetail() {
+  const h1 = usePageOverride()?.h1;
   const { slug = "" } = useParams();
   const [tab, setTab] = useState(TABS[0]);
   const { openEnquiry, compare, toggleCompare } = useSite();
@@ -54,7 +55,7 @@ export default function CollegeDetail() {
           </div>
           <div className="mt-3 flex items-center gap-4 sm:gap-5">
             {c.logo && <span className="grid size-16 shrink-0 place-items-center rounded-2xl bg-white p-2 shadow-lg ring-1 ring-white/20 sm:size-20"><img src={c.logo} alt={`${c.name} logo`} className="max-h-full max-w-full object-contain" data-testid="college-logo" /></span>}
-            <h1 className="max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl" data-testid="college-name">{c.name}</h1>
+            <h1 className="max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl" data-testid="college-name">{h1 || c.name}</h1>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-300">
             <span className="flex items-center gap-1"><MapPin className="size-4" /> {c.city}, {c.state}</span>

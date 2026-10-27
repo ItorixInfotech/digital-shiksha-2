@@ -28,8 +28,9 @@ DOMPurify.addHook("afterSanitizeAttributes", (node) => {
   if (node.tagName === "INPUT") node.setAttribute("disabled", "");
 });
 
-/** Only editor-produced markup survives: no scripts/handlers; iframes only for YouTube embeds. */
+/** Only editor-produced markup survives: no scripts/handlers; iframes only for YouTube embeds.
+ *  An <h1> inside content becomes <h2> — every page already has exactly one H1 (its title). */
 export const sanitize = (html: string) => DOMPurify.sanitize(html, {
   ADD_TAGS: ["iframe"],
   ADD_ATTR: ["target", "allow", "allowfullscreen", "frameborder", "data-type", "data-checked", "colspan", "rowspan", "colwidth", "data-youtube-video"],
-});
+}).replace(/<(\/?)h1(\s|>)/gi, "<$1h2$2");

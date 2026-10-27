@@ -14,7 +14,7 @@ import { apiGet } from "@/lib/api";
 import type { Article, College, Course, Exam, Meta } from "@/lib/types";
 import { SITE, STATS, STREAMS, slugify, EXAM_YEAR } from "@/lib/site";
 import { useSite } from "@/lib/site-context";
-import { PageSeo } from "@/components/Seo";
+import { PageSeo, usePageOverride } from "@/components/Seo";
 import { organizationLd } from "@/lib/seo";
 
 const HERO_IMG = "https://images.unsplash.com/photo-1687709348710-05314eea5476?crop=entropy&cs=srgb&auto=format&q=70&w=1600";
@@ -29,6 +29,7 @@ const FAQ = [
 ];
 
 export default function Home() {
+  const h1 = usePageOverride()?.h1;
   const { openEnquiry } = useSite();
   const [tab, setTab] = useState("Engineering");
   const [faq, setFaq] = useState(0);
@@ -49,7 +50,7 @@ export default function Home() {
       <PredictorBanner />
       {/* HERO */}
       <section className="relative overflow-hidden bg-brand-ink text-white" data-testid="home-hero">
-        <img src={HERO_IMG} alt="" className="absolute inset-0 h-full w-full object-cover opacity-25" />
+        <img src={HERO_IMG} alt="Students on an Indian college campus" className="absolute inset-0 h-full w-full object-cover opacity-25" />
         <div className="absolute inset-0 bg-gradient-to-r from-brand-ink via-brand-ink/90 to-brand-ink/40" />
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-12 lg:px-8 lg:py-24">
           <div className="lg:col-span-7 animate-fade-up">
@@ -57,7 +58,7 @@ export default function Home() {
               <BadgeCheck className="size-4" /> Counselling • Admission • India-only
             </span>
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-              Your gateway to the <span className="text-brand-leaf-soft">best colleges</span> in India.
+              {h1 || <>Your gateway to the <span className="text-brand-leaf-soft">best colleges</span> in India.</>}
             </h1>
             <p className="mt-5 max-w-xl text-lg text-slate-300">
               Explore {meta.data?.totals.colleges ?? "top"} colleges, {meta.data?.totals.courses ?? "40+"} courses and {meta.data?.totals.exams ?? "30+"} entrance exams — then let our Pune experts handle your admission end-to-end.
@@ -231,7 +232,7 @@ export default function Home() {
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           {(articles.data ?? []).slice(0, 3).map((a) => (
             <Link key={a.id} to={`/news/${a.slug}`} data-testid={`home-article-${a.slug}`} className="group overflow-hidden rounded-2xl border bg-white hover:-translate-y-0.5 hover:shadow-lg transition-[transform,box-shadow]">
-              <img src={sizedImg(a.image, 640)} alt="" loading="lazy" className="h-44 w-full object-cover" />
+              <img src={sizedImg(a.image, 640)} alt={a.title} loading="lazy" className="h-44 w-full object-cover" />
               <div className="p-5">
                 <p className="text-xs font-bold uppercase tracking-wider text-brand-leaf">{a.category}</p>
                 <h3 className="mt-2 line-clamp-2 font-semibold text-slate-900 group-hover:text-brand-leaf transition-colors">{a.title}</h3>

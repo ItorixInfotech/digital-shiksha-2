@@ -69,3 +69,57 @@ class SeoReportSummary(BaseModel):
     kinds: List[SeoReportKind]
     turned_green: List[SeoReportItem]
     top_fixes: List[SeoReportItem]
+
+
+# ---- Page Manager: per-URL SEO + schema overrides (any page, mirrored in frontend/src/lib/types.ts) ----
+SCHEMA_TYPES = ["Organization", "LocalBusiness", "EducationalOrganization", "CollegeOrUniversity", "WebPage", "Article", "NewsArticle",
+                "BreadcrumbList", "FAQPage", "Course", "Event", "Product", "HowTo", "WebSite"]
+
+
+class SchemaBlock(BaseModel):
+    type: str  # schema.org @type of the block (one of SCHEMA_TYPES)
+    json_text: str = Field(max_length=20000)  # the JSON-LD object as text
+    enabled: bool = True
+
+
+class PageOverrideIn(BaseModel):
+    path: str = Field(min_length=1, max_length=300)  # e.g. "/", "/colleges/coep-pune"
+    h1: str = Field(default="", max_length=120)
+    meta_title: str = Field(default="", max_length=70)
+    meta_description: str = Field(default="", max_length=170)
+    keywords: List[str] = []
+    canonical_url: str = Field(default="", max_length=300)
+    og_image: str = Field(default="", max_length=500)
+    noindex: bool = False
+    schemas: List[SchemaBlock] = []
+    replace_auto_schema: bool = True  # custom block of a type replaces the auto-generated block of the same type (no duplicates)
+
+
+class PageOverride(PageOverrideIn):
+    updated_at: str = ""
+
+
+class SitePage(BaseModel):
+    path: str
+    label: str
+    kind: str  # static | landing | colleges | courses | exams | articles
+    default_title: str = ""
+    has_override: bool = False
+    override_fields: List[str] = []
+
+
+class SchemaValidateIn(BaseModel):
+    type: str
+    json_text: str
+
+
+class SchemaValidateOut(BaseModel):
+    valid: bool
+    errors: List[str]
+    warnings: List[str]
+    formatted: str = ""
+
+
+class PageOverrideSaveOut(BaseModel):
+    page: PageOverride
+    warnings: List[str]

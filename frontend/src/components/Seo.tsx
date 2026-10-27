@@ -3,8 +3,8 @@ import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
 import { SITE } from "@/lib/site";
-import { absUrl, defaultSeo, entityLd, type SeoKind } from "@/lib/seo";
-import type { SeoMeta, SeoPages } from "@/lib/types";
+import { absUrl, breadcrumbLd, clip, defaultSeo, DESC_MAX, entityLd, TITLE_MAX, type SeoKind } from "@/lib/seo";
+import type { PageOverride, SeoMeta, SeoPages } from "@/lib/types";
 
 export const useSeoPages = () => useQuery({ queryKey: ["seo", "pages"], queryFn: () => apiGet<SeoPages>("/seo/pages"), staleTime: 5 * 60_000 });
 const fallbackYear = () => new Date().getFullYear(); // only until /seo/pages (server date) has loaded
@@ -29,13 +29,50 @@ function upsert(selector: string, create: () => HTMLElement, attr: string, value
 const meta = (key: "name" | "property", k: string, v: string) =>
   upsert(`meta[${key}="${k}"]`, () => { const m = document.createElement("meta"); m.setAttribute(key, k); return m; }, "content", v);
 
-/** Writes title, meta, Open Graph, canonical and JSON-LD into <head> (Google renders JS, so these are indexed). */
-export function Seo({ title, description, keywords = [], canonical, image, noindex, type = "website", jsonLd = [] }: SeoProps) {
+const normPath = (p: string) => "/" + p.replace(/^\/+|\/+$/g, "");
+/** Admin → Pages & Schema override for the current URL (null when none). */
+export function usePageOverride() {
   const { pathname } = useLocation();
+  const path = normPath(pathname);
+  return useQuery({ queryKey: ["page-seo", path], queryFn: () => apiGet<PageOverride | null>(`/page-seo?path=${encodeURIComponent(path)}`), staleTime: 5 * 60_000 }).data ?? null;
+}
+/** The page's H1: admin override when set, else the page's own heading. */
+export function useH1(fallback: string): string {
+  return usePageOverride()?.h1 || fallback;
+}
+/** Automatic titles: drop the " | Digital Shiksha" suffix when it would push the title past 60 characters (Google cuts it). */
+const fitTitle = (t: string) => {
+  const suffix = ` | ${SITE.name}`;
+  if (t.length <= TITLE_MAX) return t;
+  const main = t.endsWith(suffix) ? t.slice(0, -suffix.length) : t;
+  return main.length <= TITLE_MAX ? main : clip(main, TITLE_MAX);
+};
+const ldType = (o: object) => String((o as { "@type"?: unknown })["@type"] ?? "");
+
+/** Writes title, meta, Open Graph, canonical and JSON-LD into <head> (Google renders JS, so these are indexed).
+ *  Any field set in Admin → Pages & Schema for this URL wins; custom schema blocks replace auto blocks of the same type. */
+export function Seo(props: SeoProps) {
+  const { pathname } = useLocation();
+  const o = usePageOverride();
+  const custom: object[] = [];
+  for (const b of o?.schemas ?? []) {
+    if (!b.enabled) continue;
+    try { custom.push(JSON.parse(b.json_text) as object); } catch { /* validated on save */ }
+  }
+  const auto = props.jsonLd ?? [];
+  const types = new Set(custom.map(ldType));
+  const jsonLd = [...(o?.replace_auto_schema === false ? auto : auto.filter((x) => !types.has(ldType(x)))), ...custom];
+  const title = o?.meta_title || fitTitle(props.title);
+  const description = o?.meta_description || clip(props.description, DESC_MAX);
+  const keywords = o?.keywords.length ? o.keywords : props.keywords ?? [];
+  const canonical = o?.canonical_url || props.canonical;
+  const image = o?.og_image || props.image;
+  const noindex = Boolean(o?.noindex || props.noindex);
+  const type = props.type ?? "website";
   const ld = JSON.stringify(jsonLd);
   const kw = keywords.join(", ");
   useEffect(() => {
-    const url = absUrl(canonical || pathname);
+    const url = absUrl(canonical || normPath(pathname));
     const img = absUrl(image || SITE.logo);
     document.title = title;
     meta("name", "description", description);
@@ -66,9 +103,11 @@ export function Seo({ title, description, keywords = [], canonical, image, noind
 }
 
 /** Static pages (Home, Colleges list, …): admin overrides from SEO → Pages, else server defaults. */
-export function PageSeo({ page, jsonLd }: { page: string; jsonLd?: object[] }) {
+export function PageSeo({ page, jsonLd: given }: { page: string; jsonLd?: object[] }) {
   const { data } = useSeoPages();
   const p = data?.pages.find((x) => x.key === page);
+  // Every main page carries BreadcrumbList schema; pages that pass their own JSON-LD keep it.
+  const jsonLd = given ?? (p && p.path !== "/" ? [breadcrumbLd([["Home", "/"], [p.label, p.path]])] : undefined);
   if (!p) return <Seo title={`${SITE.name} | Colleges, Courses, Exams & Admission Counselling`} description="India's trusted admission consultant in Pune & Mumbai." jsonLd={jsonLd} />;
   return <Seo title={p.meta_title || p.default_title} description={p.meta_description || p.default_description} image={p.og_image} noindex={p.noindex} canonical={p.path} jsonLd={jsonLd} />;
 }

@@ -40,7 +40,7 @@ export default function Footer() {
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-8">
             {COLS.map((c) => (
               <div key={c.title}>
-                <h4 className="text-sm font-semibold text-white">{c.title}</h4>
+                <h2 className="text-sm font-semibold text-white">{c.title}</h2>
                 <ul className="mt-4 space-y-2.5 text-sm">
                   {c.links.map(([label, to]) => (
                     <li key={label}><Link to={to} className="text-slate-400 hover:text-white transition-colors" data-testid={linkId(label)}>{label}</Link></li>
@@ -51,7 +51,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-12 border-t border-white/10 pt-8" data-testid="footer-popular-searches">
-          <h4 className="text-sm font-semibold text-white">Popular Searches</h4>
+          <h2 className="text-sm font-semibold text-white">Popular Searches</h2>
           <div className="mt-4 grid gap-6 md:grid-cols-3">
             {POPULAR.map((g) => (
               <div key={g.title}>

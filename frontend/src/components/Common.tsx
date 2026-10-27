@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { usePageOverride } from "@/components/Seo";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 
@@ -9,6 +10,7 @@ export function PageHeader({ crumbs, title, subtitle, children, testid = "page-h
   children?: ReactNode;
   testid?: string;
 }) {
+  const h1 = usePageOverride()?.h1; // Admin → Pages & Schema can set this page's H1
   return (
     <section className="relative overflow-hidden bg-brand-ink text-white" data-testid={testid}>
       <div className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-brand-teal/20 blur-3xl" />
@@ -22,7 +24,7 @@ export function PageHeader({ crumbs, title, subtitle, children, testid = "page-h
             </span>
           ))}
         </nav>
-        <h1 className="mt-4 max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl" data-testid={`${testid}-title`}>{title}</h1>
+        <h1 className="mt-4 max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl" data-testid={`${testid}-title`}>{h1 || title}</h1>
         {subtitle && <p className="mt-3 max-w-2xl text-base text-slate-300 sm:text-lg">{subtitle}</p>}
         {children}
       </div>

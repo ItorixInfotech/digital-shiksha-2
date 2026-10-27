@@ -65,13 +65,15 @@ FAQS = [
 async def ensure_comedk_exam() -> None:
     try:
         if await db.exams.find_one({"slug": "comedk"}, {"_id": 1}):
+            # SEO pass: shorten the first version's 83-character title (Google shows ~60)
+            await db.exams.update_one({"slug": "comedk", "seo.meta_title": "COMEDK UGET 2026: Exam Date, Pattern, Cut-off & College Predictor | Digital Shiksha"}, {"$set": {"seo.meta_title": "COMEDK UGET 2026: Exam Date, Pattern & Cut-off"}})
             return
         doc = Exam(
             slug="comedk", name="COMEDK", full_name="COMEDK Undergraduate Entrance Test (UGET)", stream="Engineering", level="State",
             conducting_body="Consortium of Medical, Engineering and Dental Colleges of Karnataka (COMEDK)", exam_date="May 2026",
             application_deadline="Mar 2026", mode="Online (CBT)", eligibility="10+2 with Physics & Maths, 45% aggregate (GM)",
             overview=OVERVIEW, syllabus=["Physics", "Chemistry", "Mathematics"], website="comedk.org", faqs=FAQS,
-            seo={"meta_title": "COMEDK UGET 2026: Exam Date, Pattern, Cut-off & College Predictor | Digital Shiksha",
+            seo={"meta_title": "COMEDK UGET 2026: Exam Date, Pattern & Cut-off",
                  "meta_description": "COMEDK UGET 2026 exam date (9 May), application dates, exam pattern (180 MCQs, no negative marking), 2025 cut-off ranks and a COMEDK college predictor.",
                  "keywords": ["COMEDK UGET 2026", "COMEDK cutoff", "COMEDK college predictor"], "canonical_url": "", "og_image": "", "noindex": False},
         )
