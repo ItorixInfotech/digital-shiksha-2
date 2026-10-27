@@ -6,6 +6,7 @@ Loaded into the `cap_cutoffs` collection at startup whenever the file version ch
 Seat codes: G/L (general/ladies) + OPEN/OBC/SC/ST/VJ/NT1/NT2/NT3/SEBC + H/O/S (home univ / other / state level),
 plus EWS and TFWS. Each round stores {code: [merit_no, percentile]} with the closing (most lenient) stage.
 """
+import asyncio
 import gzip
 import json
 import logging
@@ -15,6 +16,11 @@ from pathlib import Path
 from lib.db import db
 
 logger = logging.getLogger(__name__)
+
+
+def _read_gz(path: Path) -> dict:
+    with gzip.open(path, "rt", encoding="utf-8") as fh:
+        return json.load(fh)
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 # program → bundled data file (official CET Cell CAP cut-offs, Maharashtra & minority seats, Rounds I–IV)
 DATA_FILES = {"engineering": _DATA_DIR / "cap_cutoffs_2026.json.gz", "pharmacy": _DATA_DIR / "cap_pharmacy_2026.json.gz"}
@@ -119,23 +125,27 @@ async def load_cap_data() -> None:
         logger.error("CAP slug sync failed: %s", exc)
 
 
+def _build_docs(courses: list[dict], program: str) -> list[dict]:
+    docs = []
+    for c in courses:
+        city, region = place_of(c["college_code"], c["college_name"])
+        docs.append({**c, "status": re.sub(r"^Status:\s*", "", c.get("status", "")).strip(),
+                     "home_university": canonical_hu(c.get("home_university", "")), "program": program, "city": city, "region": region, "college_slug": SLUG_BY_CODE.get(c["college_code"], ""),
+                     "branch_lc": c["branch"].lower()})
+    return docs
+
+
 async def _load_program(program: str, path: Path) -> None:
     try:
         if not path.exists():
             return
-        with gzip.open(path, "rt", encoding="utf-8") as fh:
-            payload = json.load(fh)
+        payload = await asyncio.to_thread(_read_gz, path)  # off the event loop: requests keep flowing during boot
         key = f"{VERSION_KEY}:{program}"
         match = {"program": {"$in": [program, None]}} if program == "engineering" else {"program": program}
         cur = await db.settings.find_one({"key": key})
         if cur and cur.get("version") == payload["version"] and await db.cap_cutoffs.count_documents(match, limit=1):
             return
-        docs = []
-        for c in payload["courses"]:
-            city, region = place_of(c["college_code"], c["college_name"])
-            docs.append({**c, "status": re.sub(r"^Status:\s*", "", c.get("status", "")).strip(),
-                         "home_university": canonical_hu(c.get("home_university", "")), "program": program, "city": city, "region": region, "college_slug": SLUG_BY_CODE.get(c["college_code"], ""),
-                         "branch_lc": c["branch"].lower()})
+        docs = await asyncio.to_thread(_build_docs, payload["courses"], program)
         await db.cap_cutoffs.delete_many(match)
         for i in range(0, len(docs), 500):
             await db.cap_cutoffs.insert_many(docs[i:i + 500])

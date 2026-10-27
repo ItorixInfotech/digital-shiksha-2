@@ -3,6 +3,7 @@
 Bundled file data/comedk_cutoffs_2025.json.gz (built by scripts/build_comedk_data.py from the official COMEDK PDF) is loaded into the
 `comedk_cutoffs` collection at startup whenever its version changes.
 """
+import asyncio
 import gzip
 import json
 import logging
@@ -13,6 +14,11 @@ from lib.db import db
 from lib.kcet import CITY_WORDS
 
 logger = logging.getLogger(__name__)
+
+
+def _read_gz(path: Path) -> dict:
+    with gzip.open(path, "rt", encoding="utf-8") as fh:
+        return json.load(fh)
 
 DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "comedk_cutoffs_2025.json.gz"
 VERSION_KEY = "comedk_cutoffs_version"
@@ -59,8 +65,7 @@ async def load_comedk_data() -> None:
     try:
         if not DATA_FILE.exists():
             return
-        with gzip.open(DATA_FILE, "rt", encoding="utf-8") as fh:
-            payload = json.load(fh)
+        payload = await asyncio.to_thread(_read_gz, DATA_FILE)  # off the event loop: requests keep flowing during boot
         version = f"{payload['version']}:{LOADER_REV}"
         cur = await db.settings.find_one({"key": VERSION_KEY})
         if cur and cur.get("version") == version and await db.comedk_cutoffs.count_documents({}, limit=1):

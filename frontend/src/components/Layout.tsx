@@ -7,6 +7,7 @@ import ExitIntent from "@/components/ExitIntent";
 import { useOldPageRedirect } from "@/components/RedirectGuard";
 import { CompareBar, EnquiryDialog, FloatingActions, MobileBottomBar } from "@/components/Overlays";
 import { SiteProvider } from "@/lib/site-context";
+import { flushPendingEnquiries } from "@/lib/pending-leads";
 
 function ScrollTop() {
   const { pathname } = useLocation();
@@ -16,6 +17,7 @@ function ScrollTop() {
 
 export default function Layout() {
   const hold = useOldPageRedirect();
+  useEffect(() => { void flushPendingEnquiries(); }, []); // re-send any enquiry saved offline after a connection problem
   return (
     <SiteProvider>
       <ScrollTop />

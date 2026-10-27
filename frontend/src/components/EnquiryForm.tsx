@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CheckCircle2, Loader2 } from "lucide-react";
@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiPost, ApiError } from "@/lib/api";
+import { queueEnquiry } from "@/lib/pending-leads";
 import type { Lead, LeadIn } from "@/lib/types";
 import { COURSE_INTERESTS } from "@/lib/site";
 import type { EnquiryPrefill } from "@/lib/site-context";
@@ -28,11 +29,12 @@ export default function EnquiryForm({ prefill, testid = "enquiry", showMessage =
   const [f, setF] = useState({ ...empty, course_interest: prefill?.course_interest ?? "", message: prefill?.message ?? "" });
   const [done, setDone] = useState(false);
   const [waOptIn, setWaOptIn] = useState(true);
+  const lastBody = useRef<LeadIn | null>(null);
   const set = (k: keyof typeof empty) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setF((cur) => ({ ...cur, [k]: e.target.value }));
 
   const m = useMutation({
-    mutationFn: (body: LeadIn) => apiPost<Lead>("/enquiries", body),
+    mutationFn: (body: LeadIn) => { lastBody.current = body; return apiPost<Lead>("/enquiries", body); },
     // A brief server hiccup (5xx / network) retries automatically; the API de-duplicates alerts for the same phone.
     retry: (count, err) => count < 2 && !(err instanceof ApiError && err.status < 500),
     retryDelay: 1500,
@@ -47,8 +49,14 @@ export default function EnquiryForm({ prefill, testid = "enquiry", showMessage =
       const field = Array.isArray(detail) ? String((detail[0] as { loc?: unknown[] })?.loc?.slice(-1)[0] ?? "") : "";
       const msg = err instanceof ApiError && err.status === 422
         ? field === "phone" ? "Please enter a valid 10-digit Indian mobile number." : field === "name" ? "Please enter your full name." : "Please check the details and try again."
-        : "Could not submit right now. Please try again in a moment, or call +91 8149 68 9468.";
-      toast.error(msg);
+        : "";
+      if (msg) return toast.error(msg);
+      // Server unreachable after retries: keep the enquiry in this browser and re-send it automatically — never lose the lead.
+      if (lastBody.current) queueEnquiry(lastBody.current);
+      setDone(true);
+      setF({ ...empty });
+      toast.success("Thank you! Your enquiry is saved and will reach our counsellor shortly. For urgent help call +91 8149 68 9468.");
+      onDone?.();
     },
   });
 

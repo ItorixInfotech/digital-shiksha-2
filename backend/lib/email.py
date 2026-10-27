@@ -1,4 +1,5 @@
 """Emergent-managed Resend email (see integration playbook). Lead alerts to the owner inbox only."""
+import asyncio
 import ipaddress
 import logging
 import os
@@ -97,11 +98,22 @@ async def send_email(*, to: str, subject: str, html: str, internal: bool = False
     if reply_to:
         payload["contact_email"] = reply_to
     async with httpx.AsyncClient(timeout=30) as client:
-        resp = await client.post(
-            f"{EMAIL_BASE_URL}/api/v1/email/send",
-            headers={"X-Email-Key": os.environ["EMERGENT_EMAIL_KEY"]},
-            json=payload,
-        )
+        for attempt in range(3):  # short rate-limit / server hiccups retry, so a lead alert is not dropped
+            try:
+                resp = await client.post(
+                    f"{EMAIL_BASE_URL}/api/v1/email/send",
+                    headers={"X-Email-Key": os.environ["EMERGENT_EMAIL_KEY"]},
+                    json=payload,
+                )
+            except httpx.HTTPError as exc:
+                if attempt == 2:
+                    raise
+                logger.warning("Email send error (attempt %d): %s", attempt + 1, exc)
+                await asyncio.sleep(3 * (attempt + 1) ** 2)
+                continue
+            if resp.status_code != 429 and resp.status_code < 500 or attempt == 2:
+                break
+            await asyncio.sleep(3 * (attempt + 1) ** 2)
     if resp.status_code >= 400:
         try:
             body = resp.json()
