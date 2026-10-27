@@ -175,30 +175,44 @@ def _issues(title: str, desc: str) -> list[str]:
     return out
 
 
-@router.get("/admin/page-seo/audit", response_model=List[TitleAuditRow])
-async def audit_titles(_: str = Depends(require_admin)):
-    """Every public page with the title/description Google sees and what is wrong with them."""
+async def _page_heads() -> list[dict]:
+    """Effective <head> values for every public page, mirroring <Seo>: Page Manager override > record SEO > automatic."""
     y = _year()
-    ov = {o["path"]: o async for o in db.page_overrides.find({}, {"_id": 0, "path": 1, "meta_title": 1, "meta_description": 1})}
-    rows: list[tuple[str, str, str, str, str]] = []  # path, label, kind, auto title, auto description
+    ov = {o["path"]: o async for o in db.page_overrides.find({}, {"_id": 0, "path": 1, "meta_title": 1, "meta_description": 1,
+                                                                  "canonical_url": 1, "og_image": 1, "noindex": 1})}
+    rows: list[dict] = []
     for p in (await _pages()).pages:
-        rows.append((p.path, p.label, "static", p.meta_title or p.default_title, p.meta_description or p.default_description))
+        rows.append({"path": p.path, "label": p.label, "kind": "static", "title": p.meta_title or p.default_title,
+                     "description": p.meta_description or p.default_description, "og_image": p.og_image, "noindex": p.noindex})
     for s in await list_landing():
         seo = s.override.seo if s.override else None
-        rows.append((f"/{s.slug}", s.label, "landing", (seo and seo.meta_title) or s.default_title, (seo and seo.meta_description) or s.default_description))
-    fields = {"colleges": ("name", "short_name", "city", "exams_accepted", "avg_package", "nirf_rank"), "courses": ("name", "full_name", "overview", "duration", "avg_fees"),
-              "exams": ("name", "full_name", "exam_date"), "articles": ("title", "excerpt", "content")}
+        rows.append({"path": f"/{s.slug}", "label": s.label, "kind": "landing", "title": (seo and seo.meta_title) or s.default_title,
+                     "description": (seo and seo.meta_description) or s.default_description, "og_image": "", "noindex": False})
+    fields = {"colleges": ("name", "short_name", "city", "exams_accepted", "avg_package", "nirf_rank", "image", "logo"),
+              "courses": ("name", "full_name", "overview", "duration", "avg_fees", "image"),
+              "exams": ("name", "full_name", "exam_date", "image"), "articles": ("title", "excerpt", "content", "image")}
     for kind, prefix in (("colleges", "/colleges"), ("courses", "/courses"), ("exams", "/exams"), ("articles", "/news")):
         proj = {"_id": 0, "slug": 1, "seo": 1, **{f: 1 for f in fields[kind]}}
         async for d in db[kind].find({}, proj):
-            t, desc, _seo = effective(kind, d, y)
-            rows.append((f"{prefix}/{d['slug']}", d.get("name") or d.get("title") or d["slug"], kind, t, desc))
-    out = []
-    for path, label, kind, t, desc in rows:
-        o = ov.get(path, {})
-        ct, cd = o.get("meta_title", ""), o.get("meta_description", "")
-        out.append(TitleAuditRow(path=path, label=label, kind=kind, title=ct or _fit(t.strip()), description=cd or desc.strip(),
-                                 title_custom=ct, description_custom=cd, issues=[]))
+            t, desc, seo = effective(kind, d, y)
+            rows.append({"path": f"{prefix}/{d['slug']}", "label": d.get("name") or d.get("title") or d["slug"], "kind": kind, "title": t,
+                         "description": desc, "canonical": seo.get("canonical_url", ""), "og_image": seo.get("og_image") or d.get("image") or "",
+                         "noindex": bool(seo.get("noindex"))})
+    for r in rows:
+        o = ov.get(r["path"], {})
+        r["title_custom"], r["description_custom"] = o.get("meta_title", ""), o.get("meta_description", "")
+        r["title"] = r["title_custom"] or _fit(r["title"].strip())
+        r["description"] = r["description_custom"] or r["description"].strip()
+        r["canonical"] = o.get("canonical_url") or r.get("canonical") or r["path"]
+        r["og_image"] = o.get("og_image") or r["og_image"]
+        r["noindex"] = bool(o.get("noindex")) or r["noindex"]
+    return rows
+
+
+@router.get("/admin/page-seo/audit", response_model=List[TitleAuditRow])
+async def audit_titles(_: str = Depends(require_admin)):
+    """Every public page with the title/description Google sees and what is wrong with them."""
+    out = [TitleAuditRow(**{k: r[k] for k in TitleAuditRow.model_fields if k != "issues"}, issues=[]) for r in await _page_heads()]
     dup = Counter(r.title.lower() for r in out if r.title)
     for r in out:
         r.issues = _issues(r.title, r.description) + (["title_duplicate"] if r.title and dup[r.title.lower()] > 1 else [])

@@ -183,3 +183,4 @@ class BulkSeoIn(BaseModel):
 
 class BulkSeoOut(BaseModel):
     saved: int
+
